@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request; // Corrected import
 use Illuminate\Support\Facades\Auth;
 
 
