@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ProductFeature; // Add this
+use App\Models\Product;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ProductController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = Product::with('createdBy')->latest();
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('sku', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($request->filled('type_filter')) {
+            $query->where('is_service', $request->input('type_filter') === 'service');
+        }
+
+        if ($request->filled('status_filter')) {
+            $query->where('is_active', $request->input('status_filter') === 'active');
+        }
+
+        $products = $query->paginate(10)->withQueryString();
+        return view('products.index', compact('products'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $productFeatures = ProductFeature::orderBy('name')->get();
+        return view('products.create', ['product' => new Product(), 'productFeatures' => $productFeatures]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreProductRequest $request)
+    {
+        $validatedData = $request->validated();
+        $validatedData['created_by_user_id'] = Auth::id();
+
+        // If it's a service, quantity_on_hand might not be relevant or could be set to a high number/null
+        if ($validatedData['is_service']) {
+            // $validatedData['quantity_on_hand'] = 0; // Or handle as per your business logic for services
+        }
+        
+        $product = Product::create($validatedData);
+
+        $this->syncFeatures($product, $request->input('features', []));
+        
+        return redirect()->route('products.index')
+                         ->with('success', 'Product/Service created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Product $product)
+    {
+        $product->load(['createdBy', 'features']); // Eager load features
+        return view('products.show', compact('product'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Product $product)
+    {
+        $productFeatures = ProductFeature::orderBy('name')->get();
+        $product->load('features'); // Load existing features for the form
+        return view('products.edit', compact('product', 'productFeatures'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $product->update($request->validated()); 
+        $this->syncFeatures($product, $request->input('features', []));
+        return redirect()->route('products.index')->with('success', 'Product/Service updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Product $product)
+    {
+        // Add checks here if product is linked to orders, invoices, etc.
+        $product->delete(); // Soft delete
+        return redirect()->route('products.index')->with('success', 'Product/Service deleted successfully.');
+    }
+
+    /**
+     * Sync product features.
+     */
+    protected function syncFeatures(Product $product, array $featuresData)
+    {
+        $syncData = [];
+        foreach ($featuresData as $feature) {
+            if (!empty($feature['feature_id']) && !empty($feature['value'])) {
+                // Ensure feature_id is numeric if it comes from form as string
+                $syncData[ (int) $feature['feature_id']] = ['value' => $feature['value']];
+            }
+        }
+        $product->features()->sync($syncData);
+    }
+}

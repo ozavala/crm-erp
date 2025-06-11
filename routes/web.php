@@ -7,6 +7,8 @@ use App\Http\Controllers\UserRoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductFeatureController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 
 
@@ -31,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('leads', LeadController::class);
     Route::post('leads/{lead}/activities', [LeadController::class, 'storeActivity'])->name('leads.activities.store');
+    Route::resource('products', ProductController::class);
+    Route::resource('product-features', ProductFeatureController::class);
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 
