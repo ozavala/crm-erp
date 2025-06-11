@@ -6,6 +6,7 @@ use App\Http\Controllers\CrmUserController;
 use App\Http\Controllers\UserRoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\LeadController;
 
 
 Route::get('/', function () {
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('user-roles',UserRoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('customers', CustomerController::class);
+    Route::resource('leads', LeadController::class);
 });
 
 require __DIR__.'/auth.php';
