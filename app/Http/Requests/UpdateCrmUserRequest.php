@@ -37,6 +37,8 @@ class UpdateCrmUserRequest extends FormRequest
                 Rule::unique('crm_users', 'email')->ignore($userId, 'user_id'),
             ],
             'password' => 'nullable|string|min:8|confirmed', // Password is optional on update
+            'roles' => 'nullable|array',
+            'roles.*' => 'integer|exists:user_roles,role_id',
         ];
     }
 }

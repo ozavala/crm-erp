@@ -28,6 +28,8 @@ class StoreCrmUserRequest extends FormRequest
             'full_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:crm_users,email',
             'password' => 'required|string|min:8|confirmed',
+            'roles' => 'nullable|array',
+            'roles.*' => 'integer|exists:user_roles,role_id',
         ];
     }
 }

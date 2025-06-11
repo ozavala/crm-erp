@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('crm_user_user_role', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('crm_user_id');
+            $table->unsignedBigInteger('role_id');
+            $table->timestamps(); // Optional: if you want to track when a role was assigned
+
+            $table->foreign('crm_user_id')->references('user_id')->on('crm_users')->onDelete('cascade');
+            $table->foreign('role_id')->references('role_id')->on('user_roles')->onDelete('cascade');
+
+            $table->primary(['crm_user_id', 'role_id']);
         });
     }
 

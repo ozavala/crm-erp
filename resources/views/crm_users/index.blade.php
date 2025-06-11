@@ -16,6 +16,7 @@
                 <th>Username</th>
                 <th>Full Name</th>
                 <th>Email</th>
+                <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,6 +27,13 @@
                     <td>{{ $user->username }}</td>
                     <td>{{ $user->full_name }}</td>
                     <td>{{ $user->email }}</td>
+                    <td>
+                        @forelse($user->roles as $role)
+                            <span class="badge bg-secondary">{{ $role->name }}</span>
+                        @empty
+                            No roles
+                        @endforelse
+                    </td>
                     <td>
                         <a href="{{ route('crm-users.show', $user->user_id) }}" class="btn btn-info btn-sm">View</a>
                         <a href="{{ route('crm-users.edit', $user->user_id) }}" class="btn btn-warning btn-sm">Edit</a>
@@ -38,7 +46,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center">No CRM users found.</td>
+                    <td colspan="6" class="text-center">No CRM users found.</td>
                 </tr>
             @endforelse
         </tbody>

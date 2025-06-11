@@ -17,6 +17,13 @@
             <p class="card-text"><strong>Email Verified At:</strong> {{ $crmUser->email_verified_at ? $crmUser->email_verified_at->format('Y-m-d H:i:s') : 'Not verified' }}</p>
             <p class="card-text"><strong>Created At:</strong> {{ $crmUser->created_at->format('Y-m-d H:i:s') }}</p>
             <p class="card-text"><strong>Updated At:</strong> {{ $crmUser->updated_at->format('Y-m-d H:i:s') }}</p>
+             <p class="card-text"><strong>Roles:</strong>
+                @forelse($crmUser->roles as $role)
+                    <span class="badge bg-info">{{ $role->name }}</span>
+                @empty
+                    No roles assigned.
+                @endforelse
+            </p>
         </div>
         <div class="card-footer">
             <a href="{{ route('crm-users.edit', $crmUser->user_id) }}" class="btn btn-warning">Edit</a>

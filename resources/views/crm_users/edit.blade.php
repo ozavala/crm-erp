@@ -47,6 +47,21 @@
             <label for="password_confirmation" class="form-label">Confirm Password</label>
             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
         </div>
+         <div class="mb-3">
+            <label class="form-label">Roles</label>
+            @foreach($roles as $role)
+                <div class="form-check">
+                    <input class="form-check-input @error('roles.'.$role->role_id) is-invalid @enderror"
+                           type="checkbox"
+                           name="roles[]"
+                           value="{{ $role->role_id }}"
+                           id="role_{{ $role->role_id }}"
+                           {{ (is_array(old('roles')) && in_array($role->role_id, old('roles'))) || (isset($assignedRoles) && in_array($role->role_id, $assignedRoles) && !is_array(old('roles'))) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="role_{{ $role->role_id }}">{{ $role->name }}</label>
+                </div>
+            @endforeach
+            @error('roles.*') <div class="text-danger small">{{ $message }}</div> @enderror
+        </div>
 
         <button type="submit" class="btn btn-primary">Update User</button>
         <a href="{{ route('crm-users.index') }}" class="btn btn-secondary">Cancel</a>
