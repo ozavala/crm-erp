@@ -31,8 +31,8 @@ class UpdateUserRoleRequest extends FormRequest
                 Rule::unique('user_roles', 'name')->ignore($roleId, 'role_id'),
             ],
             'description' => 'nullable|string|max:65535',
-            // 'permissions' => 'nullable|array', // For assigning permissions later
-            // 'permissions.*' => 'integer|exists:permissions,permission_id', // For assigning permissions later
+            'permissions' => 'nullable|array', // For assigning permissions later
+            'permissions.*' => 'integer|exists:permissions,permission_id', // For assigning permissions later
         ];
     }
 }

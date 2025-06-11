@@ -1,42 +1,52 @@
 @extends('layouts.app')
 
-@section('title', 'Create User Role')
+@section('title', 'User Role Details')
 
 @section('content')
 <div class="container">
-    <h1>Create New User Role</h1>
+    <h1>User Role: {{ $userRole->name }}</h1>
 
-    <form action="{{ route('user-roles.store') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-            <label for="name" class="form-label">Role Name</label>
-            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-            @error('name')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+    <div class="card mb-3">
+        <div class="card-header">
+            Role Details
         </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-            @error('description')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <div class="card-body">
+            <p><strong>ID:</strong> {{ $userRole->role_id }}</p>
+            <p><strong>Name:</strong> {{ $userRole->name }}</p>
+            <p><strong>Description:</strong> {{ $userRole->description ?: 'N/A' }}</p>
+            <p><strong>Created At:</strong> {{ $userRole->created_at->format('Y-m-d H:i:s') }}</p>
+            <p><strong>Updated At:</strong> {{ $userRole->updated_at->format('Y-m-d H:i:s') }}</p>
         </div>
+        <div class="card-footer">
+            <a href="{{ route('user-roles.edit', $userRole->role_id) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ route('user-roles.index') }}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
 
-        {{-- Permissions assignment will be added here later --}}
-        {{-- <div class="mb-3">
-            <label class="form-label">Permissions</label>
-            @foreach($permissions as $permission)
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permission->permission_id }}" id="permission_{{ $permission->permission_id }}">
-                    <label class="form-check-label" for="permission_{{ $permission->permission_id }}">{{ $permission->name }}</label>
-                </div>
-            @endforeach
-        </div> --}}
+    <div class="card mb-3">
+        <div class="card-header">
+            Assigned Users ({{ $userRole->users->count() }})
+        </div>
+        <ul class="list-group list-group-flush">
+            @forelse($userRole->users as $user)
+                <li class="list-group-item">{{ $user->full_name }} ({{ $user->username }})</li>
+            @empty
+                <li class="list-group-item">No users assigned to this role.</li>
+            @endforelse
+        </ul>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Create Role</button>
-        <a href="{{ route('user-roles.index') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+    <div class="card">
+        <div class="card-header">
+            Assigned Permissions ({{ $userRole->permissions->count() }})
+        </div>
+        <ul class="list-group list-group-flush">
+            @forelse($userRole->permissions as $permission)
+                <li class="list-group-item">{{ $permission->name }} <small class="text-muted">({{ $permission->description }})</small></li>
+            @empty
+                <li class="list-group-item">No permissions assigned to this role.</li>
+            @endforelse
+        </ul>
+    </div>
 </div>
 @endsection

@@ -20,6 +20,6 @@ class Permission extends Model
     // Will be defined fully after pivot table migration
     public function roles()
     {
-        return $this->belongsToMany(UserRole::class, 'permission_user_role', 'permission_id', 'role_id');
+        return $this->belongsToMany(UserRole::class, 'permission_user_role', 'permission_id', 'role_id')->withTimestamps();
     }
 }

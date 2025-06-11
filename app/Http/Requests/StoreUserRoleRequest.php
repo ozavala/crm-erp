@@ -25,8 +25,8 @@ class StoreUserRoleRequest extends FormRequest
         return [
             'name' => 'required|string|max:100|unique:user_roles,name',
             'description' => 'nullable|string|max:65535',
-            // 'permissions' => 'nullable|array', // For assigning permissions later
-            // 'permissions.*' => 'integer|exists:permissions,permission_id', // For assigning permissions later
+            'permissions' => 'nullable|array', // For assigning permissions later
+            'permissions.*' => 'integer|exists:permissions,permission_id', // For assigning permissions later
         ];
     }
 }

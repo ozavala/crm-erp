@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UserRole;
 use App\Http\Requests\StoreUserRoleRequest;
 use App\Http\Requests\UpdateUserRoleRequest;
-// use App\Models\Permission; // Uncomment when Permission model is created
+use App\Models\Permission; // Uncomment when Permission model is created
 
 class UserRoleController extends Controller
 {
@@ -25,7 +25,8 @@ class UserRoleController extends Controller
     {
         // $permissions = Permission::all(); // Uncomment when Permission model is created
         // return view('user_roles.create', compact('permissions')); // Adjust view name
-        return view('user_roles.create');
+        $permissions = Permission::orderBy('name')->get();
+        return view('user_roles.create', compact('permissions'));
     }
 
     /**
@@ -35,9 +36,9 @@ class UserRoleController extends Controller
     {
         $userRole = UserRole::create($request->only('name', 'description'));
 
-        // if ($request->has('permissions')) { // Uncomment when permissions are handled
-        //     $userRole->permissions()->sync($request->input('permissions'));
-        // }
+         if ($request->has('permissions')) { // Uncomment when permissions are handled
+             $userRole->permissions()->sync($request->input('permissions'));
+         }
 
         return redirect()->route('user-roles.index')->with('success', 'User Role created successfully.');
     }
@@ -59,7 +60,9 @@ class UserRoleController extends Controller
         // $permissions = Permission::all(); // Uncomment when Permission model is created
         // $assignedPermissions = $userRole->permissions->pluck('permission_id')->toArray(); // Uncomment
         // return view('user_roles.edit', compact('userRole', 'permissions', 'assignedPermissions')); // Adjust view name
-        return view('user_roles.edit', compact('userRole'));
+        $permissions = Permission::orderBy('name')->get();
+        $assignedPermissions = $userRole->permissions->pluck('permission_id')->toArray();
+        return view('user_roles.edit', compact('userRole', 'permissions', 'assignedPermissions'));
     }
 
     /**
@@ -74,6 +77,11 @@ class UserRoleController extends Controller
         // } else {
         //     $userRole->permissions()->detach(); // Remove all permissions if none are selected
         // }
+        if ($request->has('permissions')) {
+            $userRole->permissions()->sync($request->input('permissions'));
+        } else {
+            $userRole->permissions()->detach(); // Remove all permissions if none are selected
+        }
 
         return redirect()->route('user-roles.index')->with('success', 'User Role updated successfully.');
     }
@@ -90,7 +98,7 @@ class UserRoleController extends Controller
 
         // Optional: Detach all permissions before deleting the role
         // $userRole->permissions()->detach();
-
+        $userRole->permissions()->detach(); // Detach all permissions before deleting the rol
         $userRole->delete();
         return redirect()->route('user-roles.index')->with('success', 'User Role deleted successfully.');
     }

@@ -27,15 +27,21 @@
         </div>
 
         {{-- Permissions assignment will be added here later --}}
-        {{-- <div class="mb-3">
+         <div class="mb-3">
             <label class="form-label">Permissions</label>
             @foreach($permissions as $permission)
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permission->permission_id }}" id="permission_{{ $permission->permission_id }}" {{ in_array($permission->permission_id, old('permissions', $assignedPermissions ?? [])) ? 'checked' : '' }}>
+                    <input class="form-check-input @error('permissions.'.$permission->permission_id) is-invalid @enderror"
+                           type="checkbox"
+                           name="permissions[]"
+                           value="{{ $permission->permission_id }}"
+                           id="permission_{{ $permission->permission_id }}"
+                           {{ (is_array(old('permissions')) && in_array($permission->permission_id, old('permissions'))) || (isset($assignedPermissions) && in_array($permission->permission_id, $assignedPermissions) && !is_array(old('permissions'))) ? 'checked' : '' }}>
                     <label class="form-check-label" for="permission_{{ $permission->permission_id }}">{{ $permission->name }}</label>
                 </div>
             @endforeach
-        </div> --}}
+            @error('permissions.*') <div class="text-danger small">{{ $message }}</div> @enderror
+        </div>
 
         <button type="submit" class="btn btn-primary">Update Role</button>
         <a href="{{ route('user-roles.index') }}" class="btn btn-secondary">Cancel</a>
