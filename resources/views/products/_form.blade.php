@@ -99,6 +99,32 @@
 
 <hr class="my-4">
 
+<div id="inventory-management-section" style="{{ old('is_service', $product->is_service ?? '0') == '1' ? 'display:none;' : '' }}">
+    <h4>Inventory Levels per Warehouse</h4>
+    @if(isset($warehouses) && $warehouses->count() > 0)
+        @foreach($warehouses as $warehouse)
+            @php
+                $currentQuantity = old('inventory.'.$warehouse->warehouse_id.'.quantity', $product->warehouses->find($warehouse->warehouse_id)->pivot->quantity ?? 0);
+            @endphp
+            <div class="row mb-2 align-items-center">
+                <label for="inventory_{{ $warehouse->warehouse_id }}" class="col-md-3 col-form-label">{{ $warehouse->name }}</label>
+                <div class="col-md-3">
+                    <input type="number" class="form-control @error('inventory.'.$warehouse->warehouse_id.'.quantity') is-invalid @enderror"
+                           id="inventory_{{ $warehouse->warehouse_id }}"
+                           name="inventory[{{ $warehouse->warehouse_id }}][quantity]"
+                           value="{{ $currentQuantity }}" min="0">
+                    @error('inventory.'.$warehouse->warehouse_id.'.quantity')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        @endforeach
+    @else
+        <p>No active warehouses found. <a href="{{ route('warehouses.create') }}">Create a warehouse</a> to manage inventory.</p>
+    @endif
+    <hr class="my-4">
+</div>
+
 <div class="mt-4">
     <button type="submit" class="btn btn-primary">{{ isset($product->product_id) ? 'Update' : 'Create' }} Product/Service</button>
     <a href="{{ route('products.index') }}" class="btn btn-secondary">Cancel</a>
@@ -110,14 +136,17 @@
         const typeSelect = document.getElementById('is_service');
         const quantityField = document.getElementById('quantity_on_hand_field');
         const quantityInput = document.getElementById('quantity_on_hand');
+        const inventoryManagementSection = document.getElementById('inventory-management-section');
         let featureRowIndex = {{ $featureIndex + 1 }}; // Start index for new rows
 
         function toggleQuantityField() {
             if (typeSelect.value === '1') { // Service
                 quantityField.style.display = 'none';
+                if (inventoryManagementSection) inventoryManagementSection.style.display = 'none';
                 quantityInput.value = 0; // Or clear it, or set to null if your backend handles it
             } else { // Product
                 quantityField.style.display = 'block';
+                if (inventoryManagementSection) inventoryManagementSection.style.display = 'block';
             }
         }
 

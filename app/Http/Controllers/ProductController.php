@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductFeature; // Add this
+use App\Models\Warehouse; // Add this
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -45,7 +46,8 @@ class ProductController extends Controller
     public function create()
     {
         $productFeatures = ProductFeature::orderBy('name')->get();
-        return view('products.create', ['product' => new Product(), 'productFeatures' => $productFeatures]);
+        $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
+        return view('products.create', ['product' => new Product(), 'productFeatures' => $productFeatures, 'warehouses' => $warehouses]);
     }
 
     /**
@@ -62,8 +64,11 @@ class ProductController extends Controller
         }
         
         $product = Product::create($validatedData);
-
         $this->syncFeatures($product, $request->input('features', []));
+
+        if (!$product->is_service) {
+            $this->syncInventory($product, $request->input('inventory', []));
+        }
         
         return redirect()->route('products.index')
                          ->with('success', 'Product/Service created successfully.');
@@ -74,7 +79,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['createdBy', 'features']); // Eager load features
+        $product->load(['createdBy', 'features', 'warehouses']); // Eager load features and warehouses
         return view('products.show', compact('product'));
     }
 
@@ -84,8 +89,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $productFeatures = ProductFeature::orderBy('name')->get();
-        $product->load('features'); // Load existing features for the form
-        return view('products.edit', compact('product', 'productFeatures'));
+        $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
+        $product->load(['features', 'warehouses']); // Load existing features and inventory for the form
+        return view('products.edit', compact('product', 'productFeatures', 'warehouses'));
     }
 
     /**
@@ -95,6 +101,11 @@ class ProductController extends Controller
     {
         $product->update($request->validated()); 
         $this->syncFeatures($product, $request->input('features', []));
+        if (!$product->is_service) {
+            $this->syncInventory($product, $request->input('inventory', []));
+        } else {
+            $product->warehouses()->detach(); // Remove all inventory if it's changed to a service
+        }
         return redirect()->route('products.index')->with('success', 'Product/Service updated successfully.');
     }
 
@@ -121,5 +132,19 @@ class ProductController extends Controller
             }
         }
         $product->features()->sync($syncData);
+    }
+
+    /**
+     * Sync product inventory across warehouses.
+     */
+    protected function syncInventory(Product $product, array $inventoryData)
+    {
+        $syncData = [];
+        foreach ($inventoryData as $warehouseId => $data) {
+            if (isset($data['quantity']) && is_numeric($data['quantity'])) {
+                $syncData[$warehouseId] = ['quantity' => (int)$data['quantity']];
+            }
+        }
+        $product->warehouses()->sync($syncData);
     }
 }

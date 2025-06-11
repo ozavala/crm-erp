@@ -27,6 +27,31 @@
                 </div>
             </div>
             <hr>
+            @if($product->features->isNotEmpty())
+            <h5>Product Features</h5>
+            <dl class="row mb-3">
+                @foreach($product->features as $feature)
+                <dt class="col-sm-3">{{ $feature->name }}</dt>
+                <dd class="col-sm-9">{{ $feature->pivot->value }}</dd>
+                @endforeach
+            </dl>
+            <hr>
+            @endif
+            
+            @if(!$product->is_service && $product->warehouses->isNotEmpty())
+            <h5>Inventory Levels</h5>
+            <ul class="list-group mb-3">
+                @foreach($product->warehouses as $warehouse)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ $warehouse->name }}
+                        <span class="badge bg-primary rounded-pill">{{ $warehouse->pivot->quantity }}</span>
+                    </li>
+                @endforeach
+            </ul>
+            <hr>
+            @endif
+
+            <h5>Audit Information</h5>
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>Created By:</strong> {{ $product->createdBy ? $product->createdBy->full_name : 'N/A' }}</p>

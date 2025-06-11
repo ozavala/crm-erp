@@ -39,6 +39,8 @@ class UpdateProductRequest extends FormRequest
             'features' => 'nullable|array',
             'features.*.feature_id' => 'required_with:features.*.value|exists:product_features,feature_id',
             'features.*.value' => 'required_with:features.*.feature_id|string|max:255',
+            'inventory' => 'nullable|array',
+            'inventory.*.quantity' => 'nullable|integer|min:0',
         ];
     }
 }

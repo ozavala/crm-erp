@@ -54,4 +54,12 @@ class Product extends Model
     {
         return $this->belongsToMany(ProductFeature::class, 'product_product_feature', 'product_id', 'feature_id')->withPivot('value')->withTimestamps();
     }
+
+    /**
+     * The warehouses that stock the product.
+     */
+    public function warehouses(): BelongsToMany
+    {
+        return $this->belongsToMany(Warehouse::class, 'product_warehouse', 'product_id', 'warehouse_id')->withPivot('quantity')->withTimestamps();
+    }
 }
