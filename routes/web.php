@@ -7,6 +7,7 @@ use App\Http\Controllers\UserRoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\DashboardController; // Add DashboardController
 
 
 Route::get('/', function () {
@@ -14,7 +15,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return app(DashboardController::class)->index(); // Use the new controller
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('customers', CustomerController::class);
     Route::resource('leads', LeadController::class);
+    Route::post('leads/{lead}/activities', [LeadController::class, 'storeActivity'])->name('leads.activities.store');
+    Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 
 require __DIR__.'/auth.php';

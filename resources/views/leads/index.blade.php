@@ -17,12 +17,40 @@
     @endif
 
     <div class="mb-3">
-        <form action="{{ route('leads.index') }}" method="GET" class="d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="Search by title, contact, customer..." value="{{ request('search') }}">
-            <button type="submit" class="btn btn-outline-primary">Search</button>
-            @if(request('search'))
-                <a href="{{ route('leads.index') }}" class="btn btn-outline-secondary ms-2">Clear</a>
-            @endif
+        <form action="{{ route('leads.index') }}" method="GET">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search by title, contact, customer..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="status_filter" class="form-select">
+                        <option value="">All Statuses</option>
+                        @foreach($filterStatuses as $key => $label)
+                            <option value="{{ $key }}" {{ request('status_filter') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="source_filter" class="form-select">
+                        <option value="">All Sources</option>
+                        @foreach($filterSources as $key => $label)
+                            <option value="{{ $key }}" {{ request('source_filter') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="assigned_to_filter" class="form-select">
+                        <option value="">All Users</option>
+                        @foreach($crmUsers as $id => $name)
+                            <option value="{{ $id }}" {{ request('assigned_to_filter') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex">
+                    <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                    <a href="{{ route('leads.index') }}" class="btn btn-outline-secondary ms-2" title="Clear Filters"><i class="bi bi-x-lg"></i> Clear</a>
+                </div>
+            </div>
         </form>
     </div>
 

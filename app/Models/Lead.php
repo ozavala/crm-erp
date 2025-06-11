@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
@@ -55,6 +56,14 @@ class Lead extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(CrmUser::class, 'created_by_user_id', 'user_id');
+    }
+
+    /**
+     * Get all activities associated with the lead.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class, 'lead_id', 'lead_id')->latest('activity_date');
     }
 
     // You can add accessors/mutators or other methods as needed
