@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CrmUserController;
 use App\Http\Controllers\UserRoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\CustomerController;
 
 
 Route::get('/', function () {
@@ -25,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('crm-users', CrmUserController::class);
     Route::resource('user-roles',UserRoleController::class);
     Route::resource('permissions', PermissionController::class);
-    
+    Route::resource('customers', CustomerController::class);
 });
 
 require __DIR__.'/auth.php';

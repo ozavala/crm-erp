@@ -23,6 +23,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('permissions.index') }}">{{ __('Permissions') }}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('customers.index') }}">{{ __('Customers') }}</a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
