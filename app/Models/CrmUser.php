@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Models\UserRole; // Ensure you have the correct namespace for UserRole
 
+ 
 class CrmUser extends Authenticatable
 {
     use HasFactory, Notifiable;

@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CrmUserController;
+use App\Http\Controllers\UserRoleController;
+use App\Http\Controllers\PermissionController;
 
 
 Route::get('/', function () {
@@ -21,6 +23,9 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('crm-users', CrmUserController::class);
+    Route::resource('user-roles',UserRoleController::class);
+    Route::resource('permissions', PermissionController::class);
+    
 });
 
 require __DIR__.'/auth.php';
