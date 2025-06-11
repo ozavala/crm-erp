@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::resource('crm-users', CrmUserController::class);
     Route::resource('user-roles',UserRoleController::class);
     Route::resource('permissions', PermissionController::class);

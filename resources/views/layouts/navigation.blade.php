@@ -17,7 +17,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('crm-users.index') }}">{{ __('Crm Users') }}</a>
                 </li>
-                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('user-roles.index') }}">{{ __('User Roles') }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('permissions.index') }}">{{ __('Permissions') }}</a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
