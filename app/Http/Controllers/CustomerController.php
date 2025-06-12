@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Address; // Add this
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Http\Request; // Corrected import
@@ -55,9 +56,12 @@ class CustomerController extends Controller
     {
         $validatedData = $request->validated();
         $validatedData['created_by_user_id'] = Auth::id();
+        
+        $customerData = collect($validatedData)->except(['addresses'])->all();
+        $customer = Customer::create($customerData);
 
-        Customer::create($validatedData);
-
+        $this->syncAddresses($customer, $request->input('addresses', []));
+        
         return redirect()->route('customers.index')
                          ->with('success', 'Customer created successfully.');
     }
@@ -67,7 +71,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        $customer->load('createdBy');
+        $customer->load(['createdBy', 'addresses']);
         return view('customers.show', compact('customer'));
     }
 
@@ -77,6 +81,7 @@ class CustomerController extends Controller
     public function edit(Customer $customer)
     {
         $statuses = $this->customerStatuses;
+        $customer->load('addresses'); // Load addresses for the form
         return view('customers.edit', compact('customer', 'statuses'));
     }
 
@@ -85,8 +90,11 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        $customer->update($request->validated());
+        $validatedData = $request->validated();
+        $customerData = collect($validatedData)->except(['addresses'])->all();
+        $customer->update($customerData);
 
+        $this->syncAddresses($customer, $request->input('addresses', []));
         return redirect()->route('customers.index')
                          ->with('success', 'Customer updated successfully.');
     }
@@ -111,6 +119,38 @@ class CustomerController extends Controller
             // Handle potential foreign key constraint violations if not handled by DB or model
             return redirect()->route('customers.index')
                              ->with('error', 'Could not delete customer. They might be associated with other records.');
+        }
+    }
+
+    /**
+     * Sync customer addresses.
+     * For now, this handles a single address block from the form, intended as primary.
+     * Can be expanded to handle multiple address blocks.
+     */
+    protected function syncAddresses(Customer $customer, array $addressesData)
+    {
+        // Assuming $addressesData is an array of address attributes for now.
+        // If handling multiple, this would be an array of arrays.
+        // For this iteration, we'll assume one address block is passed.
+
+        if (!empty($addressesData)) {
+            $addressInput = $addressesData[0] ?? null; // Get the first (and currently only) address block
+
+            if ($addressInput && !empty($addressInput['street_address_line_1'])) {
+                // If this address is marked as primary, unmark other primary addresses
+                if (!empty($addressInput['is_primary'])) {
+                    $customer->addresses()->where('is_primary', true)->update(['is_primary' => false]);
+                }
+
+                // Update or create the address
+                // If an ID is passed, update; otherwise, create.
+                // For simplicity, we'll create or update the first address or a new one.
+                // A more robust solution for multiple addresses would involve checking existing address IDs.
+                $customer->addresses()->updateOrCreate(
+                    ['address_id' => $addressInput['address_id'] ?? null], // Condition to find existing
+                    $addressInput // Data to update or create
+                );
+            }
         }
     }
 }

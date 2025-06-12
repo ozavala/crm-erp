@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 use App\Models\UserRole; // Ensure you have the correct namespace for UserRole
 
@@ -64,6 +66,19 @@ class CrmUser extends Authenticatable
     public function getNameAttribute(): string
     {
         return $this->full_name;
+    }
+
+    public function leads() 
+    {
+        return $this->hasMany(Lead::class, 'created_by_user_id', 'user_id');
+    }
+    public function customers() 
+    {
+        return $this->hasMany(Customer::class, 'created_by_user_id', 'user_id');
+    }
+    public function addresses()
+    {
+        return $this->morphMany(Address::class, 'addressable');
     }
 }
    

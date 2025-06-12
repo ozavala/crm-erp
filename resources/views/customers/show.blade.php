@@ -21,17 +21,24 @@
                     <p><strong>Status:</strong> <span class="badge bg-{{ $customer->status == 'Active' ? 'success' : ($customer->status == 'Inactive' ? 'secondary' : ($customer->status == 'Lead' ? 'info' : 'warning')) }}">{{ $customer->status ?: 'N/A' }}</span></p>
                 </div>
                 <div class="col-md-6">
-                    <h5>Address</h5>
-                    <p>
-                        {{ $customer->address_street ?: '' }}<br>
-                        {{ $customer->address_city ? $customer->address_city . ',' : '' }}
-                        {{ $customer->address_state ?: '' }}
-                        {{ $customer->address_postal_code ?: '' }}<br>
-                        {{ $customer->address_country ?: '' }}
-                        @if(!$customer->address_street && !$customer->address_city && !$customer->address_country)
-                            N/A
-                        @endif
-                    </p>
+                    <h5>Addresses</h5>
+                    @forelse ($customer->addresses as $address)
+                        <div class="mb-2 p-2 border rounded {{ $address->is_primary ? 'border-primary' : '' }}">
+                            <strong>{{ $address->address_type ?: 'Address' }} {{ $address->is_primary ? '(Primary)' : '' }}</strong><br>
+                            {{ $address->street_address_line_1 }}<br>
+                            @if($address->street_address_line_2)
+                                {{ $address->street_address_line_2 }}<br>
+                            @endif
+                            {{ $address->city }}, {{ $address->state_province }} {{ $address->postal_code }}<br>
+                            {{ $address->country_code }}
+                        </div>
+                    @empty
+                        <p>No addresses on file.</p>
+                    @endforelse
+                    {{-- Old address fields (can be removed after migration) --}}
+                    @if(empty($customer->addresses->first()) && ($customer->address_street || $customer->address_city))
+                        <p class="text-muted small"><em>Legacy Address: {{ $customer->address_street }}, {{ $customer->address_city }}, {{ $customer->address_state }} {{ $customer->address_postal_code }} {{ $customer->address_country }}</em></p>
+                    @endif
                 </div>
             </div>
 

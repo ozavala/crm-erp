@@ -40,6 +40,17 @@ class UpdateCustomerRequest extends FormRequest
             'address_country' => 'nullable|string|max:100',
             'status' => 'nullable|string|max:50|in:Active,Inactive,Lead,Prospect',
             'notes' => 'nullable|string',
+             // New Address Fields (assuming one address block for now, indexed at 0)
+            'addresses' => 'nullable|array|max:1', // Allow only one address block for now
+            'addresses.*.address_id' => 'nullable|integer|exists:addresses,address_id', // For updates
+            'addresses.*.address_type' => 'nullable|string|max:50',
+            'addresses.*.street_address_line_1' => 'required_with:addresses.*.city,addresses.*.postal_code|string|max:255',
+            'addresses.*.street_address_line_2' => 'nullable|string|max:255',
+            'addresses.*.city' => 'required_with:addresses.*.street_address_line_1,addresses.*.postal_code|string|max:100',
+            'addresses.*.state_province' => 'nullable|string|max:100',
+            'addresses.*.postal_code' => 'required_with:addresses.*.street_address_line_1,addresses.*.city|string|max:20',
+            'addresses.*.country_code' => 'nullable|string|size:2',
+            'addresses.*.is_primary' => 'nullable|boolean',
         ];
     }
 }
