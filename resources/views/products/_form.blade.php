@@ -18,6 +18,17 @@
     @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
+<div class="mb-3">
+    <label for="product_category_id" class="form-label">Category</label>
+    <select class="form-select @error('product_category_id') is-invalid @enderror" id="product_category_id" name="product_category_id">
+        <option value="">Select Category</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->category_id }}" {{ old('product_category_id', $product->product_category_id ?? '') == $category->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
+        @endforeach
+    </select>
+    @error('product_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+</div>
+
 <div class="row">
     <div class="col-md-4 mb-3">
         <label for="price" class="form-label">Price ($) <span class="text-danger">*</span></label>

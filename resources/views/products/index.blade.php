@@ -19,24 +19,32 @@
     <div class="mb-3">
         <form action="{{ route('products.index') }}" method="GET">
             <div class="row g-2">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <input type="text" name="search" class="form-control" placeholder="Search by name, SKU, description..." value="{{ request('search') }}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 col-sm-6">
                     <select name="type_filter" class="form-select">
                         <option value="">All Types</option>
                         <option value="product" {{ request('type_filter') == 'product' ? 'selected' : '' }}>Product</option>
                         <option value="service" {{ request('type_filter') == 'service' ? 'selected' : '' }}>Service</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 col-sm-6">
                     <select name="status_filter" class="form-select">
                         <option value="">All Statuses</option>
                         <option value="active" {{ request('status_filter') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ request('status_filter') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex">
+                <div class="col-md-2 col-sm-6">
+                    <select name="category_filter" class="form-select">
+                        <option value="">All Categories</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->category_id }}" {{ request('category_filter') == $category->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 col-sm-6 d-flex">
                     <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
                     <a href="{{ route('products.index') }}" class="btn btn-outline-secondary ms-2" title="Clear Filters"><i class="bi bi-x-lg"></i> Clear</a>
                 </div>
@@ -50,6 +58,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>SKU</th>
+                <th>Category</th>
                 <th>Type</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -63,6 +72,7 @@
                     <td>{{ $product->product_id }}</td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->sku ?: 'N/A' }}</td>
+                    <td>{{ $product->category->name ?? 'N/A' }}</td>
                     <td><span class="badge bg-{{ $product->is_service ? 'info' : 'secondary' }}">{{ $product->type_name }}</span></td>
                     <td>${{ number_format($product->price, 2) }}</td>
                     <td>{{ $product->is_service ? 'N/A' : $product->quantity_on_hand }}</td>
@@ -79,7 +89,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center">No products or services found.</td>
+                    <td colspan="9" class="text-center">No products or services found.</td>
                 </tr>
             @endforelse
         </tbody>

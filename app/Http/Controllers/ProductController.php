@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductFeature; // Add this
+use App\Models\ProductCategory; // Add this
 use App\Models\Warehouse; // Add this
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
@@ -17,7 +18,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with('createdBy')->latest();
+        $query = Product::with(['createdBy', 'category'])->latest();
 
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -35,9 +36,14 @@ class ProductController extends Controller
         if ($request->filled('status_filter')) {
             $query->where('is_active', $request->input('status_filter') === 'active');
         }
+        
+        if ($request->filled('category_filter')) {
+            $query->where('product_category_id', $request->input('category_filter'));
+        }
 
         $products = $query->paginate(10)->withQueryString();
-        return view('products.index', compact('products'));
+        $categories = ProductCategory::orderBy('name')->get(); // For filter dropdown
+        return view('products.index', compact('products', 'categories'));
     }
 
     /**
@@ -47,7 +53,12 @@ class ProductController extends Controller
     {
         $productFeatures = ProductFeature::orderBy('name')->get();
         $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
-        return view('products.create', ['product' => new Product(), 'productFeatures' => $productFeatures, 'warehouses' => $warehouses]);
+        $categories = ProductCategory::orderBy('name')->get();
+        return view('products.create', [
+            'product' => new Product(), 
+            'productFeatures' => $productFeatures, 
+            'warehouses' => $warehouses, 
+            'categories' => $categories]);
     }
 
     /**
@@ -79,7 +90,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['createdBy', 'features', 'warehouses']); // Eager load features and warehouses
+        $product->load(['createdBy', 'features', 'warehouses', 'category']); // Eager load features, warehouses and category
         return view('products.show', compact('product'));
     }
 
@@ -90,8 +101,9 @@ class ProductController extends Controller
     {
         $productFeatures = ProductFeature::orderBy('name')->get();
         $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
-        $product->load(['features', 'warehouses']); // Load existing features and inventory for the form
-        return view('products.edit', compact('product', 'productFeatures', 'warehouses'));
+        $categories = ProductCategory::orderBy('name')->get();
+        $product->load(['features', 'warehouses', 'category']); // Load existing features, inventory and category for the form
+        return view('products.edit', compact('product', 'productFeatures', 'warehouses', 'categories'));
     }
 
     /**
@@ -99,7 +111,8 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->validated()); 
+        $validatedData = $request->validated();
+        $product->update($validatedData); 
         $this->syncFeatures($product, $request->input('features', []));
         if (!$product->is_service) {
             $this->syncInventory($product, $request->input('inventory', []));

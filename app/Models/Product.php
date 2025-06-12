@@ -24,6 +24,7 @@ class Product extends Model
         'is_service',
         'is_active',
         'created_by_user_id',
+        'product_category_id',
     ];
 
     protected $casts = [
@@ -61,5 +62,13 @@ class Product extends Model
     public function warehouses(): BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class, 'product_warehouse', 'product_id', 'warehouse_id')->withPivot('quantity')->withTimestamps();
+    }
+
+    /**
+     * Get the category that the product belongs to.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id', 'category_id');
     }
 }

@@ -22,6 +22,7 @@
                     <p><strong>Price:</strong> ${{ number_format($product->price, 2) }}</p>
                     <p><strong>Cost:</strong> {{ $product->cost ? '$'.number_format($product->cost, 2) : 'N/A' }}</p>
                     @if(!$product->is_service)
+                    <p><strong>Category:</strong> {{ $product->category->name ?? 'N/A' }}</p>
                     <p><strong>Quantity on Hand:</strong> {{ $product->quantity_on_hand }}</p>
                     @endif
                 </div>
