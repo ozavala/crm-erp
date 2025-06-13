@@ -54,6 +54,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('quotations.index') }}">{{ __('Quotations') }}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('orders.index') }}">{{ __('Orders') }}</a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
