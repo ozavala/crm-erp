@@ -54,4 +54,11 @@ class Customer extends Model
     {
         return $this->hasMany(Lead::class, 'customer_id', 'customer_id');
     }
+    /**
+     * Get all of the customer's orders.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'customer_id', 'customer_id');
+    }
 }

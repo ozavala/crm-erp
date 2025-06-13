@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quotation extends Model
@@ -68,5 +69,11 @@ class Quotation extends Model
         return $this->hasMany(QuotationItem::class, 'quotation_id', 'quotation_id');
     }
 
-    // Method to calculate totals can be added here
+    /**
+     * Get the order associated with the quotation.
+     */
+    public function order(): HasOne // A quotation typically converts to one order
+    {
+        return $this->hasOne(Order::class, 'quotation_id', 'quotation_id');
+    }
 }

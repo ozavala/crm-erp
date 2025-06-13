@@ -69,4 +69,12 @@ class Opportunity extends Model
     {
         return $this->hasMany(Quotation::class, 'opportunity_id', 'opportunity_id');
     }
+
+    /**
+     * Get the orders for the opportunity.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'opportunity_id', 'opportunity_id');
+    }
 }
