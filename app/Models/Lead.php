@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lead extends Model
 {
@@ -65,6 +66,14 @@ class Lead extends Model
     {
         return $this->hasMany(Activity::class, 'lead_id', 'lead_id')->latest('activity_date');
     }
+     /**
+     * Get the opportunity associated with the lead, if converted.
+     */
+    public function opportunity(): HasOne
+    {
+        return $this->hasOne(Opportunity::class, 'lead_id', 'lead_id');
+    }
+
 
     // You can add accessors/mutators or other methods as needed
     // For example, a method to get a formatted value:

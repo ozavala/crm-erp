@@ -29,17 +29,30 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('leads.index') }}">{{ __('Leads') }}</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('products.index') }}">{{ __('Products/Services') }}</a>
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        {{ __('Products') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownProducts">
+                        <a class="dropdown-item" href="{{ route('products.index') }}">
+                            {{ __('Products/Services') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('product-categories.index') }}">
+                            {{ __('Product Categories') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('product-features.index') }}">
+                            {{ __('Product Features') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('warehouses.index') }}">
+                            {{ __('Warehouses') }}
+                        </a>
+                    </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('product-features.index') }}">{{ __('Product Features') }}</a>
+                    <a class="nav-link" href="{{ route('opportunities.index') }}">{{ __('Opportunities') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('warehouses.index') }}">{{ __('Warehouses') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('product-categories.index') }}">{{ __('Product Categories') }}</a>
+                    <a class="nav-link" href="{{ route('quotations.index') }}">{{ __('Quotations') }}</a>
                 </li>
             </ul>
 

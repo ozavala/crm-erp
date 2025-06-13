@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductFeatureController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\OpportunityController;
+use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 
 
@@ -39,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('product-features', ProductFeatureController::class);
     Route::resource('product-categories', ProductCategoryController::class);
     Route::resource('warehouses', WarehouseController::class);
+    Route::resource('opportunities', OpportunityController::class);
+    Route::resource('quotations', QuotationController::class);
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 
