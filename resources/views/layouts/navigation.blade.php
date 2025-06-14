@@ -14,20 +14,51 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Home') }}</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('crm-users.index') }}">{{ __('Crm Users') }}</a>
+               
+                
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        {{ __('Users') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
+                        <a class="dropdown-item" href="{{ route('crm-users.index') }}">
+                            {{ __('Crm Users') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('user-roles.index') }}">
+                            {{ __('User Roles') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('addresses.index') }}">
+                            {{ __('Addresses') }}
+                        </a>
+
+                        <a class="dropdown-item" href="{{ route('permissions.index') }}">
+                            {{ __('Pemissions') }}
+                        </a>
+                        
+                    </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('user-roles.index') }}">{{ __('User Roles') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('permissions.index') }}">{{ __('Permissions') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('customers.index') }}">{{ __('Customers') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('leads.index') }}">{{ __('Leads') }}</a>
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        {{ __('Customers') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
+                        <a class="dropdown-item" href="{{ route('customers.index') }}">
+                            {{ __('Customers') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('leads.index') }}">
+                            {{ __('Leads') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('opportunities.index') }}">
+                            {{ __('Opportunities') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('quotations.index') }}">
+                            {{ __('Quotations') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('orders.index') }}">
+                            {{ __('Sales Orders') }}
+                        </a>
+                        
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -48,21 +79,21 @@
                         </a>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('opportunities.index') }}">{{ __('Opportunities') }}</a>
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        {{ __('Suppliers') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
+                        <a class="dropdown-item" href="{{ route('suppliers.index') }}">
+                            {{ __('Suppliers') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('purchase-orders.index') }}">
+                            {{ __('Purchase Orders') }}
+                        </a>
+                     
+                    </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('quotations.index') }}">{{ __('Quotations') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('orders.index') }}">{{ __('Orders') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('suppliers.index') }}">{{ __('Suppliers') }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('purchase-orders.index') }}">{{ __('Purchase Orders') }}</a>
-                </li>
+                
             </ul>
 
             <!-- Right Side Of Navbar -->
