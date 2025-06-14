@@ -57,6 +57,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('orders.index') }}">{{ __('Orders') }}</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('suppliers.index') }}">{{ __('Suppliers') }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('purchase-orders.index') }}">{{ __('Purchase Orders') }}</a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
