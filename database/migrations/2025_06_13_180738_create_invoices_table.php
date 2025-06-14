@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('invoices', function (Blueprint $table) {
+            $table->id('invoice_id');
+            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained('customers', 'customer_id')->onDelete('cascade');
+            $table->string('invoice_number')->unique();
+            $table->date('invoice_date');
+            $table->date('due_date');
+            $table->string('status')->default('Draft'); // e.g., Draft, Sent, Paid, Partially Paid, Overdue, Void
+            $table->decimal('subtotal', 15, 2)->default(0.00);
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 15, 2)->nullable();
+            $table->decimal('discount_amount', 15, 2)->default(0.00);
+            $table->decimal('tax_percentage', 5, 2)->nullable();
+            $table->decimal('tax_amount', 15, 2)->default(0.00);
+            $table->decimal('total_amount', 15, 2)->default(0.00);
+            $table->decimal('amount_paid', 15, 2)->default(0.00);
+            $table->text('terms_and_conditions')->nullable();
+            $table->text('notes')->nullable();
+            $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('invoices');
+    }
+};

@@ -89,6 +89,11 @@ class Order extends Model
     //     return $this->belongsTo(Address::class, 'billing_address_id', 'address_id');
     // }
 
-    // Relationship to Invoice will be added later
-    // public function invoices(): HasMany { ... }
+    /**
+     * Get the invoices for the order.
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'order_id', 'order_id');
+    }
 }
