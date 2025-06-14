@@ -31,9 +31,11 @@
 <hr>
 <h5>Primary Address</h5>
 @php
-    $address = old('addresses.0', ($supplier->addresses->first() ?? new \App\Models\Address()));
-    if (empty(old()) && !$supplier->exists && !$supplier->addresses->first()) {
-        $address->is_primary = true;
+    $addressData = old('addresses.0');
+    if ($addressData) {
+        $address = new \App\Models\Address($addressData);
+    } else {
+        $address = $supplier->addresses->first() ?? new \App\Models\Address(['is_primary' => !$supplier->exists]);
     }
 @endphp
 <input type="hidden" name="addresses[0][address_id]" value="{{ $address->address_id ?? '' }}">

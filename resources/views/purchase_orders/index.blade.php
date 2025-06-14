@@ -1,0 +1,92 @@
+@extends('layouts.app')
+
+@section('title', 'Purchase Orders')
+
+@section('content')
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Purchase Orders</h1>
+        <a href="{{ route('purchase-orders.create') }}" class="btn btn-primary">Add New Purchase Order</a>
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="mb-3">
+        <form action="{{ route('purchase-orders.index') }}" method="GET">
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <input type="text" name="search" class="form-control" placeholder="Search by PO #, supplier..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="type_filter" class="form-select">
+                        <option value="">All Types</option>
+                        @foreach($types as $key => $value)
+                            <option value="{{ $key }}" {{ request('type_filter') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status_filter" class="form-select">
+                        <option value="">All Statuses</option>
+                        @foreach($statuses as $key => $value)
+                            <option value="{{ $key }}" {{ request('status_filter') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                    <a href="{{ route('purchase-orders.index') }}" class="btn btn-outline-secondary ms-2" title="Clear Filters"><i class="bi bi-x-lg"></i> Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>PO #</th>
+                <th>Supplier</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Order Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($purchaseOrders as $purchaseOrder)
+                <tr>
+                    <td>{{ $purchaseOrder->purchase_order_id }}</td>
+                    <td><a href="{{ route('purchase-orders.show', $purchaseOrder->purchase_order_id) }}">{{ $purchaseOrder->purchase_order_number ?: ('PO #'.$purchaseOrder->purchase_order_id) }}</a></td>
+                    <td>{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
+                    <td>{{ $purchaseOrder->type ?: 'N/A' }}</td>
+                    <td><span class="badge bg-info text-dark">{{ $purchaseOrder->status }}</span></td>
+                    <td>${{ number_format($purchaseOrder->total_amount, 2) }}</td>
+                    <td>{{ $purchaseOrder->order_date->format('Y-m-d') }}</td>
+                    <td>
+                        <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="{{ route('purchase-orders.destroy', $purchaseOrder->purchase_order_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure? This action cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center">No purchase orders found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center">
+        {{ $purchaseOrders->links() }}
+    </div>
+</div>
+@endsection
