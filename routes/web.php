@@ -17,6 +17,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 
 
@@ -51,6 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::resource('addresses', AddressController::class);
+    Route::resource('invoices', InvoiceController::class);
+    // Payments - nested under invoices for now
+    Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
+    Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
+
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 

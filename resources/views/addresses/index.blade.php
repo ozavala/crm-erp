@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>All Addresses</h1>
-        {{-- <a href="{{ route('addresses.create') }}" class="btn btn-primary">Add New Address (Standalone)</a> --}}
+        <a href="{{ route('addresses.create') }}" class="btn btn-primary">Add New Address (Standalone)</a> --}}
         {{-- Standalone address creation is generally not recommended for polymorphic relations without context --}}
     </div>
 

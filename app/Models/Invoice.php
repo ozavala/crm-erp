@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
@@ -76,8 +77,13 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class, 'invoice_id', 'invoice_id');
     }
 
-    // Relationship to Payments will be added later
-    // public function payments(): HasMany { ... }
+    /**
+     * Get all of the invoice's payments.
+     */
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
+    }
 
     public function getAmountDueAttribute()
     {

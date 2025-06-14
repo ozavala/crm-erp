@@ -57,6 +57,9 @@
                         <a class="dropdown-item" href="{{ route('orders.index') }}">
                             {{ __('Sales Orders') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('invoices.index') }}">
+                            {{ __('Invoices') }}
+                        </a>
                         
                     </div>
                 </li>

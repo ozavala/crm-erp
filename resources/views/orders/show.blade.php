@@ -119,7 +119,9 @@
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
-                {{-- Add button to create Invoice later --}}
+                @if(!in_array($order->status, ['Cancelled', 'Completed'])) {{-- Or other logic to determine if invoice can be created --}}
+                    <a href="{{ route('invoices.create', ['order_id' => $order->order_id]) }}" class="btn btn-success ms-2">Create Invoice</a>
+                @endif
             </div>
             <a href="{{ route('orders.index') }}" class="btn btn-secondary">Back to List</a>
         </div>

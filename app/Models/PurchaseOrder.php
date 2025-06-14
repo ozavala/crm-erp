@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrder extends Model
@@ -90,5 +91,13 @@ class PurchaseOrder extends Model
         // Assuming 'shipping_address_id' refers to an ID in the 'addresses' table
         // and these addresses might be linked to your company/warehouse rather than a supplier/customer.
         return $this->belongsTo(Address::class, 'shipping_address_id', 'address_id');
+    }
+
+    /**
+     * Get all of the purchase order's payments.
+     */
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
     }
 }
