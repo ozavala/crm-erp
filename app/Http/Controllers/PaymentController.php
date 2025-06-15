@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Invoice; // To update invoice amount_paid
 use App\Models\PurchaseOrder; // To update PO amount_paid (if implemented directly)
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Http\Requests\StorePaymentRequest;
 // We might not need UpdatePaymentRequest if payments are immutable or handled differently
 // use App\Http\Requests\UpdatePaymentRequest;
@@ -52,6 +54,7 @@ class PaymentController extends Controller
 
         DB::transaction(function () use ($validatedData, $payableModel) {
             $payment = Payment::create($validatedData);
+            $this->createJournalEntriesForPayment($payment, $payableModel);
 
             // Update the amount_paid on the payable model (e.g., Invoice)
             if ($payableModel instanceof Invoice) {
@@ -89,6 +92,7 @@ class PaymentController extends Controller
         DB::transaction(function () use ($payment, $payable) {
             if ($payable instanceof Invoice) {
                 $payable->decrement('amount_paid', $payment->amount);
+                // TODO: Consider how to reverse or mark journal entries related to this deleted payment.
                 // Optionally, update invoice status
                 if ($payable->amount_paid <= 0) {
                     $payable->status = 'Sent'; // Or 'Draft' or original status
@@ -109,6 +113,50 @@ class PaymentController extends Controller
         }
 
         return redirect()->back()->with('success', 'Payment deleted successfully.'); // Fallback
+    }
+
+    /**
+     * Create journal entries for a given payment.
+     */
+    protected function createJournalEntriesForPayment(Payment $payment, Model $payableModel)
+    {
+        $journalEntry = JournalEntry::create([
+            'entry_date' => $payment->payment_date,
+            'transaction_type' => 'Payment',
+            'description' => "Payment for " . class_basename($payableModel) . " #" . ($payableModel->invoice_number ?? $payableModel->purchase_order_number ?? $payableModel->getKey()),
+            'referenceable_id' => $payment->payment_id,
+            'referenceable_type' => Payment::class,
+            'created_by_user_id' => $payment->created_by_user_id,
+        ]);
+
+        if ($payableModel instanceof Invoice) {
+            // Payment Received for an Invoice
+            // Debit Cash (or Bank), Credit Accounts Receivable
+            $journalEntry->lines()->createMany([
+                [
+                    'account_name' => 'Cash', // Or specific bank account
+                    'debit_amount' => $payment->amount,
+                    'credit_amount' => 0,
+                ],
+                [
+                    'account_name' => 'Accounts Receivable',
+                    'debit_amount' => 0,
+                    'credit_amount' => $payment->amount,
+                    'entity_id' => $payableModel->customer_id,
+                    'entity_type' => Customer::class,
+                ]
+            ]);
+        } elseif ($payableModel instanceof PurchaseOrder) {
+            // Payment Made for a Purchase Order (or Bill)
+            // Debit Accounts Payable, Credit Cash (or Bank)
+            // This assumes you are paying against the PO directly.
+            // Ideally, you'd pay against a Bill entered from the supplier.
+            // For now, we'll assume direct PO payment.
+            // $journalEntry->lines()->createMany([ ... similar to above but reversed and using Accounts Payable ... ]);
+            // This part will be fleshed out more if/when a Bill model is introduced.
+            // For now, we'll log a simpler entry if it's a PO.
+            // This is a placeholder for more complex PO payment journaling.
+        }
     }
 
     // Other methods like index, create, show, edit, update might not be directly used

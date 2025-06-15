@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 15, 2)->default(0.00);
             $table->decimal('tax_percentage', 5, 2)->nullable();
             $table->decimal('tax_amount', 15, 2)->default(0.00);
+            $table->decimal('amount_paid', 15, 2)->default(0);
             $table->decimal('shipping_cost', 15, 2)->default(0.00);
             $table->decimal('other_charges', 15, 2)->default(0.00);
             $table->decimal('total_amount', 15, 2)->default(0.00);
