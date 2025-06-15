@@ -12,7 +12,7 @@ class UserRole extends Model
     protected $primaryKey = 'role_id';
 
     protected $fillable = [
-        'name',
+        'name', // Roles should have a name, e.g., 'Admin', 'Sales'
         'description',
     ];
 

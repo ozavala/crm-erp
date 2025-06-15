@@ -56,7 +56,18 @@
                     <td>{{ $order->order_id }}</td>
                     <td><a href="{{ route('orders.show', $order->order_id) }}">{{ $order->order_number ?: ('Order #'.$order->order_id) }}</a></td>
                     <td>{{ $order->customer->full_name ?? 'N/A' }}</td>
-                    <td><span class="badge bg-primary">{{ $order->status }}</span></td>
+                    <td>
+                        @php
+                            $statusClass = match($order->status) {
+                                'Completed' => 'bg-success',
+                                'Shipped', 'Processing' => 'bg-info text-dark',
+                                'Pending' => 'bg-warning text-dark',
+                                'Cancelled' => 'bg-danger',
+                                default => 'bg-secondary'
+                            };
+                        @endphp
+                        <span class="badge {{ $statusClass }}">{{ $order->status }}</span>
+                    </td>
                     <td>${{ number_format($order->total_amount, 2) }}</td>
                     <td>{{ $order->order_date->format('Y-m-d') }}</td>
                     <td>

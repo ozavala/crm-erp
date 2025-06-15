@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('warehouse_id');
             $table->string('name');
             $table->string('location')->nullable();
-            $table->text('address')->nullable();
+            //$table->text('address')->nullable();//using polymorphic addresses instead
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
