@@ -51,6 +51,11 @@
                         <a class="dropdown-item" href="{{ route('opportunities.index') }}">
                             {{ __('Opportunities') }}
                         </a>
+                        <<div class="alert alert-success" role="alert">
+                          <h4 class="alert-heading"></h4>
+                          <p></p>
+                          <p class="mb-0"></p>
+                        </div>
                         <a class="dropdown-item" href="{{ route('quotations.index') }}">
                             {{ __('Quotations') }}
                         </a>

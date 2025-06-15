@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Models\Customer;
+use App\Http\Requests\StoreActivityRequest;
 use App\Models\CrmUser;
 use App\Models\Activity; // Add Activity model
 use App\Http\Requests\StoreLeadRequest;
@@ -107,7 +108,7 @@ class LeadController extends Controller
      */
     public function show(Lead $lead)
     {
-        $lead->load(['customer', 'assignedTo', 'createdBy']);
+        $lead->load(['customer', 'assignedTo', 'createdBy', 'activities.user']); // Eager load activities and their users
         return view('leads.show', compact('lead')); // Activities will be loaded via relationship in the view
     }
 
@@ -145,24 +146,22 @@ class LeadController extends Controller
     /**
      * Store a new activity for the specified lead.
      */
-    public function storeActivity(Request $request, Lead $lead)
+    /**
+     * Store a newly created activity for the lead.
+     */
+    public function storeActivity(StoreActivityRequest $request, Lead $lead)
     {
-        $request->validate([
-            'type' => 'required|string|max:50|in:Call,Email,Meeting,Note,Other', // Define allowed types
-            'description' => 'required|string',
-            'activity_date' => 'nullable|date',
-        ]);
+        $validatedData = $request->validated();
 
-        $lead->activities()->create([
-            'user_id' => Auth::id(),
-            'type' => $request->input('type'),
-            'description' => $request->input('description'),
-            'activity_date' => $request->input('activity_date') ?: now(),
-        ]);
+        $activity = new Activity($validatedData);
+        $activity->user_id = Auth::id(); // User who performed/logged the activity
+        // lead_id is automatically set by the relationship
 
-        return back()->with('success', 'Activity logged successfully.');
+        $lead->activities()->save($activity);
+
+        return redirect()->route('leads.show', $lead->lead_id)
+                         ->with('success', 'Activity added successfully.');
     }
-
     /**
      * Convert the specified lead to a customer.
      */

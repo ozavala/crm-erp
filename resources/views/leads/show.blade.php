@@ -67,42 +67,70 @@
     </div>
 
     <!-- Activities Section -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5>Log Activity</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('leads.activities.store', $lead->lead_id) }}" method="POST">
-                @csrf
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label for="activity_type" class="form-label">Type <span class="text-danger">*</span></label>
-                        <select name="type" id="activity_type" class="form-select @error('type') is-invalid @enderror" required>
-                            <option value="Note" {{ old('type') == 'Note' ? 'selected' : '' }}>Note</option>
-                            <option value="Call" {{ old('type') == 'Call' ? 'selected' : '' }}>Call</option>
-                            <option value="Email" {{ old('type') == 'Email' ? 'selected' : '' }}>Email</option>
-                            <option value="Meeting" {{ old('type') == 'Meeting' ? 'selected' : '' }}>Meeting</option>
-                            <option value="Other" {{ old('type') == 'Other' ? 'selected' : '' }}>Other</option>
-                        </select>
-                        @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="activity_date" class="form-label">Date</label>
-                        <input type="datetime-local" name="activity_date" id="activity_date" class="form-control @error('activity_date') is-invalid @enderror" value="{{ old('activity_date', now()->format('Y-m-d\TH:i')) }}">
-                        @error('activity_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
+    <div class="row mt-4">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Activities</h4>
                 </div>
-                <div class="mb-3">
-                    <label for="activity_description" class="form-label">Description <span class="text-danger">*</span></label>
-                    <textarea name="description" id="activity_description" rows="3" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>
-                    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="card-body">
+                    @if($lead->activities->isNotEmpty())
+                        <ul class="list-group list-group-flush">
+                            @foreach($lead->activities as $activity)
+                                <li class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ $activity->type }}</h6>
+                                        <small class="text-muted">{{ $activity->activity_date->format('M d, Y H:i') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ nl2br(e($activity->description)) }}</p>
+                                    <small class="text-muted">Logged by: {{ $activity->user->full_name ?? 'N/A' }}</small>
+                                    {{-- Add edit/delete for activities later if needed --}}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p>No activities recorded for this lead yet.</p>
+                    @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Log Activity</button>
-            </form>
+            </div>
         </div>
-    </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Log New Activity</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('leads.activities.store', $lead->lead_id) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="activity_type" class="form-label">Activity Type <span class="text-danger">*</span></label>
+                            <select class="form-select @error('type') is-invalid @enderror" id="activity_type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="Call" {{ old('type') == 'Call' ? 'selected' : '' }}>Call</option>
+                                <option value="Email" {{ old('type') == 'Email' ? 'selected' : '' }}>Email</option>
+                                <option value="Meeting" {{ old('type') == 'Meeting' ? 'selected' : '' }}>Meeting</option>
+                                <option value="Note" {{ old('type') == 'Note' ? 'selected' : '' }}>Note</option>
+                                <option value="Other" {{ old('type') == 'Other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                            @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="activity_date" class="form-label">Activity Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control @error('activity_date') is-invalid @enderror" id="activity_date" name="activity_date" value="{{ old('activity_date', now()->format('Y-m-d\TH:i')) }}" required>
+                            @error('activity_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="activity_description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('description') is-invalid @enderror" id="activity_description" name="description" rows="4" required>{{ old('description') }}</textarea>
+                            @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Activity</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-    <div class="card mt-4">
+    {{--<div class="card mt-4">
         <div class="card-header">
             <h5>Activity History</h5>
         </div>
@@ -122,7 +150,7 @@
             @empty
                 <div class="list-group-item">No activities logged yet.</div>
             @endforelse
-        </div>
+        </div>--}}
     </div>
 </div>
 @endsection
