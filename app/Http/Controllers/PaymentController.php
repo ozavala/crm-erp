@@ -13,6 +13,8 @@ use App\Http\Requests\StorePaymentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Customer; // If you need to link payments to customers
 
 class PaymentController extends Controller
 {

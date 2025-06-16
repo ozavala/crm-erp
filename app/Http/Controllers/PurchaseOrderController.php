@@ -48,22 +48,20 @@ class PurchaseOrderController extends Controller
     public function create(Request $request)
     {
         $statuses = PurchaseOrder::$statuses;
-        $types = PurchaseOrder::$types;
-        $suppliers = Supplier::orderBy('name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
-        // Assuming your company addresses might be identified by lacking an addressable_type or specific type
-        // This logic might need refinement based on how you store company addresses.
-        $companyAddresses = Address::where(function ($query) {
-                                $query->whereNull('addressable_type') // Generic addresses
-                                      ->orWhere('addressable_type', 'App\Models\Warehouse'); // Or addresses linked to warehouses
-                            })
-                            ->orderBy('address_type')
-                            ->orderBy('street_address_line_1')
-                            ->get();
+            $types = PurchaseOrder::$types;
+            $suppliers = Supplier::orderBy('name')->get();
+            $products = Product::where('is_active', true)->orderBy('name')->get();
+            // Assuming your company addresses might be identified by being linked to Warehouses
+            // or having a specific address_type, or being unlinked (addressable_type is null).
+            // This logic might need refinement based on how you store company addresses.
+            $companyAddresses = Address::where('addressable_type', \App\Models\Warehouse::class) // Example: Addresses linked to Warehouses
+                                ->orWhereNull('addressable_type') // Example: Generic company addresses
+                                ->orderBy('street_address_line_1')
+                                ->get();
 
-        $purchaseOrder = new PurchaseOrder();
-        return view('purchase_orders.create', compact('statuses', 'types', 'suppliers', 'products', 'companyAddresses', 'purchaseOrder'));
-    }
+            $purchaseOrder = new PurchaseOrder(['purchase_order_number' => 'PO-' . strtoupper(Str::random(8))]);
+            return view('purchase_orders.create', compact('purchaseOrder', 'suppliers', 'products', 'companyAddresses', 'statuses', 'types'));
+        }
 
     /**
      * Store a newly created resource in storage.
@@ -71,108 +69,107 @@ class PurchaseOrderController extends Controller
     public function store(StorePurchaseOrderRequest $request)
     {
         $validatedData = $request->validated();
+            
+            return DB::transaction(function () use ($validatedData, $request) {
+                $poData = collect($validatedData)->except(['items'])->all();
+                $poData['created_by_user_id'] = Auth::id();
+                $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? ('PO-' . strtoupper(Str::random(8)));
+                $poData['amount_paid'] = 0; // Initialize amount_paid
+
+                $totals = $this->calculateTotals(
+                    $validatedData['items'] ?? [],
+                    $validatedData['discount_type'] ?? null,
+                    $validatedData['discount_value'] ?? 0,
+                    $validatedData['tax_percentage'] ?? 0,
+                    $validatedData['shipping_cost'] ?? 0,
+                    $validatedData['other_charges'] ?? 0
+                );
+                $poData = array_merge($poData, $totals);
+
+                $purchaseOrder = PurchaseOrder::create($poData);            
+                foreach ($validatedData['items'] ?? [] as $itemData) {
+                    $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
+                    $purchaseOrder->items()->create($itemData);
+                }
+
+                return redirect()->route('purchase-orders.index')
+                                 ->with('success', 'Purchase Order created successfully.');
+            });
         
-        return DB::transaction(function () use ($validatedData, $request) {
-            $poData = collect($validatedData)->except(['items'])->all();
-            $poData['created_by_user_id'] = Auth::id();
-            $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? ('PO-' . strtoupper(Str::random(8)));
-
-            $totals = $this->calculateTotals(
-                $validatedData['items'] ?? [],
-                $validatedData['discount_type'] ?? null,
-                $validatedData['discount_value'] ?? 0,
-                $validatedData['tax_percentage'] ?? 0,
-                $validatedData['shipping_cost'] ?? 0,
-                $validatedData['other_charges'] ?? 0
-            );
-            $poData = array_merge($poData, $totals);
-
-            $purchaseOrder = PurchaseOrder::create($poData);            
-            foreach ($validatedData['items'] ?? [] as $itemData) {
-                $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
-                $purchaseOrder->items()->create($itemData);
-            }
-
-            return redirect()->route('purchase-orders.index')
-                             ->with('success', 'Purchase Order created successfully.');
-        });
     }
 
     /**
      * Display the specified resource.
      */
     public function show(PurchaseOrder $purchaseOrder)
-    {
-        $purchaseOrder->load(['supplier', 'createdBy', 'items', 'items.product', 'shippingAddress']);
-        return view('purchase_orders.show', compact('purchaseOrder'));
-    }
+        {
+            $purchaseOrder->load(['supplier', 'createdBy', 'items.product', 'shippingAddress', 'payments']);
+            return view('purchase_orders.show', compact('purchaseOrder'));
+        }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(PurchaseOrder $purchaseOrder)
-    {
-        $statuses = PurchaseOrder::$statuses;
-        $types = PurchaseOrder::$types;
-        $suppliers = Supplier::orderBy('name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
-        $purchaseOrder->load('items');
-        $companyAddresses = Address::where(function ($query) {
-                                $query->whereNull('addressable_type')
-                                      ->orWhere('addressable_type', 'App\Models\Warehouse');
-                            })
-                            ->orderBy('address_type')
-                            ->orderBy('street_address_line_1')
-                            ->get();
+   public function edit(PurchaseOrder $purchaseOrder)
+        {
+            $statuses = PurchaseOrder::$statuses;
+            $types = PurchaseOrder::$types;
+            $suppliers = Supplier::orderBy('name')->get();
+            $products = Product::where('is_active', true)->orderBy('name')->get();
+            $purchaseOrder->load('items');
+            $companyAddresses = Address::where('addressable_type', \App\Models\Warehouse::class)
+                                ->orWhereNull('addressable_type')
+                                ->orderBy('street_address_line_1')
+                                ->get();
 
- return view('purchase_orders.create', compact('statuses', 'types', 'suppliers', 'products', 'companyAddresses', 'purchaseOrder'));
-    }
+            return view('purchase_orders.edit', compact('purchaseOrder', 'statuses', 'types', 'suppliers', 'products', 'companyAddresses'));
+        }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder)
-    {
-        $validatedData = $request->validated();
+     public function update(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder)
+        {
+            $validatedData = $request->validated();
 
-        return DB::transaction(function () use ($validatedData, $request, $purchaseOrder) {
-            $poData = collect($validatedData)->except(['items'])->all();
-            $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? $purchaseOrder->purchase_order_number ?? ('PO-' . strtoupper(Str::random(8)));
+            return DB::transaction(function () use ($validatedData, $request, $purchaseOrder) {
+                $poData = collect($validatedData)->except(['items'])->all();
+                $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? $purchaseOrder->purchase_order_number ?? ('PO-' . strtoupper(Str::random(8)));
 
-            $totals = $this->calculateTotals(
-                $validatedData['items'] ?? [],
-                $validatedData['discount_type'] ?? null,
-                $validatedData['discount_value'] ?? 0,
-                $validatedData['tax_percentage'] ?? 0,
-                $validatedData['shipping_cost'] ?? 0,
-                $validatedData['other_charges'] ?? 0
-            );
-            $poData = array_merge($poData, $totals);
-            
-            $purchaseOrder->update($poData);
-            
-            $existingItemIds = $purchaseOrder->items->pluck('purchase_order_item_id')->all();
-            $newItemIds = [];
+                $totals = $this->calculateTotals(
+                    $validatedData['items'] ?? [],
+                    $validatedData['discount_type'] ?? null,
+                    $validatedData['discount_value'] ?? 0,
+                    $validatedData['tax_percentage'] ?? 0,
+                    $validatedData['shipping_cost'] ?? 0,
+                    $validatedData['other_charges'] ?? 0
+                );
+                $poData = array_merge($poData, $totals);
+                
+                $purchaseOrder->update($poData);
+                
+                $existingItemIds = $purchaseOrder->items->pluck('purchase_order_item_id')->all();
+                $newItemIds = [];
 
-            foreach ($validatedData['items'] ?? [] as $itemData) {
-                $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
-                if (isset($itemData['purchase_order_item_id']) && in_array($itemData['purchase_order_item_id'], $existingItemIds)) {
-                    $item = $purchaseOrder->items()->find($itemData['purchase_order_item_id']);
-                    $item->update($itemData);
-                    $newItemIds[] = $item->purchase_order_item_id;
-                } else {
-                    $newItem = $purchaseOrder->items()->create($itemData);
-                    $newItemIds[] = $newItem->purchase_order_item_id;
+                foreach ($validatedData['items'] ?? [] as $itemData) {
+                    $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
+                    if (isset($itemData['purchase_order_item_id']) && in_array($itemData['purchase_order_item_id'], $existingItemIds)) {
+                        $item = $purchaseOrder->items()->find($itemData['purchase_order_item_id']);
+                        $item->update($itemData);
+                        $newItemIds[] = $item->purchase_order_item_id;
+                    } else {
+                        $newItem = $purchaseOrder->items()->create($itemData);
+                        $newItemIds[] = $newItem->purchase_order_item_id;
+                    }
                 }
-            }
-            $itemsToDelete = array_diff($existingItemIds, $newItemIds);
-            if (!empty($itemsToDelete)) {
-                $purchaseOrder->items()->whereIn('purchase_order_item_id', $itemsToDelete)->delete();
-            }
+                $itemsToDelete = array_diff($existingItemIds, $newItemIds);
+                if (!empty($itemsToDelete)) {
+                    $purchaseOrder->items()->whereIn('purchase_order_item_id', $itemsToDelete)->delete();
+                }
 
-            return redirect()->route('purchase-orders.index')
-                             ->with('success', 'Purchase Order updated successfully.');
-        });
+                return redirect()->route('purchase-orders.index')
+                                 ->with('success', 'Purchase Order updated successfully.');
+            });
     }
 
     /**
@@ -181,51 +178,56 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchaseOrder)
     {
         // Add checks if PO is linked to bills, receipts etc.
-        $purchaseOrder->items()->delete();
-        $purchaseOrder->delete();
-        return redirect()->route('purchase-orders.index')
-                         ->with('success', 'Purchase Order deleted successfully.');
-    }
-
-    protected function calculateTotals(
-        array $items,
-        ?string $discountType,
-        float $discountValue,
-        float $taxPercentage,
-        float $shippingCost,
-        float $otherCharges
-    ): array
-    {
-        $subtotal = 0;
-        foreach ($items as $item) {
-            $subtotal += ($item['quantity'] ?? 0) * ($item['unit_price'] ?? 0);
-        }
-
-        $discountAmount = 0.00;
-        if ($discountValue > 0) {
-            if ($discountType === 'percentage') {
-                $discountAmount = ($subtotal * $discountValue) / 100;
-            } elseif ($discountType === 'fixed') {
-                $discountAmount = $discountValue;
+        if ($purchaseOrder->payments()->exists()) {
+                return redirect()->route('purchase-orders.index')
+                                 ->with('error', 'Cannot delete Purchase Order with existing payments. Please delete payments first.');
             }
+            $purchaseOrder->items()->delete();
+            $purchaseOrder->delete();
+            return redirect()->route('purchase-orders.index')
+                             ->with('success', 'Purchase Order deleted successfully.');
         }
 
-        $subtotalAfterDiscount = $subtotal - $discountAmount;
+        protected function calculateTotals(
+            array $items,
+            ?string $discountType,
+            float $discountValue,
+            float $taxPercentage,
+            float $shippingCost,
+            float $otherCharges
+        ): array
+        {
+            $subtotal = 0;
+            foreach ($items as $item) {
+                $subtotal += ($item['quantity'] ?? 0) * ($item['unit_price'] ?? 0);
+            }
 
-        $taxAmount = 0.00;
-        if ($taxPercentage > 0) {
-            $taxAmount = ($subtotalAfterDiscount * $taxPercentage) / 100;
-        }
+            $discountAmount = 0.00;
+            if ($discountValue > 0) {
+                if ($discountType === 'percentage') {
+                    $discountAmount = ($subtotal * $discountValue) / 100;
+                } elseif ($discountType === 'fixed') {
+                    $discountAmount = $discountValue;
+                }
+            }
 
-        $totalAmount = $subtotalAfterDiscount + $taxAmount + $shippingCost + $otherCharges;
+            $subtotalAfterDiscount = $subtotal - $discountAmount;
 
-        return [
-            'subtotal' => $subtotal,
-            'discount_amount' => $discountAmount,
-            'tax_amount' => $taxAmount,
-            'shipping_cost' => $shippingCost,
-            'other_charges' => $otherCharges,
-            'total_amount' => $totalAmount,
-        ];
+            $taxAmount = 0.00;
+            if ($taxPercentage > 0) {
+                $taxAmount = ($subtotalAfterDiscount * $taxPercentage) / 100;
+            }
+
+            $totalAmount = $subtotalAfterDiscount + $taxAmount + $shippingCost + $otherCharges;
+
+            return [
+                'subtotal' => $subtotal,
+                'discount_amount' => $discountAmount,
+                'tax_amount' => $taxAmount,
+                'shipping_cost' => $shippingCost,
+                'other_charges' => $otherCharges,
+                'total_amount' => $totalAmount,
+            ];
+        
     }
 }

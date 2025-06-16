@@ -54,7 +54,9 @@
                 <th>Supplier</th>
                 <th>Type</th>
                 <th>Status</th>
-                <th>Total</th>
+                <th class="text-end">Total</th>
+                <th class="text-end">Amount Paid</th>
+                <th class="text-end">Amount Due</th>
                 <th>Order Date</th>
                 <th>Actions</th>
             </tr>
@@ -66,8 +68,21 @@
                     <td><a href="{{ route('purchase-orders.show', $purchaseOrder->purchase_order_id) }}">{{ $purchaseOrder->purchase_order_number ?: ('PO #'.$purchaseOrder->purchase_order_id) }}</a></td>
                     <td>{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
                     <td>{{ $purchaseOrder->type ?: 'N/A' }}</td>
-                    <td><span class="badge bg-info text-dark">{{ $purchaseOrder->status }}</span></td>
-                    <td>${{ number_format($purchaseOrder->total_amount, 2) }}</td>
+                    <td>
+                         @php
+                            $statusClass = match($purchaseOrder->status) {
+                                'Completed', 'Received' => 'bg-success',
+                                'Sent', 'Confirmed' => 'bg-info text-dark',
+                                'Partially Received' => 'bg-warning text-dark',
+                                'Cancelled' => 'bg-danger',
+                                default => 'bg-secondary'
+                            };
+                        @endphp
+                        <span class="badge {{ $statusClass }}">{{ $purchaseOrder->status }}</span>
+                    </td>
+                    <td class="text-end">${{ number_format($purchaseOrder->total_amount, 2) }}</td>
+                    <td class="text-end">${{ number_format($purchaseOrder->amount_paid, 2) }}</td>
+                    <td class="text-end">${{ number_format($purchaseOrder->amount_due, 2) }}</td>
                     <td>{{ $purchaseOrder->order_date->format('Y-m-d') }}</td>
                     <td>
                         <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning btn-sm">Edit</a>
@@ -80,7 +95,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center">No purchase orders found.</td>
+                    <td colspan="10" class="text-center">No purchase orders found.</td>
                 </tr>
             @endforelse
         </tbody>

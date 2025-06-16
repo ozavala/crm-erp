@@ -87,7 +87,7 @@ class OrderController extends Controller
             $orderData['created_by_user_id'] = Auth::id();
             $orderData['order_number'] = $orderData['order_number'] ?? ('ORD-' . strtoupper(Str::random(8)));
             
-            $totals = $this->calculateTotals($request->input('items', []), $request->input('discount_type'), $request->input('discount_value', 0), $request->input('tax_percentage', 0));
+ $totals = $this->calculateTotals($validatedData['items'] ?? [], $validatedData['discount_type'] ?? null, $validatedData['discount_value'] ?? 0, $validatedData['tax_percentage'] ?? 0);
             $orderData = array_merge($orderData, $totals);
 
             $order = Order::create($orderData);

@@ -42,4 +42,25 @@ class ProductCategory extends Model
     {
         return $this->hasMany(Product::class, 'product_category_id', 'category_id');
     }
+    /**
+     * Check if the current category is a descendant of the given category.
+     *
+     * @param ProductCategory|null $potentialAncestor
+     * @return bool
+     */
+    public function isDescendantOf(?ProductCategory $potentialAncestor): bool
+    {
+        if (!$potentialAncestor) {
+            return false;
+        }
+
+        $parent = $this->parent;
+        while ($parent) {
+            if ($parent->category_id === $potentialAncestor->category_id) {
+                return true;
+            }
+            $parent = $parent->parent;
+        }
+        return false;
+    }
 }

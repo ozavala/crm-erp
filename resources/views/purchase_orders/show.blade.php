@@ -5,46 +5,58 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center">
-        <h1>PO: {{ $purchaseOrder->purchase_order_number ?: ('PO #'.$purchaseOrder->purchase_order_id) }}
-            <span class="badge bg-info text-dark fs-6">{{ $purchaseOrder->status }}</span>
-            @if($purchaseOrder->type) <span class="badge bg-secondary fs-6">{{ $purchaseOrder->type }}</span> @endif
+        <h1>PO: {{ $purchaseOrder->purchase_order_number }}
+            @php
+                $statusClass = match($purchaseOrder->status) {
+                    'Completed', 'Received' => 'bg-success',
+                    'Sent', 'Confirmed' => 'bg-info text-dark',
+                    'Partially Received' => 'bg-warning text-dark',
+                    'Cancelled' => 'bg-danger',
+                    default => 'bg-secondary'
+                };
+            @endphp
+            <span class="badge {{ $statusClass }} fs-6">{{ $purchaseOrder->status }}</span>
         </h1>
         {{-- Add PDF export button or other actions here --}}
     </div>
+     @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error')) {{-- For payment specific errors --}}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <div class="card mb-4">
         <div class="card-header">
-            PO ID: {{ $purchaseOrder->purchase_order_id }} | Order Date: {{ $purchaseOrder->order_date->format('M d, Y') }}
+            PO ID: {{ $purchaseOrder->purchase_order_id }} | Order Date: {{ $purchaseOrder->order_date->format('M d, Y') }} | Expected Delivery: {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('M d, Y') : 'N/A' }}
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-6">
                     <h5>Supplier Details</h5>
                     <p><strong>Supplier:</strong> <a href="{{ route('suppliers.show', $purchaseOrder->supplier_id) }}">{{ $purchaseOrder->supplier->name }}</a></p>
-                    <p><strong>Contact:</strong> {{ $purchaseOrder->supplier->contact_person ?: 'N/A' }}</p>
-                    <p><strong>Email:</strong> {{ $purchaseOrder->supplier->email ?: 'N/A' }}</p>
+                    <p><strong>Contact:</strong> {{ $purchaseOrder->supplier->contact_person ?? 'N/A' }}</p>
+                    <p><strong>Email:</strong> {{ $purchaseOrder->supplier->email ?? 'N/A' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <h5>Order Information</h5>
-                    <p><strong>Expected Delivery:</strong> {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('M d, Y') : 'N/A' }}</p>
+                    <h5>Shipping & Other Info</h5>
+                    <p><strong>Shipping To:</strong>
+                        @if($purchaseOrder->shippingAddress)
+                            {{ $purchaseOrder->shippingAddress->street_address_line_1 }}, {{ $purchaseOrder->shippingAddress->city }}
+                        @else
+                            N/A
+                        @endif
+                    </p>
+                    <p><strong>Type:</strong> {{ $purchaseOrder->type }}</p>
                     <p><strong>Created By:</strong> {{ $purchaseOrder->createdBy->full_name ?? 'N/A' }}</p>
                 </div>
             </div>
-
-            @if($purchaseOrder->shippingAddress)
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <h5>Ship To Address (Your Company)</h5>
-                    <p>
-                        {{ $purchaseOrder->shippingAddress->street_address_line_1 }}<br>
-                        @if($purchaseOrder->shippingAddress->street_address_line_2){{ $purchaseOrder->shippingAddress->street_address_line_2 }}<br>@endif
-                        {{ $purchaseOrder->shippingAddress->city }}, {{ $purchaseOrder->shippingAddress->state_province }} {{ $purchaseOrder->shippingAddress->postal_code }}<br>
-                        {{ $purchaseOrder->shippingAddress->country_code }}
-                        ({{ $purchaseOrder->shippingAddress->address_type ?? 'Company Address'}})
-                    </p>
-                </div>
-            </div>
-            @endif
 
             <h5>Line Items</h5>
             <table class="table table-sm table-bordered">
@@ -54,7 +66,7 @@
                         <th>Item Name</th>
                         <th>Description</th>
                         <th class="text-end">Qty</th>
-                        <th class="text-end">Unit Cost</th>
+                        <th class="text-end">Unit Price</th>
                         <th class="text-end">Total</th>
                     </tr>
                 </thead>
@@ -62,7 +74,7 @@
                     @foreach($purchaseOrder->items as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->item_name }} @if($item->product) <small class="text-muted">(SKU: {{ $item->product->sku }})</small> @endif</td>
+                        <td>{{ $item->item_name }} @if($item->product) <small class="text-muted">({{ $item->product->sku }})</small> @endif</td>
                         <td>{{ $item->item_description ?: 'N/A' }}</td>
                         <td class="text-end">{{ $item->quantity }}</td>
                         <td class="text-end">${{ number_format($item->unit_price, 2) }}</td>
@@ -79,34 +91,74 @@
                     <p class="d-flex justify-content-between"><span>Tax ({{ $purchaseOrder->tax_percentage ?: 0 }}%):</span> <span>${{ number_format($purchaseOrder->tax_amount, 2) }}</span></p>
                     <p class="d-flex justify-content-between"><span>Shipping Cost:</span> <span>${{ number_format($purchaseOrder->shipping_cost, 2) }}</span></p>
                     <p class="d-flex justify-content-between"><span>Other Charges:</span> <span>${{ number_format($purchaseOrder->other_charges, 2) }}</span></p>
-                    <h5 class="d-flex justify-content-between"><span>Grand Total:</span> <span>${{ number_format($purchaseOrder->total_amount, 2) }}</span></h5>
+                    <hr class="my-1">
+                    <p class="d-flex justify-content-between"><span>Total Amount:</span> <span>${{ number_format($purchaseOrder->total_amount, 2) }}</span></p>
+                    <p class="d-flex justify-content-between"><span>Amount Paid:</span> <span>${{ number_format($purchaseOrder->amount_paid, 2) }}</span></p>
+                    <h5 class="d-flex justify-content-between"><span>Amount Due:</span> <span>${{ number_format($purchaseOrder->amount_due, 2) }}</span></h5>
                 </div>
             </div>
 
-            @if($purchaseOrder->terms_and_conditions)
-                <hr>
-                <h5>Terms & Conditions</h5>
-                <p>{{ nl2br(e($purchaseOrder->terms_and_conditions)) }}</p>
-            @endif
-
             @if($purchaseOrder->notes)
-                <hr>
-                <h5>Notes</h5>
-                <p>{{ nl2br(e($purchaseOrder->notes)) }}</p>
+                <hr><h5>Notes:</h5><p>{{ nl2br(e($purchaseOrder->notes)) }}</p>
             @endif
-
+            @if($purchaseOrder->terms_and_conditions)
+                <hr><h5>Terms & Conditions:</h5><p>{{ nl2br(e($purchaseOrder->terms_and_conditions)) }}</p>
+            @endif
         </div>
         <div class="card-footer d-flex justify-content-between">
             <div>
                 <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning">Edit</a>
-                <form action="{{ route('purchase-orders.destroy', $purchaseOrder->purchase_order_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure? This action cannot be undone.');">
+                <form action="{{ route('purchase-orders.destroy', $purchaseOrder->purchase_order_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
-                {{-- Add button to mark as received, etc. --}}
             </div>
             <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    {{-- Payments Section for Purchase Order --}}
+    <div class="card mt-4">
+        <div class="card-header"><h4>Payments Made</h4></div>
+        <div class="card-body">
+            @if ($purchaseOrder->amount_due > 0 && !in_array($purchaseOrder->status, ['Completed', 'Cancelled']))
+            <div class="mb-4 p-3 border rounded">
+                <h5>Record New Payment</h5>
+                <form action="{{ route('payments.store') }}" method="POST"> {{-- Generic store route --}}
+                    @include('payments._form', ['payable' => $purchaseOrder])
+                </form>
+            </div>
+            @elseif (in_array($purchaseOrder->status, ['Completed']) && $purchaseOrder->amount_due <= 0)
+                <div class="alert alert-success">This Purchase Order is fully paid.</div>
+            @endif
+
+            <h5>Payment History</h5>
+            @if($purchaseOrder->payments->isNotEmpty())
+                <table class="table table-sm">
+                    <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Action</th></tr></thead>
+                    <tbody>
+                        @foreach($purchaseOrder->payments as $payment)
+                        <tr>
+                            <td>{{ $payment->payment_date->format('Y-m-d') }}</td>
+                            <td>${{ number_format($payment->amount, 2) }}</td>
+                            <td>{{ $payment->payment_method ?: 'N/A' }}</td>
+                            <td>{{ $payment->reference_number ?: 'N/A' }}</td>
+                            <td>
+                                @if(!in_array($purchaseOrder->status, ['Completed', 'Cancelled']))
+                                <form action="{{ route('payments.destroy', $payment->payment_id) }}" method="POST" onsubmit="return confirm('Delete this payment?');">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p>No payments recorded for this purchase order yet.</p>
+            @endif
         </div>
     </div>
 </div>

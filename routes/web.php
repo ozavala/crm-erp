@@ -19,6 +19,7 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 
 
@@ -54,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::resource('addresses', AddressController::class);
     Route::resource('invoices', InvoiceController::class);
-    // Payments - nested under invoices for now
+    Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
 

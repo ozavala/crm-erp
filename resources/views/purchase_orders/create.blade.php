@@ -7,7 +7,7 @@
     <h1>Create New Purchase Order</h1>
 
     <form action="{{ route('purchase-orders.store') }}" method="POST">
-        @include('purchase_orders._form', ['purchaseOrder' => new \App\Models\PurchaseOrder()])
+        @include('purchase_orders._form')
     </form>
 </div>
 @endsection

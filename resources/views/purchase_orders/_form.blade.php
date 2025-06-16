@@ -1,6 +1,11 @@
 @csrf
 <div class="row">
     <div class="col-md-4 mb-3">
+        <label for="purchase_order_number" class="form-label">PO Number</label>
+        <input type="text" class="form-control @error('purchase_order_number') is-invalid @enderror" id="purchase_order_number" name="purchase_order_number" value="{{ old('purchase_order_number', $purchaseOrder->purchase_order_number ?? '') }}">
+        @error('purchase_order_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-4 mb-3">
         <label for="supplier_id" class="form-label">Supplier <span class="text-danger">*</span></label>
         <select class="form-select @error('supplier_id') is-invalid @enderror" id="supplier_id" name="supplier_id" required>
             <option value="">Select Supplier</option>
@@ -13,34 +18,40 @@
         @error('supplier_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="purchase_order_number" class="form-label">PO Number (Optional)</label>
-        <input type="text" class="form-control @error('purchase_order_number') is-invalid @enderror" id="purchase_order_number" name="purchase_order_number" value="{{ old('purchase_order_number', $purchaseOrder->purchase_order_number ?? '') }}">
-        @error('purchase_order_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
-    </div>
-    <div class="col-md-4 mb-3">
-        <label for="order_date" class="form-label">Order Date <span class="text-danger">*</span></label>
-        <input type="date" class="form-control @error('order_date') is-invalid @enderror" id="order_date" name="order_date" value="{{ old('order_date', ($purchaseOrder->order_date ?? now())->format('Y-m-d')) }}" required>
-        @error('order_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <label for="shipping_address_id" class="form-label">Ship To (Your Address)</label>
+        <select class="form-select @error('shipping_address_id') is-invalid @enderror" id="shipping_address_id" name="shipping_address_id">
+            <option value="">Select Shipping Address</option>
+            @foreach($companyAddresses as $address)
+                <option value="{{ $address->address_id }}" {{ (old('shipping_address_id', $purchaseOrder->shipping_address_id ?? '') == $address->address_id) ? 'selected' : '' }}>
+                    {{ $address->street_address_line_1 }}, {{ $address->city }} ({{ $address->address_type ?? class_basename($address->addressable_type) }})
+                </option>
+            @endforeach
+        </select>
+        @error('shipping_address_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
+        <label for="order_date" class="form-label">Order Date <span class="text-danger">*</span></label>
+        <input type="date" class="form-control @error('order_date') is-invalid @enderror" id="order_date" name="order_date" value="{{ old('order_date', ($purchaseOrder->order_date ?? now())->format('Y-m-d')) }}" required>
+        @error('order_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-3 mb-3">
         <label for="expected_delivery_date" class="form-label">Expected Delivery Date</label>
-        <input type="date" class="form-control @error('expected_delivery_date') is-invalid @enderror" id="expected_delivery_date" name="expected_delivery_date" value="{{ old('expected_delivery_date', $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('Y-m-d') : '') }}">
+        <input type="date" class="form-control @error('expected_delivery_date') is-invalid @enderror" id="expected_delivery_date" name="expected_delivery_date" value="{{ old('expected_delivery_date', ($purchaseOrder->expected_delivery_date ?? now()->addDays(14))->format('Y-m-d')) }}">
         @error('expected_delivery_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
-    <div class="col-md-4 mb-3">
-        <label for="type" class="form-label">PO Type</label>
+    <div class="col-md-3 mb-3">
+        <label for="type" class="form-label">Type</label>
         <select class="form-select @error('type') is-invalid @enderror" id="type" name="type">
-            <option value="">Select Type</option>
             @foreach($types as $key => $value)
-                <option value="{{ $key }}" {{ old('type', $purchaseOrder->type ?? '') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                <option value="{{ $key }}" {{ old('type', $purchaseOrder->type ?? 'Standard') == $key ? 'selected' : '' }}>{{ $value }}</option>
             @endforeach
         </select>
         @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
         <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
             @foreach($statuses as $key => $value)
@@ -51,35 +62,20 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <label for="shipping_address_id" class="form-label">Ship To (Your Company Address)</label>
-        <select class="form-select @error('shipping_address_id') is-invalid @enderror" id="shipping_address_id" name="shipping_address_id">
-            <option value="">Select Your Shipping Address</option>
-            @foreach($companyAddresses as $address)
-                <option value="{{ $address->address_id }}" {{ (old('shipping_address_id', $purchaseOrder->shipping_address_id ?? ($address->is_primary ? $address->address_id : '')) == $address->address_id) ? 'selected' : '' }}>
-                    {{ $address->street_address_line_1 }}, {{ $address->city }} {{ $address->postal_code }} ({{ $address->address_type ?? 'Company Address' }})
-                </option>
-            @endforeach
-        </select>
-        @error('shipping_address_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-    </div>
-</div>
-
 <hr>
 <h4>Line Items</h4>
 <div id="po-items-container">
     @php
-        $poItems = old('items', isset($purchaseOrder) ? $purchaseOrder->items->toArray() : [['product_id' => '', 'item_name' => '', 'item_description' => '', 'quantity' => 1, 'unit_price' => '']]);
+        $currentItems = old('items', (isset($purchaseOrder) ? $purchaseOrder->items->toArray() : [['product_id' => '', 'item_name' => '', 'item_description' => '', 'quantity' => 1, 'unit_price' => '']]));
         $itemIndex = 0;
     @endphp
 
-    @foreach($poItems as $index => $item)
+    @foreach($currentItems as $index => $item)
         @php $itemIndex = $index; @endphp
         <div class="row align-items-center mb-2 po-item-row border p-2 rounded">
             <input type="hidden" name="items[{{ $index }}][purchase_order_item_id]" value="{{ $item['purchase_order_item_id'] ?? '' }}">
             <div class="col-md-3 mb-2">
-                <label class="form-label">Product/Service</label>
+                <label class="form-label">Product</label>
                 <select name="items[{{ $index }}][product_id]" class="form-select product-select">
                     <option value="">Select Product</option>
                     @foreach($products as $product)
@@ -93,12 +89,12 @@
                 <label class="form-label">Item Name <span class="text-danger">*</span></label>
                 <input type="text" name="items[{{ $index }}][item_name]" class="form-control item-name" value="{{ $item['item_name'] ?? '' }}" required>
             </div>
-            <div class="col-md-3 mb-2">
+            <div class="col-md-2 mb-2">
                 <label class="form-label">Quantity <span class="text-danger">*</span></label>
                 <input type="number" name="items[{{ $index }}][quantity]" class="form-control item-quantity" value="{{ $item['quantity'] ?? 1 }}" min="1" required>
             </div>
             <div class="col-md-2 mb-2">
-                <label class="form-label">Unit Cost <span class="text-danger">*</span></label>
+                <label class="form-label">Unit Price <span class="text-danger">*</span></label>
                 <input type="number" step="0.01" name="items[{{ $index }}][unit_price]" class="form-control item-unit-price" value="{{ $item['unit_price'] ?? '' }}" min="0" required>
             </div>
             <div class="col-md-1 mb-2 d-flex align-items-end">
@@ -120,25 +116,8 @@
 <hr>
 
 <div class="row justify-content-end">
-    <div class="col-md-4">
-        <div class="row mb-2">
-            <label for="discount_type" class="col-sm-4 col-form-label">Discount Type</label>
-            <div class="col-sm-8">
-                <select name="discount_type" id="discount_type" class="form-select @error('discount_type') is-invalid @enderror">
-                    <option value="">None</option>
-                    <option value="percentage" {{ old('discount_type', $purchaseOrder->discount_type ?? '') == 'percentage' ? 'selected' : '' }}>Percentage (%)</option>
-                    <option value="fixed" {{ old('discount_type', $purchaseOrder->discount_type ?? '') == 'fixed' ? 'selected' : '' }}>Fixed Amount ($)</option>
-                </select>
-                @error('discount_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-        </div>
-        <div class="row mb-2">
-            <label for="discount_value" class="col-sm-4 col-form-label">Discount Value</label>
-            <div class="col-sm-8">
-                <input type="number" step="0.01" name="discount_value" id="discount_value" class="form-control @error('discount_value') is-invalid @enderror" value="{{ old('discount_value', $purchaseOrder->discount_value ?? 0) }}">
-                @error('discount_value') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-        </div>
+    <div class="col-md-5">
+        {{-- Discount fields can be added here if needed for POs --}}
         <div class="row mb-2">
             <label for="tax_percentage" class="col-sm-4 col-form-label">Tax (%)</label>
             <div class="col-sm-8">
@@ -147,14 +126,14 @@
             </div>
         </div>
         <div class="row mb-2">
-            <label for="shipping_cost" class="col-sm-4 col-form-label">Shipping Cost ($)</label>
+            <label for="shipping_cost" class="col-sm-4 col-form-label">Shipping Cost</label>
             <div class="col-sm-8">
                 <input type="number" step="0.01" name="shipping_cost" id="shipping_cost" class="form-control @error('shipping_cost') is-invalid @enderror" value="{{ old('shipping_cost', $purchaseOrder->shipping_cost ?? 0) }}">
                 @error('shipping_cost') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
-        <div class="row mb-2">
-            <label for="other_charges" class="col-sm-4 col-form-label">Other Charges ($)</label>
+         <div class="row mb-2">
+            <label for="other_charges" class="col-sm-4 col-form-label">Other Charges</label>
             <div class="col-sm-8">
                 <input type="number" step="0.01" name="other_charges" id="other_charges" class="form-control @error('other_charges') is-invalid @enderror" value="{{ old('other_charges', $purchaseOrder->other_charges ?? 0) }}">
                 @error('other_charges') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -192,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function () {
         newRow.classList.add('row', 'align-items-center', 'mb-2', 'po-item-row', 'border', 'p-2', 'rounded');
         newRow.innerHTML = `
             <input type="hidden" name="items[${itemRowIndex}][purchase_order_item_id]" value="">
-            <div class="col-md-3 mb-2"><label class="form-label">Product/Service</label><select name="items[${itemRowIndex}][product_id]" class="form-select product-select"><option value="">Select Product</option>@foreach($products as $product)<option value="{{ $product->product_id }}" data-price="{{ $product->cost ?? $product->price }}" data-description="{{ $product->description }}">{{ $product->name }} (SKU: {{ $product->sku ?? 'N/A' }})</option>@endforeach</select></div>
+            <div class="col-md-3 mb-2"><label class="form-label">Product</label><select name="items[${itemRowIndex}][product_id]" class="form-select product-select"><option value="">Select Product</option>@foreach($products as $product)<option value="{{ $product->product_id }}" data-price="{{ $product->cost ?? $product->price }}" data-description="{{ $product->description }}">{{ $product->name }} (SKU: {{ $product->sku ?? 'N/A' }})</option>@endforeach</select></div>
             <div class="col-md-3 mb-2"><label class="form-label">Item Name <span class="text-danger">*</span></label><input type="text" name="items[${itemRowIndex}][item_name]" class="form-control item-name" required></div>
-            <div class="col-md-3 mb-2"><label class="form-label">Quantity <span class="text-danger">*</span></label><input type="number" name="items[${itemRowIndex}][quantity]" class="form-control item-quantity" value="1" min="1" required></div>
-            <div class="col-md-2 mb-2"><label class="form-label">Unit Cost <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${itemRowIndex}][unit_price]" class="form-control item-unit-price" min="0" required></div>
+            <div class="col-md-2 mb-2"><label class="form-label">Quantity <span class="text-danger">*</span></label><input type="number" name="items[${itemRowIndex}][quantity]" class="form-control item-quantity" value="1" min="1" required></div>
+            <div class="col-md-2 mb-2"><label class="form-label">Unit Price <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${itemRowIndex}][unit_price]" class="form-control item-unit-price" min="0" required></div>
             <div class="col-md-1 mb-2 d-flex align-items-end"><button type="button" class="btn btn-danger remove-item-btn">&times;</button></div>
             <div class="col-md-12 mb-2"><label class="form-label">Description</label><textarea name="items[${itemRowIndex}][item_description]" class="form-control item-description" rows="1"></textarea></div>
         `;
@@ -214,13 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const selectedOption = event.target.options[event.target.selectedIndex];
             const row = event.target.closest('.po-item-row');
             if (selectedOption.value) {
-                // Extract name without SKU for item_name
                 const productNameFull = selectedOption.text.trim();
                 const skuMatch = productNameFull.match(/\(SKU:.*\)/);
                 const productName = skuMatch ? productNameFull.replace(skuMatch[0], '').trim() : productNameFull;
 
                 row.querySelector('.item-name').value = productName;
-                row.querySelector('.item-unit-price').value = selectedOption.dataset.price || '';
+                row.querySelector('.item-unit-price').value = selectedOption.dataset.price || ''; // Use cost for POs
                 row.querySelector('.item-description').value = selectedOption.dataset.description || '';
             }
         }

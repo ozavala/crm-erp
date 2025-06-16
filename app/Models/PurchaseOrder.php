@@ -30,6 +30,7 @@ class PurchaseOrder extends Model
         'tax_percentage',
         'tax_amount',
         'total_amount',
+        'amount_paid', // Added
         'shipping_cost',
         'other_charges', // Any additional charges not covered by shipping or tax
         'terms_and_conditions',
@@ -48,6 +49,7 @@ class PurchaseOrder extends Model
         'tax_percentage' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'amount_paid' => 'decimal:2', // Added
     ];
     public static $types = [
         'Standard' => 'Standard',
@@ -99,5 +101,13 @@ class PurchaseOrder extends Model
     public function payments(): MorphMany
     {
         return $this->morphMany(Payment::class, 'payable');
+    }
+
+    /**
+     * Get the amount due for the purchase order.
+     */
+    public function getAmountDueAttribute()
+    {
+        return $this->total_amount - $this->amount_paid;
     }
 }
