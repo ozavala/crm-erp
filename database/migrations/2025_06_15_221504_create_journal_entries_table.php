@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('entry_date');
             $table->string('transaction_type')->nullable()->comment('e.g., Payment, Invoice, Bill, Manual Journal');
             $table->text('description')->nullable();
-            $table->morphs('referenceable'); // Optional: For direct link to Payment, Invoice, etc.
+            $table->nullableMorphs('referenceable'); // Creates nullable referenceable_id and referenceable_type
             $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
             $table->timestamps();
         });

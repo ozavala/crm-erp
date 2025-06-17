@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('account_name'); // Simplified for now: e.g., "Cash", "Accounts Receivable"
             $table->decimal('debit_amount', 15, 2)->default(0.00);
             $table->decimal('credit_amount', 15, 2)->default(0.00);
-            $table->morphs('entity'); // Optional: For sub-ledger tracking (e.g., Customer, Supplier)
+            $table->nullablemorphs('entity'); // Optional: For sub-ledger tracking (e.g., Customer, Supplier)
             $table->timestamps();
         });
     }
