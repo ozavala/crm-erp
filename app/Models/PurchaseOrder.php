@@ -65,6 +65,8 @@ class PurchaseOrder extends Model
         'Received' => 'Received',
         'Completed' => 'Completed', // All items received and potentially billed
         'Cancelled' => 'Cancelled',
+        'Partially Paid' => 'Partially Paid',
+        'Paid' => 'Paid',
     ];
     
 

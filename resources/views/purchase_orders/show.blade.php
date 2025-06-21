@@ -122,14 +122,14 @@
     <div class="card mt-4">
         <div class="card-header"><h4>Payments Made</h4></div>
         <div class="card-body">
-            @if ($purchaseOrder->amount_due > 0 && !in_array($purchaseOrder->status, ['Completed', 'Cancelled']))
+            @if ($purchaseOrder->amount_due > 0 && !in_array($purchaseOrder->status, ['Paid', 'Completed', 'Cancelled']))
             <div class="mb-4 p-3 border rounded">
                 <h5>Record New Payment</h5>
-                <form action="{{ route('payments.store') }}" method="POST"> {{-- Generic store route --}}
+                <form action="{{ route('purchase-orders.payments.store', $purchaseOrder) }}" method="POST">
                     @include('payments._form', ['payable' => $purchaseOrder])
                 </form>
             </div>
-            @elseif (in_array($purchaseOrder->status, ['Completed']) && $purchaseOrder->amount_due <= 0)
+            @elseif ($purchaseOrder->amount_due <= 0)
                 <div class="alert alert-success">This Purchase Order is fully paid.</div>
             @endif
 

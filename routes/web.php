@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('addresses', AddressController::class);
     Route::resource('invoices', InvoiceController::class);
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
+    
+    Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
     Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
 
