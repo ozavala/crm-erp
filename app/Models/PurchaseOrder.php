@@ -112,4 +112,9 @@ class PurchaseOrder extends Model
     {
         return $this->total_amount - $this->amount_paid;
     }
+
+    public function bills(): HasMany
+    {
+        return $this->hasMany(Bill::class, 'purchase_order_id', 'purchase_order_id');
+    }
 }

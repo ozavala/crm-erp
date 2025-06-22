@@ -118,19 +118,23 @@
         </div>
     </div>
 
-    {{-- Payments Section for Purchase Order --}}
+    {{-- Bills & Payments Section for Purchase Order --}}
     <div class="card mt-4">
-        <div class="card-header"><h4>Payments Made</h4></div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Bills & Payments</h4>
+            <a href="{{ route('bills.create', ['purchase_order_id' => $purchaseOrder->purchase_order_id]) }}" class="btn btn-primary">Create Bill from PO</a>
+        </div>
         <div class="card-body">
-            @if ($purchaseOrder->amount_due > 0 && !in_array($purchaseOrder->status, ['Paid', 'Completed', 'Cancelled']))
-            <div class="mb-4 p-3 border rounded">
-                <h5>Record New Payment</h5>
-                <form action="{{ route('purchase-orders.payments.store', $purchaseOrder) }}" method="POST">
-                    @include('payments._form', ['payable' => $purchaseOrder])
-                </form>
-            </div>
-            @elseif ($purchaseOrder->amount_due <= 0)
-                <div class="alert alert-success">This Purchase Order is fully paid.</div>
+            {{-- This section now shows Bills related to the PO, not direct payments --}}
+            <h5>Associated Bills</h5>
+            @if($purchaseOrder->bills->isNotEmpty())
+                <ul class="list-group">
+                    @foreach($purchaseOrder->bills as $bill)
+                        <li class="list-group-item"><a href="{{ route('bills.show', $bill) }}">Bill #{{ $bill->bill_number }}</a> - ${{ number_format($bill->total_amount, 2) }} ({{ $bill->status }})</li>
+                    @endforeach
+                </ul>
+            @else
+                <p>No bills have been created for this purchase order yet.</p>
             @endif
 
             <h5>Payment History</h5>

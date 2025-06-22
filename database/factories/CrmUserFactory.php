@@ -17,6 +17,12 @@ class CrmUserFactory extends Factory
     public function definition(): array
     {
         return [
+            'username' => $this->faker->unique()->userName,
+            'full_name' => $this->faker->name(),
+            'email' => $this->faker->unique()->email,
+            'email_verified_at' => now(), // Set email as verified
+            
+            'password' => bcrypt('password'), // Default password, can be overridden  
             //
         ];
     }

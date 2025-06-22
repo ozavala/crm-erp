@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
 use App\Models\Payment;
 use App\Models\Invoice; // To update invoice amount_paid
 use App\Models\PurchaseOrder; // To update PO amount_paid (if implemented directly)
@@ -36,8 +37,12 @@ class PaymentController extends Controller
         if ($payableType === Invoice::class) {
             $payableModel = Invoice::find($payableId);
         } elseif ($payableType === PurchaseOrder::class) {
+            // This flow should now be deprecated in favor of paying Bills.
+            // Keeping it for now, but ideally, you'd remove this and the related routes.
             // Enable linking payments directly to PurchaseOrder
             $payableModel = PurchaseOrder::find($payableId);
+        } elseif ($payableType === Bill::class) {
+            $payableModel = Bill::find($payableId);
         }
 
         if (!$payableModel) {
@@ -54,6 +59,11 @@ class PaymentController extends Controller
             $amountDue = $payableModel->amount_due; // Using the accessor from the model
             if ($validatedData['amount'] > $amountDue) {
                 return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due for the Purchase Order.');
+            }
+        } elseif ($payableModel instanceof Bill) {
+            $amountDue = $payableModel->amount_due;
+            if ($validatedData['amount'] > $amountDue) {
+                return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due for the Bill.');
             }
         }
 
@@ -85,6 +95,17 @@ class PaymentController extends Controller
                 }
                 $payableModel->save();
             }
+            // Logic for Bill payments
+            if ($payableModel instanceof Bill) {
+                $payableModel->increment('amount_paid', $payment->amount);
+
+                if ($payableModel->amount_paid >= $payableModel->total_amount) {
+                    $payableModel->status = 'Paid';
+                } else {
+                    $payableModel->status = 'Partially Paid';
+                }
+                $payableModel->save();
+            }
         });
 
         // Redirect back to the payable entity's show page
@@ -93,6 +114,9 @@ class PaymentController extends Controller
                              ->with('success', 'Payment recorded successfully.');
         } elseif ($payableModel instanceof PurchaseOrder) {
             return redirect()->route('purchase-orders.show', $payableModel->purchase_order_id)
+                             ->with('success', 'Payment recorded successfully.');
+        } elseif ($payableModel instanceof Bill) {
+            return redirect()->route('bills.show', $payableModel->bill_id)
                              ->with('success', 'Payment recorded successfully.');
         }
 
@@ -133,6 +157,17 @@ class PaymentController extends Controller
                 }
                 $payable->save();
             }
+            // Logic for deleting a Bill payment
+            if ($payable instanceof Bill) {
+                $payable->decrement('amount_paid', $payment->amount);
+                if ($payable->amount_paid <= 0) {
+                    $payable->status = 'Awaiting Payment';
+                    $payable->amount_paid = 0;
+                } else {
+                    $payable->status = 'Partially Paid';
+                }
+                $payable->save();
+            }
 
             $payment->delete();
         });
@@ -142,6 +177,9 @@ class PaymentController extends Controller
                              ->with('success', 'Payment deleted successfully and invoice updated.');
         } elseif ($payable instanceof PurchaseOrder) {
             return redirect()->route('purchase-orders.show', $payable->purchase_order_id)
+                             ->with('success', 'Payment deleted successfully and purchase order updated.');
+        } elseif ($payable instanceof Bill) {
+            return redirect()->route('bills.show', $payable->bill_id)
                              ->with('success', 'Payment deleted successfully and purchase order updated.');
         }
 
@@ -156,7 +194,7 @@ class PaymentController extends Controller
         $journalEntry = JournalEntry::create([
             'entry_date' => $payment->payment_date,
             'transaction_type' => 'Payment',
-            'description' => "Payment for " . class_basename($payableModel) . " #" . ($payableModel->invoice_number ?? $payableModel->purchase_order_number ?? $payableModel->getKey()),
+            'description' => "Payment for " . class_basename($payableModel) . " #" . ($payableModel->invoice_number ?? $payableModel->purchase_order_number ?? $payableModel->bill_number ?? $payableModel->getKey()),
             'referenceable_id' => $payment->payment_id,
             'referenceable_type' => Payment::class,
             'created_by_user_id' => $payment->created_by_user_id,
@@ -181,6 +219,23 @@ class PaymentController extends Controller
             ]);
         } elseif ($payableModel instanceof PurchaseOrder) {
             // Payment Made for a Purchase Order (or Bill)
+            // Debit Accounts Payable, Credit Cash (or Bank)
+            $journalEntry->lines()->createMany([
+                [
+                    'account_name' => 'Accounts Payable',
+                    'debit_amount' => $payment->amount,
+                    'credit_amount' => 0,
+                    'entity_id' => $payableModel->supplier_id,
+                    'entity_type' => \App\Models\Supplier::class,
+                ],
+                [
+                    'account_name' => 'Cash', // Or specific bank account
+                    'debit_amount' => 0,
+                    'credit_amount' => $payment->amount,
+                ]
+            ]);
+        } elseif ($payableModel instanceof Bill) {
+            // Payment Made for a Bill
             // Debit Accounts Payable, Credit Cash (or Bank)
             $journalEntry->lines()->createMany([
                 [

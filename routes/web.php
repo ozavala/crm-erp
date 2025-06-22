@@ -1,5 +1,6 @@
 <?php
 
+    
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CrmUserController;
@@ -21,6 +22,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
+Use App\Http\Controllers\BillController; // Add BillController
+
 
 
 Route::get('/', function () {
@@ -56,9 +59,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('addresses', AddressController::class);
     Route::resource('invoices', InvoiceController::class);
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
-    
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
-    Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
+    Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
+    Route::resource('bills', BillController::class);
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
 
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
