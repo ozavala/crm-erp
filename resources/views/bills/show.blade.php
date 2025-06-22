@@ -30,6 +30,10 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    <div class="mb-3">
+        <a href="{{ route('bills.edit', $bill) }}" class="btn btn-warning">Edit Bill</a>
+        {{-- Add delete button here later --}}
+    </div>
 
     <div class="card mb-4">
         <div class="card-header">

@@ -48,6 +48,7 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ route('bills.edit', $bill) }}" class="btn btn-sm btn-warning">Edit</a>
                                 </td>
                             </tr>
                         @empty

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Bill;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
+use App\Models\Product; // Added for product selection in edit view
+use App\Http\Requests\UpdateBillRequest;
 use App\Http\Requests\StoreBillRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,5 +80,68 @@ class BillController extends Controller
         return view('bills.show', compact('bill'));
     }
 
-    // ... other resource methods (edit, update, destroy)
+    public function edit(Bill $bill)
+    {
+        $bill->load(['items.product', 'supplier', 'purchaseOrder']);
+        $suppliers = Supplier::orderBy('name')->get();
+        $statuses = Bill::$statuses;
+        $products = Product::orderBy('name')->get(); // For adding new items
+
+        return view('bills.edit', compact('bill', 'suppliers', 'statuses', 'products'));
+    }
+
+    public function update(UpdateBillRequest $request, Bill $bill)
+    {
+        $validatedData = $request->validated();
+
+        return DB::transaction(function () use ($validatedData, $bill) {
+            $billData = collect($validatedData)->except(['items'])->all();
+
+            // Recalculate totals based on current items
+            $subtotal = 0;
+            foreach ($validatedData['items'] as $item) {
+                $subtotal += ($item['quantity'] ?? 0) * ($item['unit_price'] ?? 0);
+            }
+
+            $taxAmount = $validatedData['tax_amount'] ?? 0;
+            $totalAmount = $subtotal + $taxAmount;
+
+            $billData['subtotal'] = $subtotal;
+            $billData['total_amount'] = $totalAmount;
+            // Status and amount_paid are updated by PaymentController, but can be manually adjusted here if needed
+
+            $bill->update($billData);
+
+            $existingItemIds = $bill->items->pluck('bill_item_id')->toArray();
+            $updatedItemIds = [];
+
+            foreach ($validatedData['items'] as $itemData) {
+                $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
+
+                if (isset($itemData['bill_item_id']) && $itemData['bill_item_id']) {
+                    // Update existing item
+                    $billItem = $bill->items()->where('bill_item_id', $itemData['bill_item_id'])->first();
+                    if ($billItem) {
+                        $billItem->update($itemData);
+                        $updatedItemIds[] = $billItem->bill_item_id;
+                    }
+                } else {
+                    // Create new item
+                    $newItem = $bill->items()->create($itemData);
+                    $updatedItemIds[] = $newItem->bill_item_id;
+                }
+            }
+
+            // Delete items that were removed from the form
+            $itemsToDelete = array_diff($existingItemIds, $updatedItemIds);
+            if (!empty($itemsToDelete)) {
+                $bill->items()->whereIn('bill_item_id', $itemsToDelete)->delete();
+            }
+
+            return redirect()->route('bills.show', $bill->bill_id)
+                             ->with('success', 'Bill updated successfully.');
+        });
+    }
+
+    // ... other resource methods (destroy)
 }

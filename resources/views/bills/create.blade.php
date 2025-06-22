@@ -96,7 +96,7 @@
                                 <td><input type="text" class="form-control item-total" readonly></td>
                             </tr>
                         @endif
-                    </tbody>
+                    </tbody> {{-- Add button to add more rows for standalone bills --}}
                 </table>
                 {{-- Add button to add more rows for standalone bills --}}
             </div>
@@ -126,50 +126,8 @@
                 </div>
             </div>
         </div>
-        {{-- JavaScript for dynamic calculations --}}
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const billItemsBody = document.getElementById('bill-items-body');
-                const taxAmountInput = document.getElementById('tax_amount');
-                const subtotalDisplay = document.getElementById('subtotal-display');
 
-                function calculateTotals() {
-                    let subtotal = 0;
-                    const itemRows = billItemsBody.querySelectorAll('tr');
-
-                    itemRows.forEach(row => {
-                        const quantityInput = row.querySelector('.item-qty');
-                        const unitPriceInput = row.querySelector('.item-price');
-                        const itemTotalInput = row.querySelector('.item-total');
-
-                        const quantity = parseFloat(quantityInput.value) || 0;
-                        const unitPrice = parseFloat(unitPriceInput.value) || 0;
-                        const itemTotal = quantity * unitPrice;
-
-                        itemTotalInput.value = itemTotal.toFixed(2);
-                        subtotal += itemTotal;
-                    });
-
-                    const taxAmount = parseFloat(taxAmountInput.value) || 0;
-                    const totalAmount = subtotal + taxAmount;
-
-                    subtotalDisplay.textContent = '$' + subtotal.toFixed(2); // This line was missing
-                    totalAmountDisplay.textContent = '$' + totalAmount.toFixed(2);
-                }
-
-                // Attach event listeners to quantity, unit price, and tax inputs
-                billItemsBody.addEventListener('input', function(event) {
-                    if (event.target.classList.contains('item-qty') || event.target.classList.contains('item-price')) {
-                        calculateTotals();
-                    }
-                });
-
-                taxAmountInput.addEventListener('input', calculateTotals);
-
-                // Initial calculation on page load
-                calculateTotals();
-            });
-        </script>
+        @include('bills._item_calculation_script')
         
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">Save Bill</button>
