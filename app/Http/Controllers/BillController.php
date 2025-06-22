@@ -17,7 +17,11 @@ class BillController extends Controller
 
     public function index()
     {
-        // Logic to list all bills
+        $bills = Bill::with(['supplier', 'purchaseOrder'])
+            ->orderBy('bill_date', 'desc')
+            ->paginate(15);
+
+        return view('bills.index', compact('bills'));
     }
 
     public function create(Request $request)

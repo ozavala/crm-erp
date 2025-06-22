@@ -102,10 +102,20 @@
                         {{ __('Accounting') }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAccounting">
-                        <a class="dropdown-item" href="{{ route('journal-entries.index') }}">
-                            {{ __('Journal Entries') }}
+                        <a class="dropdown-item" href="{{ route('bills.index') }}">
+                            {{ __('Bills') }}
                         </a>
-                    </div>
+                        <a class="dropdown-item" href="{{ route('payments.index') }}">
+                            {{ __('Payments') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('invoices.index') }}">
+                            {{ __('Invoices') }}
+                        </a>
+                        
+                    
+                   </div>
+                     
+                    
                 </li>
             </ul>
 

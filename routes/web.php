@@ -1,6 +1,6 @@
 <?php
 
-    
+
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CrmUserController;
@@ -63,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
     Route::resource('bills', BillController::class);
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
-
+    Route::resource('payments', PaymentController::class)->except(['create', 'edit', 'show']);
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 

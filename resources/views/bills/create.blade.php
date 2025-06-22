@@ -113,14 +113,64 @@
                     <div class="col-md-6">
                         {{-- Add summary fields like subtotal, tax, total --}}
                         <div class="mb-2">
+                            <p class="d-flex justify-content-between"><span>Subtotal:</span> <span id="subtotal-display">$0.00</span></p>
+                        </div>
+                        <div class="mb-2">
                             <label for="tax_amount" class="form-label">Tax Amount</label>
-                            <input type="number" name="tax_amount" id="tax_amount" class="form-control" step="0.01" value="{{ old('tax_amount', 0) }}">
+                            <input type="number" name="tax_amount" id="tax_amount" class="form-control" step="0.01" value="{{ old('tax_amount', 0) }}" min="0">
+                        </div>
+                        <div class="mb-2">
+                            <p class="d-flex justify-content-between"><span>Total Amount:</span> <span id="total-amount-display">$0.00</span></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        {{-- JavaScript for dynamic calculations --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const billItemsBody = document.getElementById('bill-items-body');
+                const taxAmountInput = document.getElementById('tax_amount');
+                const subtotalDisplay = document.getElementById('subtotal-display');
 
+                function calculateTotals() {
+                    let subtotal = 0;
+                    const itemRows = billItemsBody.querySelectorAll('tr');
+
+                    itemRows.forEach(row => {
+                        const quantityInput = row.querySelector('.item-qty');
+                        const unitPriceInput = row.querySelector('.item-price');
+                        const itemTotalInput = row.querySelector('.item-total');
+
+                        const quantity = parseFloat(quantityInput.value) || 0;
+                        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                        const itemTotal = quantity * unitPrice;
+
+                        itemTotalInput.value = itemTotal.toFixed(2);
+                        subtotal += itemTotal;
+                    });
+
+                    const taxAmount = parseFloat(taxAmountInput.value) || 0;
+                    const totalAmount = subtotal + taxAmount;
+
+                    subtotalDisplay.textContent = '$' + subtotal.toFixed(2); // This line was missing
+                    totalAmountDisplay.textContent = '$' + totalAmount.toFixed(2);
+                }
+
+                // Attach event listeners to quantity, unit price, and tax inputs
+                billItemsBody.addEventListener('input', function(event) {
+                    if (event.target.classList.contains('item-qty') || event.target.classList.contains('item-price')) {
+                        calculateTotals();
+                    }
+                });
+
+                taxAmountInput.addEventListener('input', calculateTotals);
+
+                // Initial calculation on page load
+                calculateTotals();
+            });
+        </script>
+        
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">Save Bill</button>
             <a href="{{ $purchaseOrder ? route('purchase-orders.show', $purchaseOrder) : route('purchase-orders.index') }}" class="btn btn-secondary">Cancel</a>
