@@ -39,6 +39,7 @@ class Customer extends Model
         return "{$this->first_name} {$this->last_name}";
     }
 
+
     /**
      * Get the user who created this customer.
      */
@@ -60,5 +61,12 @@ class Customer extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'customer_id', 'customer_id');
+    }
+    /**
+     * Get all of the customer's contacts.
+     */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class, 'customer_id');
     }
 }

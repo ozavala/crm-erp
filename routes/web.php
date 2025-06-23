@@ -23,6 +23,8 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 Use App\Http\Controllers\BillController; // Add BillController
+use App\Http\Controllers\ContactController; // Add ContactController
+
 
 
 
@@ -45,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('user-roles',UserRoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('customers', CustomerController::class);
+    Route::resource('contacts', ContactController::class);
     Route::resource('leads', LeadController::class);
     Route::post('leads/{lead}/activities', [LeadController::class, 'storeActivity'])->name('leads.activities.store');
     Route::resource('products', ProductController::class);

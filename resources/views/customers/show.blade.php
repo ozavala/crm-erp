@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Details')
+@section('title', 'Customer Details - ' . $customer->name)
 
 @section('content')
 <div class="container">
@@ -61,6 +61,43 @@
                 </form>
             </div>
             <a href="{{ route('customers.index') }}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Contacts</h2>
+            <a href="{{ route('contacts.create', ['customer_id' => $customer->customer_id]) }}" class="btn btn-primary btn-sm">Add New Contact</a>
+        </div>
+        <div class="card-body">
+            @if($customer->contacts->isNotEmpty())
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Title</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($customer->contacts as $contact)
+                            <tr>
+                                <td><a href="{{ route('contacts.show', $contact) }}">{{ $contact->first_name }} {{ $contact->last_name }}</a></td>
+                                <td>{{ $contact->title }}</td>
+                                <td>{{ $contact->email }}</td>
+                                <td>{{ $contact->phone }}</td>
+                                <td>
+                                    <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">Edit</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p>No contacts found for this customer.</p>
+            @endif
         </div>
     </div>
 
