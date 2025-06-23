@@ -101,8 +101,8 @@
         </div>
     </div>
 
-    {{-- Placeholder for related items like Orders, Invoices, etc. --}}
-    {{-- <h3 class="mt-4">Related Orders</h3> --}}
-    {{-- <p>Order listing will go here.</p> --}}
+    {{-- Notes Section --}}
+    @include('partials._notes', ['model' => $customer])
+
 </div>
 @endsection

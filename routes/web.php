@@ -24,6 +24,7 @@ use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\DashboardController; // Add DashboardController
 Use App\Http\Controllers\BillController; // Add BillController
 use App\Http\Controllers\ContactController; // Add ContactController
+use App\Http\Controllers\NoteController; // Add NoteController
 
 
 
@@ -74,6 +75,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('bills/{bill}/force-delete', [BillController::class, 'forceDelete'])->name('bills.force-delete');
     
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
+
+    Route::post('notes', [NoteController::class, 'store'])->name('notes.store');
+    Route::delete('notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
 });
 
 require __DIR__.'/auth.php';

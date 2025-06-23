@@ -69,4 +69,9 @@ class Customer extends Model
     {
         return $this->hasMany(Contact::class, 'customer_id');
     }
+
+    public function notes(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'noteable');
+    }
 }
