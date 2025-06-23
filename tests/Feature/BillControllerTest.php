@@ -133,7 +133,7 @@ class BillControllerTest extends TestCase
 
         // Assert item changes in the database
         $this->assertDatabaseHas('bill_items', ['bill_item_id' => $itemToUpdate->bill_item_id, 'quantity' => 5]);
-        $this->assertDatabaseMissing('bill_items', ['bill_item_id' => $itemToDelete->bill_item_id]);
+        $this->assertSoftDeleted('bill_items', ['bill_item_id' => $itemToDelete->bill_item_id]);
         $this->assertDatabaseHas('bill_items', ['bill_id' => $bill->bill_id, 'item_name' => 'A Brand New Item', 'unit_price' => 75.00]);
 
         // Assert totals were recalculated correctly

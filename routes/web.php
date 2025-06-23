@@ -60,10 +60,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('invoices', InvoiceController::class);
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
+    
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
-    Route::resource('bills', BillController::class);
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
     Route::resource('payments', PaymentController::class)->except(['create', 'edit', 'show']);
+    
+    Route::resource('bills', BillController::class);
+    Route::post('bills/{bill}/restore', [BillController::class, 'restore'])->name('bills.restore');
+    Route::delete('bills/{bill}/force-delete', [BillController::class, 'forceDelete'])->name('bills.force-delete');
+    
     Route::post('leads/{lead}/convert', [LeadController::class, 'convertToCustomer'])->name('leads.convertToCustomer');
 });
 

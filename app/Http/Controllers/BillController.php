@@ -112,7 +112,7 @@ class BillController extends Controller
 
             $bill->update($billData);
 
-            $existingItemIds = $bill->items->pluck('bill_item_id')->toArray();
+            $existingItemIds = $bill->items()->withTrashed()->pluck('bill_item_id')->toArray();
             $updatedItemIds = [];
 
             foreach ($validatedData['items'] as $itemData) {
@@ -120,7 +120,7 @@ class BillController extends Controller
 
                 if (isset($itemData['bill_item_id']) && $itemData['bill_item_id']) {
                     // Update existing item
-                    $billItem = $bill->items()->where('bill_item_id', $itemData['bill_item_id'])->first();
+                    $billItem = $bill->items()->find($itemData['bill_item_id']);
                     if ($billItem) {
                         $billItem->update($itemData);
                         $updatedItemIds[] = $billItem->bill_item_id;
@@ -133,10 +133,9 @@ class BillController extends Controller
             }
 
             // Delete items that were removed from the form
-            $itemsToDelete = array_diff($existingItemIds, $updatedItemIds);
-            if (!empty($itemsToDelete)) {
-                $bill->items()->whereIn('bill_item_id', $itemsToDelete)->delete();
-            }
+           // This line correctly soft-deletes any items associated with the bill
+            // that are NOT in the list of updated/new items.
+            $bill->items()->whereIn('bill_item_id', array_diff($existingItemIds, $updatedItemIds))->delete();
 
             return redirect()->route('bills.show', $bill->bill_id)
                              ->with('success', 'Bill updated successfully.');
