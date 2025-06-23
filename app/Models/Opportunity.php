@@ -18,6 +18,7 @@ class Opportunity extends Model
         'name',
         'description',
         'lead_id',
+        'contact_id', 
         'customer_id',
         'stage',
         'amount',
@@ -51,6 +52,11 @@ class Opportunity extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
     }
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class, 'contact_id', 'contact_id');
+    }
+
 
     public function assignedTo(): BelongsTo
     {

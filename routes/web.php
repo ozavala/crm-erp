@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('product-features', ProductFeatureController::class);
     Route::resource('product-categories', ProductCategoryController::class);
     Route::resource('warehouses', WarehouseController::class);
+    Route::get('customers/{customer}/contacts', [OpportunityController::class, 'getContactsByCustomer'])->name('customers.contacts'); // New API route
     Route::resource('opportunities', OpportunityController::class);
     Route::resource('quotations', QuotationController::class);
     Route::resource('orders', OrderController::class);

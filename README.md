@@ -5,7 +5,9 @@ CRM-ERP is an open-source, integrated Customer Relationship Management and Enter
 ## Features
 
 - Contact and lead management  
-- Sales pipeline and deal tracking  
+- Sales pipeline and deal tracking 
+- Company and contact relationship tracking
+- Sales pipeline and deal tracking (with contact association) 
 - Task and activity management  
 - Integrated ERP modules for finance, inventory, and operations  
 - Real-time data synchronization between CRM and ERP  
@@ -21,15 +23,24 @@ To get started with CRM-ERP, please refer to the documentation and installation 
 
 1. Clone the repository  
 2. Install dependencies via Composer  
-3. Configure your environment settings  
-4. Run database migrations and seeders  
-5. Serve the application locally or deploy to your server  
+    2.1 '$ Composer install' 
+3. Configure your environment settings
+    3.1 Copy .env.example to .env
+    3.2 '$ php artisan key:generate'
+    3.3 '$ php artisan config:cache'
+4. Run database migrations and seeders
+    4.1 '$ php artisan migrate'
+    4.2 '$ php artisan seed' (optional)
+ 5. Serve the application locally or deploy to your server 
+    5.1 '$ php artisan serve'
+
 
 For detailed steps, see the [Installation Guide](docs/INSTALLATION.md) (if applicable).
 
 ## Documentation
 
-Comprehensive documentation is available to help you use and extend CRM-ERP effectively. Check the `docs/` folder or visit our project wiki.
+Comprehensive documentation is available to help you use and extend CRM-ERP effectively. Check the `docs/` folder or visit our project wiki. 
+
 
 ## Contributing
 
