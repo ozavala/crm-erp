@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\CrmUser;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,16 @@ class NoteFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'body' => $this->faker->paragraph,
+            'noteable_id' => function (array $attributes) {
+                // Ensure a Customer is created and its ID is used
+                return Customer::factory()->create()->customer_id;
+            },
+            'noteable_type' => Customer::class,
+            'created_by_user_id' => function (array $attributes) {
+                // Ensure a CrmUser is created and its ID is used
+                return CrmUser::factory()->create()->user_id;
+            },
         ];
     }
 }

@@ -26,13 +26,14 @@ class UpdateOpportunityRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'lead_id' => 'nullable|exists:leads,lead_id',
+            'lead_id' => 'nullable|exists:leads,lead_id',// If converted from a lead
+            'contact_id' => 'nullable|exists:contacts,contact_id', // Added validation for contact_id
             'customer_id' => 'nullable|exists:customers,customer_id',
             'stage' => ['required', 'string', Rule::in(array_keys(Opportunity::$stages))],
             'amount' => 'nullable|numeric|min:0',
             'expected_close_date' => 'nullable|date',
             'probability' => 'nullable|integer|min:0|max:100',
-            'assigned_to_user_id' => 'nullable|exists:crm_users,user_id',
+            'assigned_to_user_id' => 'required|exists:crm_users,user_id',
         ];
     }
 }

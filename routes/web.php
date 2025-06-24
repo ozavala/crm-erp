@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
-    Route::resource('payments', PaymentController::class)->except(['create', 'edit', 'show']);
+    Route::resource('payments', PaymentController::class)->except(['create', 'edit']);
     
     Route::resource('bills', BillController::class);
     Route::post('bills/{bill}/restore', [BillController::class, 'restore'])->name('bills.restore');

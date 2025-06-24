@@ -26,8 +26,8 @@ class Customer extends Model
         'address_state',
         'address_postal_code',
         'address_country',
-        'status', // Example: Active, Inactive, Lead
-        'notes',
+        'status', // Example: Active, Inactive, Lead 
+        // 'notes', // Removed to avoid conflict with polymorphic relationship
         'created_by_user_id',
     ];
 

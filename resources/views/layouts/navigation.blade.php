@@ -14,36 +14,35 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Home') }}</a>
                 </li>
-               
-                
                 <li class="nav-item dropdown">
-                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        {{ __('Users') }}
+                    <a id="navbarDropdownAdmin" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ __('Admin') }}
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAdmin">
                         <a class="dropdown-item" href="{{ route('crm-users.index') }}">
-                            {{ __('Crm Users') }}
+                            {{ __('CRM Users') }}
                         </a>
                         <a class="dropdown-item" href="{{ route('user-roles.index') }}">
                             {{ __('User Roles') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('permissions.index') }}">
+                            {{ __('Permissions') }}
+                        </a>
                         <a class="dropdown-item" href="{{ route('addresses.index') }}">
                             {{ __('Addresses') }}
                         </a>
-
-                        <a class="dropdown-item" href="{{ route('permissions.index') }}">
-                            {{ __('Pemissions') }}
-                        </a>
-                        
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        {{ __('Customers') }}
+                    <a id="navbarDropdownSales" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ __('Sales') }}
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownSales">
                         <a class="dropdown-item" href="{{ route('customers.index') }}">
                             {{ __('Customers') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('contacts.index') }}">
+                            {{ __('Contacts') }}
                         </a>
                         <a class="dropdown-item" href="{{ route('leads.index') }}">
                             {{ __('Leads') }}
@@ -51,7 +50,6 @@
                         <a class="dropdown-item" href="{{ route('opportunities.index') }}">
                             {{ __('Opportunities') }}
                         </a>
-                       
                         <a class="dropdown-item" href="{{ route('quotations.index') }}">
                             {{ __('Quotations') }}
                         </a>
@@ -61,14 +59,29 @@
                         <a class="dropdown-item" href="{{ route('invoices.index') }}">
                             {{ __('Invoices') }}
                         </a>
-                        
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        {{ __('Products') }}
+                    <a id="navbarDropdownPurchasing" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ __('Purchasing') }}
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownProducts">
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPurchasing">
+                        <a class="dropdown-item" href="{{ route('suppliers.index') }}">
+                            {{ __('Suppliers') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('purchase-orders.index') }}">
+                            {{ __('Purchase Orders') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('bills.index') }}">
+                            {{ __('Bills') }}
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownInventory" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ __('Inventory') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownInventory">
                         <a class="dropdown-item" href="{{ route('products.index') }}">
                             {{ __('Products/Services') }}
                         </a>
@@ -84,38 +97,17 @@
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a id="navbarDropdownProducts" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        {{ __('Suppliers') }}
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsers">
-                        <a class="dropdown-item" href="{{ route('suppliers.index') }}">
-                            {{ __('Suppliers') }}
-                        </a>
-                        <a class="dropdown-item" href="{{ route('purchase-orders.index') }}">
-                            {{ __('Purchase Orders') }}
-                        </a>
-                     
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a id="navbarDropdownAccounting" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                    <a id="navbarDropdownAccounting" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ __('Accounting') }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAccounting">
-                        <a class="dropdown-item" href="{{ route('bills.index') }}">
-                            {{ __('Bills') }}
-                        </a>
                         <a class="dropdown-item" href="{{ route('payments.index') }}">
                             {{ __('Payments') }}
                         </a>
-                        <a class="dropdown-item" href="{{ route('invoices.index') }}">
-                            {{ __('Invoices') }}
+                        <a class="dropdown-item" href="{{ route('journal-entries.index') }}">
+                            {{ __('Journal Entries') }}
                         </a>
-                        
-                    
-                   </div>
-                     
-                    
+                    </div>
                 </li>
             </ul>
 

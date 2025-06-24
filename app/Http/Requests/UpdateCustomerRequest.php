@@ -39,7 +39,7 @@ class UpdateCustomerRequest extends FormRequest
             'address_postal_code' => 'nullable|string|max:20',
             'address_country' => 'nullable|string|max:100',
             'status' => 'nullable|string|max:50|in:Active,Inactive,Lead,Prospect',
-            'notes' => 'nullable|string',
+            //'notes' => 'nullable|string',
              // New Address Fields (assuming one address block for now, indexed at 0)
             'addresses' => 'nullable|array|max:1', // Allow only one address block for now
             'addresses.*.address_id' => 'nullable|integer|exists:addresses,address_id', // For updates

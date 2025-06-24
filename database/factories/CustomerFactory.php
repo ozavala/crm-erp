@@ -25,24 +25,8 @@ class CustomerFactory extends Factory
             'address_state' => $this->faker->state(),
             'address_postal_code' => $this->faker->postcode(),
             'status' => $this->faker->randomElement(['lead', 'customer', 'vip']),
-            'notes' => $this->faker->paragraph(),
-            'created_by_user_id' => User::factory(),
-
-            Address::create([
-                'addressable_id' => Customer::factory(),
-                'addressable_type' => Customer::class,
-                'address_type' => $this->faker->randomElement(['Primary', 'Billing', 'Shipping']),
-                'street_address_line_1' => $this->faker->streetAddress(),
-                'street_address_line_2' => $this->faker->optional()->secondaryAddress(),
-                'city' => $this->faker->city(),
-                'state_province' => $this->faker->state(),
-                'postal_code' => $this->faker->postcode(),
-                'country_code' => $this->faker->countryCode(),
-                'is_primary' => $this->faker->boolean(80), // 80% chance of being primary
-            ]),
-           
-            
+            //'notes' => $this->faker->paragraph(),
+            'created_by_user_id' => \App\Models\CrmUser::factory()->create()->user_id, // Ensure a CrmUser is created and its ID is used
         ];
     }
 }
-

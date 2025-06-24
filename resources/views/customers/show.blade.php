@@ -42,9 +42,7 @@
                 </div>
             </div>
 
-            <hr>
-            <h5>Notes</h5>
-            <p>{{ $customer->notes ?: 'N/A' }}</p>
+           
             <hr>
 
             <p><strong>Created By:</strong> {{ $customer->createdBy ? $customer->createdBy->full_name : 'N/A' }} ({{ $customer->createdBy ? $customer->createdBy->username : 'N/A' }})</p>

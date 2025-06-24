@@ -41,5 +41,7 @@
             <a href="{{ route('opportunities.index') }}" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
+    {{-- Notes Section --}}
+    @include('partials._notes', ['model' => $opportunity])
 </div>
 @endsection

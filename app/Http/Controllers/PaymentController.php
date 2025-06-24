@@ -19,6 +19,12 @@ use App\Models\Customer; // If you need to link payments to customers
 
 class PaymentController extends Controller
 {
+    public function index(Request $request)
+    {   
+        $payments = Payment::with(['payable', 'createdBy'])->paginate(10);
+        return view('payments.index', compact('payments'));
+    }
+    
     /**
      * Store a newly created resource in storage.
      * This method will be generic but primarily used via specific routes
@@ -121,6 +127,11 @@ class PaymentController extends Controller
         }
 
         return redirect()->back()->with('success', 'Payment recorded successfully.'); // Fallback
+    }
+    public function show(Payment $payment)
+    {
+        $payable = $payment->payable;
+        return view('payments.show', compact('payable'));
     }
 
     /**

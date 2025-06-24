@@ -14,7 +14,10 @@ class Note extends Model
 
     protected $primaryKey = 'note_id';
 
-    protected $fillable = ['body', 'noteable_id', 'noteable_type', 'created_by_user_id'];
+    protected $fillable = ['body',
+                        'noteable_id', 
+                        'noteable_type', 
+                        'created_by_user_id'];
 
     public function noteable(): MorphTo
     {
