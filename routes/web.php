@@ -57,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('product-categories', ProductCategoryController::class);
     Route::resource('warehouses', WarehouseController::class);
     Route::get('customers/{customer}/contacts', [OpportunityController::class, 'getContactsByCustomer'])->name('customers.contacts'); // New API route
+    Route::get('opportunities/kanban', [OpportunityController::class, 'kanban'])->name('opportunities.kanban');
+    Route::patch('opportunities/{opportunity}/stage', [OpportunityController::class, 'updateStage'])->name('opportunities.updateStage');
     Route::resource('opportunities', OpportunityController::class);
     Route::resource('quotations', QuotationController::class);
     Route::resource('orders', OrderController::class);

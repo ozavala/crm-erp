@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Opportunity; // Ensure this is imported
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class OpportunityController extends Controller
@@ -102,5 +103,46 @@ class OpportunityController extends Controller
                          ];
                      })
         );
+    }
+     /**
+     * Display the opportunities in a Kanban board view.
+     */
+    public function kanban()
+    {
+        $opportunitiesByStage = Opportunity::with(['customer', 'assignedTo'])
+            ->orderBy('expected_close_date', 'asc')
+            ->get()
+            ->groupBy('stage');
+
+        // Ensure all stages from the model are present in the final array
+        $stages = Opportunity::$stages;
+        $kanbanData = [];
+        foreach ($stages as $stageKey => $stageName) {
+            $kanbanData[$stageKey] = $opportunitiesByStage->get($stageKey, collect());
+        }
+
+        return view('opportunities.kanban', compact('kanbanData', 'stages'));
+    }
+
+    /**
+     * Update the stage of an opportunity via AJAX.
+     */
+    public function updateStage(Request $request, Opportunity $opportunity)
+    {
+        $validated = $request->validate([
+            'stage' => ['required', 'string', Rule::in(array_keys(Opportunity::$stages))],
+        ]);
+
+        $oldStage = $opportunity->stage;
+        $newStage = $validated['stage'];
+
+        $opportunity->update(['stage' => $newStage]);
+
+        // Stage Automation: If moved to 'Proposal', create a follow-up task.
+        if ($newStage !== $oldStage && $newStage === 'Proposal') {
+            $opportunity->tasks()->create(['title' => 'Prepare and send proposal for ' . $opportunity->name, 'priority' => 'High', 'due_date' => now()->addDays(3), 'assigned_to_user_id' => $opportunity->assigned_to_user_id, 'created_by_user_id' => Auth::id(), ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Stage updated.']);
     }
 }
