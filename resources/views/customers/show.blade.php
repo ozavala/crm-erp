@@ -102,5 +102,7 @@
     {{-- Notes Section --}}
     @include('partials._notes', ['model' => $customer])
 
+     {{-- Tasks Section --}}
+    @include('partials._tasks', ['model' => $customer])
 </div>
 @endsection

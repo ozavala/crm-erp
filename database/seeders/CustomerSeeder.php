@@ -21,7 +21,7 @@ class CustomerSeeder extends Seeder
             'phone_number' => '123-456-7890', 
             'company_name' => 'Doe Enterprises',
             'status' => 'active', // Example: Active, Inactive, Lead
-            'notes' => 'Important customer, handle with care.',
+            //'notes' => 'Important customer, handle with care.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
         ]);
 
@@ -42,7 +42,7 @@ class CustomerSeeder extends Seeder
             'phone_number' => '987-654-3210',
             'company_name' => 'Smith LLC',
             'status' => 'inactive', // Example: Active, Inactive, Lead
-            'notes' => 'Potential lead, follow up next month.',
+            //'notes' => 'Potential lead, follow up next month.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
         ]);
 
@@ -63,7 +63,7 @@ class CustomerSeeder extends Seeder
             'phone_number' => '555-123-4567',
             'company_name' => 'Johnson Corp',       
             'status' => 'lead', // Example: Active, Inactive, Lead  
-            'notes' => 'Interested in our services, needs more information.',
+            //'notes' => 'Interested in our services, needs more information.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
         ]);
 
@@ -84,7 +84,7 @@ class CustomerSeeder extends Seeder
             'phone_number' => '111-222-3333',
             'company_name' => 'Brown Industries',
             'status' => 'active', // Example: Active, Inactive, Lead
-            'notes' => 'Regular customer, always on time with payments.',
+            //'notes' => 'Regular customer, always on time with payments.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
         ]);
 

@@ -74,4 +74,9 @@ class Customer extends Model
     {
         return $this->morphMany(Note::class, 'noteable');
     }
+
+    public function tasks(): MorphMany
+    {
+        return $this->morphMany(Task::class, 'taskable');
+    }
 }

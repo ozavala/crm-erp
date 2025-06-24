@@ -25,6 +25,7 @@ use App\Http\Controllers\DashboardController; // Add DashboardController
 Use App\Http\Controllers\BillController; // Add BillController
 use App\Http\Controllers\ContactController; // Add ContactController
 use App\Http\Controllers\NoteController; // Add NoteController
+use App\Http\Controllers\TaskController; // Add TaskController
 
 
 
@@ -78,6 +79,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('notes', [NoteController::class, 'store'])->name('notes.store');
     Route::delete('notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
+
+    Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::patch('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 });
 
 require __DIR__.'/auth.php';

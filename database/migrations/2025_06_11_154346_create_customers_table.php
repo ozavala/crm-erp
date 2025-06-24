@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('address_postal_code', 20)->nullable();
             $table->string('address_country', 100)->nullable();
             $table->string('status', 50)->default('Active')->nullable(); // Example: Active, Inactive, Lead
-            $table->text('notes')->nullable();
+            //$table->text('notes')->nullable();
             $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
