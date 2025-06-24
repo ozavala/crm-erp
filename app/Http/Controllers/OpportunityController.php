@@ -107,21 +107,30 @@ class OpportunityController extends Controller
      /**
      * Display the opportunities in a Kanban board view.
      */
-    public function kanban()
+    public function kanban(Request $request)
     {
-        $opportunitiesByStage = Opportunity::with(['customer', 'assignedTo'])
-            ->orderBy('expected_close_date', 'asc')
-            ->get()
-            ->groupBy('stage');
+        $query = Opportunity::with(['customer', 'assignedTo']);
+
+        // Apply filter for assigned user if provided
+        if ($request->filled('assigned_to_user_id')) {
+            $query->where('assigned_to_user_id', $request->input('assigned_to_user_id'));
+        }
+
+        $opportunitiesByStage = $query->orderBy('expected_close_date', 'asc')->get()->groupBy('stage');
 
         // Ensure all stages from the model are present in the final array
         $stages = Opportunity::$stages;
         $kanbanData = [];
+        $stageTotals = [];
+        $crmUsers = CrmUser::orderBy('full_name')->get();
+
         foreach ($stages as $stageKey => $stageName) {
-            $kanbanData[$stageKey] = $opportunitiesByStage->get($stageKey, collect());
+            $opportunitiesInStage = $opportunitiesByStage->get($stageKey, collect());
+            $kanbanData[$stageKey] = $opportunitiesInStage;
+            $stageTotals[$stageKey] = $opportunitiesInStage->sum('amount');
         }
 
-        return view('opportunities.kanban', compact('kanbanData', 'stages'));
+        return view('opportunities.kanban', compact('kanbanData', 'stages', 'stageTotals', 'crmUsers'));
     }
 
     /**
