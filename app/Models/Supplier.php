@@ -45,6 +45,15 @@ class Supplier extends Model
     {
         return $this->morphMany(Contact::class, 'contactable');
     }
+    public function notes(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'noteable');
+    }
+
+    public function tasks(): MorphMany
+    {
+        return $this->morphMany(Task::class, 'taskable');
+    }
 
     // public function products() { ... }
 }

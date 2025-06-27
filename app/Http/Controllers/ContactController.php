@@ -36,14 +36,24 @@ class ContactController extends BaseController
         return view('contacts.index', compact('contacts'));
     }
 
-    public function create()
-{
-    $contact = new Contact();
-    $customers = Customer::orderBy('company_name')->get();
-    $suppliers = Supplier::orderBy('name')->get();
-    return view('contacts.create', compact('contact', 'customers', 'suppliers'));
-}
+    public function create(Request $request)
+    {
+        $contact = new Contact();
 
+        // Check for pre-selection from a parent entity's page, e.g., from a "Add Contact" button on a customer's page.
+        // This allows passing ?customer_id=123 in the URL.
+        if ($request->filled('customer_id')) {
+            $contact->contactable_type = Customer::class;
+            $contact->contactable_id = $request->input('customer_id');
+        } elseif ($request->filled('supplier_id')) {
+            $contact->contactable_type = Supplier::class;
+            $contact->contactable_id = $request->input('supplier_id');
+        }
+
+        $customers = Customer::orderBy('company_name')->get();
+        $suppliers = Supplier::orderBy('name')->get();
+        return view('contacts.create', compact('contact', 'customers', 'suppliers'));
+    }
 
     public function store(StoreContactRequest $request)
     {

@@ -62,7 +62,8 @@ class SupplierController extends Controller
     public function show(Supplier $supplier)
     {
         $supplier->load('addresses');
-        return view('suppliers.show', compact('supplier'));
+        $supplier_contacts =  $supplier->contacts->where('contactable_type', 'App\Models\Supplier')->where('contactable_id', $supplier->supplier_id);
+        return view('suppliers.show', compact('supplier', 'supplier_contacts'));
     }
 
     /**

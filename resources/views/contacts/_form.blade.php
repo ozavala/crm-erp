@@ -92,55 +92,33 @@
 </div>
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const contactableTypeSelector = document.getElementById('contactable_type_selector');
-        const customerSelectGroup = document.getElementById('customer_select_group');
-        const customerSelect = document.getElementById('customer_id');
-        const supplierSelectGroup = document.getElementById('supplier_select_group');
-        const supplierSelect = document.getElementById('supplier_id');
-        const hiddenContactableId = document.getElementById('hidden_contactable_id');
-        const hiddenContactableType = document.getElementById('hidden_contactable_type');
+document.addEventListener('DOMContentLoaded', function () {
+    const contactableTypeSelector = document.getElementById('contactable_type_selector');
+    const customerSelectGroup = document.getElementById('customer_select_group');
+    const customerSelect = document.getElementById('customer_id');
+    const supplierSelectGroup = document.getElementById('supplier_select_group');
+    const supplierSelect = document.getElementById('supplier_id');
+    const hiddenContactableId = document.getElementById('hidden_contactable_id');
+    const hiddenContactableType = document.getElementById('hidden_contactable_type');
 
-        function updateContactableFields() {
-            const selectedType = contactableTypeSelector.value;
-            let selectedId = '';
-            let selectedModelClass = '';
+    function syncFormState() {
+        const selectedType = contactableTypeSelector.value;
 
-            // Reset visibility and values
-            customerSelectGroup.style.display = 'none';
-            supplierSelectGroup.style.display = 'none';
-            customerSelect.removeAttribute('required');
-            supplierSelect.removeAttribute('required');
+        customerSelectGroup.style.display = (selectedType === 'customer') ? 'block' : 'none';
+        supplierSelectGroup.style.display = (selectedType === 'supplier') ? 'block' : 'none';
+        customerSelect.required = (selectedType === 'customer');
+        supplierSelect.required = (selectedType === 'supplier');
 
-            if (selectedType === 'customer') {
-                customerSelectGroup.style.display = 'block';
-                customerSelect.setAttribute('required', 'required');
-                selectedId = customerSelect.value;
-                selectedModelClass = '{{ \App\Models\Customer::class }}';
-            } else if (selectedType === 'supplier') {
-                supplierSelectGroup.style.display = 'block';
-                supplierSelect.setAttribute('required', 'required');
-                selectedId = supplierSelect.value;
-                selectedModelClass = '{{ \App\Models\Supplier::class }}';
-            }
+        hiddenContactableId.value = (selectedType === 'customer') ? customerSelect.value : ((selectedType === 'supplier') ? supplierSelect.value : '');
+        hiddenContactableType.value = (selectedType === 'customer') ? '{{ addslashes(\App\Models\Customer::class) }}' : ((selectedType === 'supplier') ? '{{ addslashes(\App\Models\Supplier::class) }}' : '');
+    }
 
-            hiddenContactableId.value = selectedId;
-            hiddenContactableType.value = selectedModelClass;
-        }
-
-        // Event listeners
-        contactableTypeSelector.addEventListener('change', updateContactableFields);
-        customerSelect.addEventListener('change', function() {
-            if (contactableTypeSelector.value === 'customer') {
-                hiddenContactableId.value = this.value;
-            }
-        });
-        supplierSelect.addEventListener('change', function() {
-            if (contactableTypeSelector.value === 'supplier') {
-                hiddenContactableId.value = this.value;
-            }
-        });
-        updateContactableFields(); // Call once to set initial visibility and values
+    // Add event listeners to all relevant dropdowns to sync state on any change
+    [contactableTypeSelector, customerSelect, supplierSelect].forEach(element => {
+        element.addEventListener('change', syncFormState);
     });
+
+    syncFormState(); // Call once on page load to set the initial state correctly
+});
 </script>
 @endpush

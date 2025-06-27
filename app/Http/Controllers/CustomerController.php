@@ -72,6 +72,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         $customer->load(['createdBy', 'addresses']);
+        $customer_contacts =  $customer->contacts->where('contactable_type', 'App\Models\Customer')->where('contactable_id', $customer->customer_id);
         return view('customers.show', compact('customer'));
     }
 
