@@ -71,8 +71,8 @@
 <h4>Product Features</h4>
 <div id="product-features-container">
     @php
-        $existingFeatures = old('features', isset($product) ? $product->features->mapWithKeys(function ($feature) {
-            return [ $loop->index => ['feature_id' => $feature->feature_id, 'value' => $feature->pivot->value] ];
+        $existingFeatures = old('features', isset($product) ? $product->features->mapWithKeys(function ($feature, $key) {
+            return [ $key => ['feature_id' => $feature->feature_id, 'value' => $feature->pivot->value] ];
         })->all() : []);
         $featureIndex = 0;
     @endphp

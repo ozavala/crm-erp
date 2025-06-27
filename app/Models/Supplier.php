@@ -38,5 +38,13 @@ class Supplier extends Model
         return $this->hasMany(PurchaseOrder::class, 'supplier_id', 'supplier_id');
     }
 
+    /**
+     * Get all of the supplier's contacts.
+     */
+    public function contacts(): MorphMany
+    {
+        return $this->morphMany(Contact::class, 'contactable');
+    }
+
     // public function products() { ... }
 }

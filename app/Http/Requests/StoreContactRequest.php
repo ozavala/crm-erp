@@ -2,16 +2,21 @@
 
 namespace App\Http\Requests;
 
+
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Traits\ValidatesContactable;
+
 
 class StoreContactRequest extends FormRequest
 {
+    use ValidatesContactable;
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        // Allow if the user is authenticated.
+        return $this->user() !== null;
     }
 
     /**
@@ -21,13 +26,14 @@ class StoreContactRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'customer_id' => 'required|exists:customers,customer_id',
+        $contactRules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:contacts,email',
+            'email' => ['nullable', 'email', 'max:255', 'unique:contacts,email'],
             'phone' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
         ];
+
+        return array_merge($contactRules, $this->contactableRules());
     }
 }

@@ -36,7 +36,8 @@ class Customer extends Model
      */
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        $full_name ="{$this->first_name} {$this->last_name}";
+        return $full_name;
     }
 
 
@@ -65,9 +66,9 @@ class Customer extends Model
     /**
      * Get all of the customer's contacts.
      */
-    public function contacts(): HasMany
+    public function contacts(): MorphMany
     {
-        return $this->hasMany(Contact::class, 'customer_id');
+        return $this->morphMany(Contact::class, 'contactable');
     }
 
     public function notes(): MorphMany

@@ -11,7 +11,14 @@
             Contact Details
         </div>
         <div class="card-body">
-            <p><strong>Company:</strong> <a href="{{ route('customers.show', $contact->customer) }}">{{ $contact->customer->company_name ?: $contact->customer->full_name }}</a></p>
+            <p><strong>Company:</strong>
+                @if ($contact->contactable_id && $contact->contactable) {{-- Ensure ID and relation are present --}}
+                    @if ($contact->contactable_type === \App\Models\Customer::class)
+                        <a href="{{ route('customers.show', $contact->contactable_id) }}">{{ $contact->contactable->company_name ?: $contact->contactable->full_name }}</a>
+                    @elseif ($contact->contactable_type === \App\Models\Supplier::class)
+                        <a href="{{ route('suppliers.show', $contact->contactable_id) }}">{{ $contact->contactable->name }}</a>
+                    @endif
+            </p>
             <p><strong>Title:</strong> {{ $contact->title ?: 'N/A' }}</p>
             <p><strong>Email:</strong> {{ $contact->email ?: 'N/A' }}</p>
             <p><strong>Phone:</strong> {{ $contact->phone ?: 'N/A' }}</p>
@@ -28,7 +35,13 @@
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
-            <a href="{{ route('customers.show', $contact->customer) }}" class="btn btn-secondary">Back to Customer</a>
+           <a href="{{ $contact->contactable_id && $contact->contactable_type === \App\Models\Customer::class
+                ? route('customers.show', $contact->contactable_id) // Only attempt if contactable_id is not null
+                : ($contact->contactable_id && $contact->contactable_type === \App\Models\Supplier::class
+                    ? route('suppliers.show', $contact->contactable_id) // Only attempt if contactable_id is not null
+                    : route('contacts.index')) }}" class="btn btn-secondary">
+                Back to {{ $contact->contactable_type ? class_basename($contact->contactable_type) : 'Contacts' }}
+            </a>
         </div>
     </div>
 </div>

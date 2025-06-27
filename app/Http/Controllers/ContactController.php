@@ -7,71 +7,102 @@ use App\Http\Requests\UpdateContactRequest;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Models\Customer;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Supplier;
+use Illuminate\Support\Facades\Auth; // Keep this
+use Illuminate\Routing\Controller as BaseController; // Correctly alias Laravel's base controller
+use Illuminate\Support\Facades\Route;
 
 
-class ContactController extends Controller
+class ContactController extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) : mixed {
+            if ($request->has('contact') && ($contact = $request->route('contact')) instanceof Contact) {
+                if ($contact && !$contact->relationLoaded('contactable')) {
+                    $contact->load('contactable');
+                }
+            }
+            return $next($request);
+        })->only(['show', 'edit', 'update', 'destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
    public function index()
     {
-        $contacts = Contact::with('customer')->latest()->paginate(15);
+        $contacts = Contact::with('contactable')->latest()->paginate(15);
         return view('contacts.index', compact('contacts'));
     }
 
     public function create()
-    {
-        $contact = new Contact();
-        $customers = Customer::orderBy('company_name')->get();
-        // Pre-select customer if an ID is passed in the request
-        $selectedCustomerId = request()->get('customer_id');
+{
+    $contact = new Contact();
+    $customers = Customer::orderBy('company_name')->get();
+    $suppliers = Supplier::orderBy('name')->get();
+    return view('contacts.create', compact('contact', 'customers', 'suppliers'));
+}
 
-        return view('contacts.create', compact('contact', 'customers', 'selectedCustomerId'));
-    }
 
     public function store(StoreContactRequest $request)
     {
-        $data = $request->validated();
-        $data['created_by_user_id'] = Auth::id();
-
-        $contact = Contact::create($data);
-
-        // Redirect back to the customer's page for a better user experience
-        return redirect()->route('customers.show', $contact->customer_id)
-                         ->with('success', 'Contact created successfully.');
+        $validatedData = $request->validated();
+        $validatedData['created_by_user_id'] = Auth::id(); // Use Auth::id() for consistency
+        $contact = Contact::create($validatedData);
+        return $this->redirectToContactableShow($contact->contactable_type, $contact->contactable_id, 'Contact created successfully.');
     }
+        
+    
 
+    /**
+     * Display the specified contact with its related contactable entity.
+     *
+     * @param  \App\Models\Contact  $contact
+     * @return \Illuminate\View\View
+     */
     public function show(Contact $contact)
     {
-        $contact->load('customer');
+        // The 'contactable' relation is already eager loaded in the constructor middleware
         return view('contacts.show', compact('contact'));
     }
 
     public function edit(Contact $contact)
     {
+        // Order by company_name for consistency and better display in the dropdown
         $customers = Customer::orderBy('company_name')->get();
-        $selectedCustomerId = $contact->customer_id;
-
-        return view('contacts.edit', compact('contact', 'customers', 'selectedCustomerId'));
+        $suppliers = Supplier::orderBy('name')->get();
+        return view('contacts.edit', compact('contact', 'customers', 'suppliers'));
     }
 
     public function update(UpdateContactRequest $request, Contact $contact)
     {
-        $contact->update($request->validated());
-
-        return redirect()->route('customers.show', $contact->customer_id)
-                         ->with('success', 'Contact updated successfully.');
+       $contact->update($request->validated());        
+        return $this->redirectToContactableShow($contact->contactable_type, $contact->contactable_id, 'Contact updated successfully.');
+       
     }
 
     public function destroy(Contact $contact)
     {
-        $customerId = $contact->customer_id;
+        $contactableId = $contact->contactable_id;
+        $contactableType = $contact->contactable_type;
+
         $contact->delete(); // Soft delete
 
-        return redirect()->route('customers.show', $customerId)
-                         ->with('success', 'Contact deleted successfully.');
+        // Use the helper method for consistent redirection after deletion
+        return $this->redirectToContactableShow($contactableType, $contactableId, 'Contact deleted successfully.');
     }
-}
+    /**
+     * Helper to redirect to the contactable entity's show page.
+     */
+    private function redirectToContactableShow(string $contactableType, ?int $contactableId, string $message)
+    {
+        if ($contactableId && $contactableType === \App\Models\Customer::class) {
+            return redirect()->route('customers.show', $contactableId)->with('success', $message);
+        } elseif ($contactableId && $contactableType === \App\Models\Supplier::class) {
+            return redirect()->route('suppliers.show', $contactableId)->with('success', $message);
+        }
+        return redirect()->route('contacts.index')->with('success', $message);
+    }
 
+}
