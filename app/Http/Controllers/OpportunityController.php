@@ -64,7 +64,10 @@ class OpportunityController extends Controller
 
         $selectedCustomerId = $opportunity->customer_id;
         // Load contacts for the pre-selected customer for the edit form
-        $contacts = Contact::where('customer_id', $selectedCustomerId)->orderBy('first_name')->get();
+        $contacts = Contact::where('contactable_type', Customer::class)
+                           ->where('contactable_id', $selectedCustomerId)
+                           ->orderBy('first_name')
+                           ->get();
 
         return view('opportunities.edit', compact('opportunity', 'customers', 'crmUsers', 'stages', 'selectedCustomerId', 'contacts'));
     }

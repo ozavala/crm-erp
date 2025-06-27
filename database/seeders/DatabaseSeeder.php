@@ -10,6 +10,15 @@ use App\Models\Lead;
 use App\Models\Opportunity;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Database\Seeders\CrmUserSeeder;
+use Database\Seeders\ProductCategorySeeder;
+use Database\Seeders\ProductFeatureSeeder;
+use Database\Seeders\ProductSeeder;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\UserRoleSeeder;
+use Database\Seeders\WarehouseSeeder;
+use Database\Seeders\SupplierSeeder;
+use App\Models\Supplier;
 
 class DatabaseSeeder extends Seeder
 {
@@ -60,6 +69,17 @@ class DatabaseSeeder extends Seeder
                 }
             });
         $this->command->info('Customers, Contacts, and Opportunities created.');
+
+        // To properly test the polymorphic relationship, create contacts for Suppliers too.
+        // This assumes a SupplierFactory exists and the Supplier model has a 'contacts' relationship.
+        $suppliers = Supplier::all();
+        if ($suppliers->isNotEmpty()) {
+            // Get a few suppliers and add contacts to them
+            $suppliers->random(min(3, $suppliers->count()))->each(function ($supplier) {
+                $supplier->contacts()->saveMany(Contact::factory(rand(1, 2))->make());
+            });
+            $this->command->info('Contacts for Suppliers created.');
+        }
 
         // Create some standalone leads that haven't been converted yet
         Lead::factory(15)->create([
