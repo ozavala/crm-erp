@@ -26,7 +26,17 @@
                     @forelse($contacts as $contact)
                         <tr>
                             <td><a href="{{ route('contacts.show', $contact) }}">{{ $contact->first_name }} {{ $contact->last_name }}</a></td>
-                            <td><a href="{{ route('customers.show', $contact->customer) }}">{{ $contact->customer->company_name ?: $contact->customer->full_name }}</a></td>
+                            <td>
+                                @if ($contact->contactable)
+                                    @if ($contact->contactable_type === \App\Models\Customer::class)
+                                        <a href="{{ route('customers.show', $contact->contactable) }}">{{ $contact->contactable->company_name ?: $contact->contactable->full_name }}</a>
+                                    @elseif ($contact->contactable_type === \App\Models\Supplier::class)
+                                        <a href="{{ route('suppliers.show', $contact->contactable) }}">{{ $contact->contactable->name }}</a>
+                                    @endif
+                                @else
+                                    N/A
+                                @endif
+                            </td>
                             <td>{{ $contact->title }}</td>
                             <td>{{ $contact->email }}</td>
                             <td>{{ $contact->phone }}</td>

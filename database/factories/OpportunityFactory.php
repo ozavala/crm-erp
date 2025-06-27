@@ -27,8 +27,11 @@ class OpportunityFactory extends Factory
             'lead_id' => Lead::factory(),
             'customer_id' => Customer::factory(),
             'contact_id' => function (array $attributes) {
-                // Create a contact that belongs to the same customer as the opportunity
-                return Contact::factory()->create(['customer_id' => $attributes['customer_id']]);
+                // Create a contact that belongs to the same customer as the opportunity, using the polymorphic relationship
+                return Contact::factory()->create([
+                    'contactable_id' => $attributes['customer_id'],
+                    'contactable_type' => Customer::class,
+                ]);
             },
             'stage' => $this->faker->randomElement(array_keys(Opportunity::$stages)),
             'amount' => $this->faker->randomFloat(2, 1000, 100000),

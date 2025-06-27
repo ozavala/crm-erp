@@ -72,26 +72,23 @@
 
 <div class="mt-3">
     <button type="submit" class="btn btn-primary">{{ $contact->exists ? 'Update Contact' : 'Create Contact' }}</button>
-    <a href="{{ $contact->exists ?
-        // If contact exists, try to go back to its associated entity, ensuring contactable_id is not null
-        ($contact->contactable_id && $contact->contactable_type === \App\Models\Customer::class
-            ? route('customers.show', $contact->contactable_id)
-            : ($contact->contactable_id && $contact->contactable_type === \App\Models\Supplier::class
-                ? route('suppliers.show', $contact->contactable_id)
-                : route('contacts.index') // Fallback if contactable_id is null or type is unknown for existing contact
-            )
-        )
-        : // If creating a new contact
-        (
-            // Check if customer_id or supplier_id was passed in the request and is not empty
-            (request()->filled('customer_id')
-                ? route('customers.show', request('customer_id'))
-                : (request()->filled('supplier_id')
-                    ? route('suppliers.show', request('supplier_id'))
-                    : route('contacts.index') // Fallback if no valid customer_id or supplier_id in request for new contact
-                )
-            )
-    }}" class="btn btn-secondary">Cancel</a>
+    @php
+        $cancelUrl = route('contacts.index'); // Default fallback
+        if ($contact->exists) {
+            if ($contact->contactable_id && $contact->contactable_type === \App\Models\Customer::class) {
+                $cancelUrl = route('customers.show', $contact->contactable_id);
+            } elseif ($contact->contactable_id && $contact->contactable_type === \App\Models\Supplier::class) {
+                $cancelUrl = route('suppliers.show', $contact->contactable_id);
+            }
+        } else {
+            if (request()->filled('customer_id')) {
+                $cancelUrl = route('customers.show', request('customer_id'));
+            } elseif (request()->filled('supplier_id')) {
+                $cancelUrl = route('suppliers.show', request('supplier_id'));
+            }
+        }
+    @endphp
+    <a href="{{ $cancelUrl }}" class="btn btn-secondary">Cancel</a>
 </div>
 @push('scripts')
 <script>
