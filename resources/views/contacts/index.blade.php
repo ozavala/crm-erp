@@ -41,7 +41,7 @@
                     @endforelse
                 </tbody>
             </table>
-            {{ $contacts->links() }}
+            {{ $contacts->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>

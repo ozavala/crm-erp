@@ -78,7 +78,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {{ $quotations->links() }}
+        {{ $quotations->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

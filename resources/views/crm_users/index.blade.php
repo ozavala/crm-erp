@@ -53,7 +53,7 @@
     </table>
 
     <div class="d-flex justify-content-center">
-        {{ $crmUsers->links() }}
+        {{ $crmUsers->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

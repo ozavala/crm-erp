@@ -48,7 +48,7 @@
             </table>
         </div>
         <div class="card-footer">
-            {{ $opportunities->links() }}
+            {{ $opportunities->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>

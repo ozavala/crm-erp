@@ -60,7 +60,7 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center">
-                {{ $bills->links() }}
+                {{ $bills->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

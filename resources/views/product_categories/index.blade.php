@@ -67,7 +67,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {{ $productCategories->links() }}
+        {{ $productCategories->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

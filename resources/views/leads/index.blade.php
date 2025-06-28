@@ -95,7 +95,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {{ $leads->links() }}
+        {{ $leads->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

@@ -77,7 +77,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {{ $addresses->links() }}
+        {{ $addresses->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

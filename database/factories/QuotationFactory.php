@@ -17,7 +17,27 @@ class QuotationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'opportunity_id' => null, // Will be set in the seeder
+            'subject' => $this->faker->sentence,
+            'quotation_date' => now(),
+            'expiry_date' => now()->addDays(30),
+            'status' => 'Draft',
+            'subtotal' => $this->faker->randomFloat(2, 100, 10000),
+            'discount_type' => 'Percentage',
+            'discount_value' => $this->faker->numberBetween(5, 20), // Random discount between 5% and 20%
+            'discount_amount' => function (array $attributes) {
+                return $attributes['subtotal'] * ($attributes['discount_value'] / 100);
+            },
+            'tax_percentage' => 15, // Example tax percentage
+            'tax_amount' => function (array $attributes) {
+                return ($attributes['subtotal'] - $attributes['discount_amount']) * ($attributes['tax_percentage'] / 100);
+            },
+            'total_amount' => function (array $attributes) {
+                return $attributes['subtotal'] - $attributes['discount_amount'] + $attributes['tax_amount'];
+            },
+            'terms_and_conditions' => $this->faker->paragraph,
+            'notes' => $this->faker->paragraph,
+            'created_by_user_id' => null, // Will be set in the seeder
         ];
     }
 }

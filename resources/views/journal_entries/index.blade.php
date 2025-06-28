@@ -82,7 +82,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {{ $journalEntries->links() }}
+        {{ $journalEntries->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

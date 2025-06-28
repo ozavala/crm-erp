@@ -47,7 +47,7 @@
     </table>
 
     <div class="d-flex justify-content-center">
-        {{ $userRoles->links() }}
+        {{ $userRoles->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection
