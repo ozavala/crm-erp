@@ -25,6 +25,8 @@ use App\Http\Controllers\DashboardController; // Add DashboardController
 Use App\Http\Controllers\BillController; // Add BillController
 use App\Http\Controllers\ContactController; // Add ContactController
 use App\Http\Controllers\NoteController; // Add NoteController
+use App\Http\Controllers\LandedCostController;
+use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\TaskController; // Add TaskController
 
 
@@ -85,6 +87,16 @@ Route::middleware('auth')->group(function () {
     Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Landed Costs
+    Route::post('purchase-orders/{purchase_order}/landed-costs', [LandedCostController::class, 'store'])->name('landed-costs.store');
+    Route::delete('landed-costs/{landed_cost}', [LandedCostController::class, 'destroy'])->name('landed-costs.destroy');
+    Route::post('purchase-orders/{purchase_order}/landed-costs/apportion', [LandedCostController::class, 'apportion'])->name('landed-costs.apportion');
+
+    // Goods Receipts
+    Route::get('purchase-orders/{purchase_order}/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
+    Route::post('purchase-orders/{purchase_order}/goods-receipts', [GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
+    Route::get('goods-receipts/{goods_receipt}', [GoodsReceiptController::class, 'show'])->name('goods-receipts.show');
 });
 
 require __DIR__.'/auth.php';

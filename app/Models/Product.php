@@ -71,4 +71,27 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id', 'category_id');
     }
+
+    /**
+     * Updates inventory quantity and recalculates the weighted average cost.
+     *
+     * @param int $quantityReceived The number of units being added to stock.
+     * @param float $landedCostPerUnit The full landed cost for each of those units.
+     */
+    public function receiveStock(int $quantityReceived, float $landedCostPerUnit): void
+    {
+        $oldQuantity = $this->quantity_on_hand;
+        $oldAverageCost = $this->cost;
+
+        $newStockValue = $quantityReceived * $landedCostPerUnit;
+        $oldStockValue = $oldQuantity * $oldAverageCost;
+
+        $totalQuantity = $oldQuantity + $quantityReceived;
+        $totalValue = $oldStockValue + $newStockValue;
+
+        $this->quantity_on_hand = $totalQuantity;
+        $this->cost = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
+
+        $this->save();
+    }
 }

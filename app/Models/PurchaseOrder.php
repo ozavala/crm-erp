@@ -117,4 +117,55 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(Bill::class, 'purchase_order_id', 'purchase_order_id');
     }
+
+    public function landedCosts(): MorphMany
+    {
+        return $this->morphMany(LandedCost::class, 'costable');
+    }
+
+    public function goodsReceipts(): HasMany
+    {
+        return $this->hasMany(GoodsReceipt::class, 'purchase_order_id', 'purchase_order_id');
+    }
+
+    /**
+     * Updates the status of the purchase order based on goods receipts.
+     * Sets status to 'Partially Received' or 'Received'.
+     */
+    public function updateStatusAfterReceipt(): void
+    {
+        // Eager load the necessary relationships to avoid N+1 queries
+        $this->load('items', 'goodsReceipts.items');
+
+        // If there are no items on the PO, there's nothing to do.
+        if ($this->items->isEmpty()) {
+            return;
+        }
+
+        $isFullyReceived = true;
+        $hasAnyReceipts = false;
+
+        // Get a map of total received quantities for each PO item
+        $receivedQuantitiesMap = $this->goodsReceipts
+            ->flatMap->items
+            ->groupBy('purchase_order_item_id')
+            ->map->sum('quantity_received');
+
+        foreach ($this->items as $item) {
+            $totalReceivedForItem = $receivedQuantitiesMap->get($item->purchase_order_item_id, 0);
+
+            if ($totalReceivedForItem > 0) {
+                $hasAnyReceipts = true;
+            }
+
+            if ($totalReceivedForItem < $item->quantity) {
+                $isFullyReceived = false;
+            }
+        }
+
+        if ($hasAnyReceipts) {
+            $this->status = $isFullyReceived ? 'Received' : 'Partially Received';
+            $this->save();
+        }
+    }
 }
