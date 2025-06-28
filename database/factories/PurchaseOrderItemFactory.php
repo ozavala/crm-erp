@@ -13,9 +13,9 @@ class PurchaseOrderItemFactory extends Factory
 
     public function definition(): array
     {
-        $product = Product::factory()->create();
-        $quantity = $this->faker->numberBetween(1, 10);
-        $unitPrice = $product->cost > 0 ? $product->cost : $this->faker->randomFloat(2, 5, 200);
+        $product = Product::where('is_service', false)->inRandomOrder()->first() ?? Product::factory()->create(['is_service' => false]);
+        $quantity = $this->faker->numberBetween(5, 50);
+        $unitPrice = $product->cost ?? $product->price * 0.7; // Use cost if available, else estimate
 
         return [
             'purchase_order_id' => PurchaseOrder::factory(),

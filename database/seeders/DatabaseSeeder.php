@@ -89,8 +89,10 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->command->info('Leads created.');
 
-        // You can continue to call other factory-based seeders if needed
-        // For example, if you refactor QuotationSeeder to use factories:
-        // $this->call(QuotationSeeder::class);
+        // Call the newly refactored seeders
+        $this->call(QuotationSeeder::class);
+        $this->call(PurchaseOrderSeeder::class);
+        // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
+        // We will refactor them next.
     }
 }
