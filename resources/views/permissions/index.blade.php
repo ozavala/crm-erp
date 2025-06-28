@@ -45,7 +45,7 @@
     </table>
 
     <div class="d-flex justify-content-center">
-        {{ $permissions->links'pagination::bootstrap-5') }}
+        {{ $permissions->links ('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection
