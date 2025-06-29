@@ -77,6 +77,23 @@ class ReportController extends Controller
         return view('reports.sales-by-category', compact('categorySalesData', 'period'));
     }
 
+    public function salesByEmployee(Request $request)
+    {
+        $period = $request->input('period', 'last_30_days');
+
+        list($startDate, $endDate) = $this->getDateRange($period);
+
+        $employeeSalesData = DB::table('orders')
+            ->join('crm_users', 'orders.created_by_user_id', '=', 'crm_users.user_id')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->select(DB::raw('CONCAT(crm_users.first_name, ' ', crm_users.last_name) as employee_name'), DB::raw('SUM(orders.total) as total_sales'))
+            ->groupBy('employee_name')
+            ->orderByDesc('total_sales')
+            ->get();
+
+        return view('reports.sales-by-employee', compact('employeeSalesData', 'period'));
+    }
+
     private function getDateRange($period)
     {
         switch ($period) {
