@@ -1,1 +1,1 @@
-feat: Implement Sales by Product report
+feat: Implement Sales by Customer report

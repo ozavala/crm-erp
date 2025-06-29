@@ -58,6 +58,25 @@ class ReportController extends Controller
         return view('reports.sales-by-customer', compact('customerSalesData', 'period'));
     }
 
+    public function salesByCategory(Request $request)
+    {
+        $period = $request->input('period', 'last_30_days');
+
+        list($startDate, $endDate) = $this->getDateRange($period);
+
+        $categorySalesData = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('product_categories', 'products.product_category_id', '=', 'product_categories.id')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->select('product_categories.name as category_name', DB::raw('SUM(order_items.quantity * order_items.unit_price) as total_sales'))
+            ->groupBy('product_categories.name')
+            ->orderByDesc('total_sales')
+            ->get();
+
+        return view('reports.sales-by-category', compact('categorySalesData', 'period'));
+    }
+
     private function getDateRange($period)
     {
         switch ($period) {
