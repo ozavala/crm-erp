@@ -126,6 +126,10 @@
                         <a class="dropdown-item" href="{{ route('reports.sales-by-employee') }}">
                             {{ __('Sales by Employee') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('reports.sales-by-category') }}">
+                            {{ __('Sales by Category') }}
+                        </a>
+                        
                     </div>
                 </li>
             </ul>

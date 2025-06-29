@@ -16,7 +16,7 @@ class ReportController extends Controller
         list($startDate, $endDate) = $this->getDateRange($request);
 
         $salesData = Order::whereBetween('created_at', [$startDate, $endDate])
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total) as total_sales'))
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total_amount) as total_sales'))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
@@ -31,8 +31,8 @@ class ReportController extends Controller
         list($startDate, $endDate) = $this->getDateRange($request);
 
         $productSalesData = DB::table('order_items')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.product_id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->select('products.name as product_name', DB::raw('SUM(order_items.quantity * order_items.unit_price) as total_sales'))
             ->groupBy('products.name')
@@ -49,9 +49,9 @@ class ReportController extends Controller
         list($startDate, $endDate) = $this->getDateRange($request);
 
         $customerSalesData = DB::table('orders')
-            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->join('customers', 'orders.customer_id', '=', 'customers.customer_id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->select('customers.company_name as customer_name', DB::raw('SUM(orders.total) as total_sales'))
+            ->select('customers.company_name as customer_name', DB::raw('SUM(orders.total_amount) as total_sales'))
             ->groupBy('customers.company_name')
             ->orderByDesc('total_sales')
             ->get();
@@ -66,9 +66,9 @@ class ReportController extends Controller
         list($startDate, $endDate) = $this->getDateRange($request);
 
         $categorySalesData = DB::table('order_items')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->join('product_categories', 'products.product_category_id', '=', 'product_categories.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.product_id')
+            ->join('product_categories', 'products.product_category_id', '=', 'product_categories.category_id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->select('product_categories.name as category_name', DB::raw('SUM(order_items.quantity * order_items.unit_price) as total_sales'))
             ->groupBy('product_categories.name')
@@ -87,7 +87,7 @@ class ReportController extends Controller
         $employeeSalesData = DB::table('orders')
             ->join('crm_users', 'orders.created_by_user_id', '=', 'crm_users.user_id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->select(DB::raw('CONCAT(crm_users.first_name, ' ', crm_users.last_name) as employee_name'), DB::raw('SUM(orders.total) as total_sales'))
+            ->select('crm_users.full_name as employee_name', DB::raw('SUM(orders.total_amount) as total_sales'))
             ->groupBy('employee_name')
             ->orderByDesc('total_sales')
             ->get();
@@ -117,4 +117,5 @@ class ReportController extends Controller
                 return [now()->subDays(29)->startOfDay(), now()->endOfDay()];
         }
     }
+
 }
