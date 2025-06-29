@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -12,7 +13,7 @@ class ReportController extends Controller
     {
         $period = $request->input('period', 'last_30_days');
 
-        list($startDate, $endDate) = $this->getDateRange($period);
+        list($startDate, $endDate) = $this->getDateRange($request);
 
         $salesData = Order::whereBetween('created_at', [$startDate, $endDate])
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total) as total_sales'))
@@ -27,7 +28,7 @@ class ReportController extends Controller
     {
         $period = $request->input('period', 'last_30_days');
 
-        list($startDate, $endDate) = $this->getDateRange($period);
+        list($startDate, $endDate) = $this->getDateRange($request);
 
         $productSalesData = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -45,7 +46,7 @@ class ReportController extends Controller
     {
         $period = $request->input('period', 'last_30_days');
 
-        list($startDate, $endDate) = $this->getDateRange($period);
+        list($startDate, $endDate) = $this->getDateRange($request);
 
         $customerSalesData = DB::table('orders')
             ->join('customers', 'orders.customer_id', '=', 'customers.id')
@@ -62,7 +63,7 @@ class ReportController extends Controller
     {
         $period = $request->input('period', 'last_30_days');
 
-        list($startDate, $endDate) = $this->getDateRange($period);
+        list($startDate, $endDate) = $this->getDateRange($request);
 
         $categorySalesData = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -81,7 +82,7 @@ class ReportController extends Controller
     {
         $period = $request->input('period', 'last_30_days');
 
-        list($startDate, $endDate) = $this->getDateRange($period);
+        list($startDate, $endDate) = $this->getDateRange($request);
 
         $employeeSalesData = DB::table('orders')
             ->join('crm_users', 'orders.created_by_user_id', '=', 'crm_users.user_id')
@@ -94,17 +95,26 @@ class ReportController extends Controller
         return view('reports.sales-by-employee', compact('employeeSalesData', 'period'));
     }
 
-    private function getDateRange($period)
+    private function getDateRange(Request $request)
     {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if ($startDate && $endDate) {
+            return [Carbon::parse($startDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()];
+        }
+
+        $period = $request->input('period', 'last_30_days');
+
         switch ($period) {
             case 'last_7_days':
-                return [now()->subDays(6), now()];
+                return [now()->subDays(6)->startOfDay(), now()->endOfDay()];
             case 'last_30_days':
-                return [now()->subDays(29), now()];
+                return [now()->subDays(29)->startOfDay(), now()->endOfDay()];
             case 'last_90_days':
-                return [now()->subDays(89), now()];
+                return [now()->subDays(89)->startOfDay(), now()->endOfDay()];
             default:
-                return [now()->subDays(29), now()];
+                return [now()->subDays(29)->startOfDay(), now()->endOfDay()];
         }
     }
 }
