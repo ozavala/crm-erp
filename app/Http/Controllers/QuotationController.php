@@ -60,18 +60,23 @@ class QuotationController extends Controller
     {
         $validatedData = $request->validated();
         
-        return DB::transaction(function () use ($validatedData, $request) {
+        return DB::transaction(function () use ($validatedData) {
             $quotationData = collect($validatedData)->except(['items'])->all();
             $quotationData['created_by_user_id'] = Auth::id();
             
             // Calculate totals before creating quotation
-            $totals = $this->calculateTotals($request->input('items', []), $request->input('discount_type'), $request->input('discount_value', 0), $request->input('tax_percentage', 0));
+            $totals = $this->calculateTotals(
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
+            );
             $quotationData = array_merge($quotationData, $totals);
 
             $quotation = Quotation::create($quotationData);
 
             // Create quotation items
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 $quotation->items()->create($itemData);
             }
@@ -109,11 +114,16 @@ class QuotationController extends Controller
     {
         $validatedData = $request->validated();
 
-        return DB::transaction(function () use ($validatedData, $request, $quotation) {
+        return DB::transaction(function () use ($validatedData, $quotation) {
             $quotationData = collect($validatedData)->except(['items'])->all();
 
             // Calculate totals before updating quotation
-            $totals = $this->calculateTotals($request->input('items', []), $request->input('discount_type'), $request->input('discount_value', 0), $request->input('tax_percentage', 0));
+            $totals = $this->calculateTotals(
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
+            );
             $quotationData = array_merge($quotationData, $totals);
             
             $quotation->update($quotationData);
@@ -122,7 +132,7 @@ class QuotationController extends Controller
             $existingItemIds = $quotation->items->pluck('quotation_item_id')->all();
             $newItemIds = [];
 
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 if (isset($itemData['quotation_item_id']) && in_array($itemData['quotation_item_id'], $existingItemIds)) {
                     // Update existing item
