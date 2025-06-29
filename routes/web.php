@@ -28,6 +28,7 @@ use App\Http\Controllers\NoteController; // Add NoteController
 use App\Http\Controllers\LandedCostController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\TaskController; // Add TaskController
+use App\Http\Controllers\ReportController;
 
 
 
@@ -97,6 +98,9 @@ Route::middleware('auth')->group(function () {
     Route::get('purchase-orders/{purchase_order}/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
     Route::post('purchase-orders/{purchase_order}/goods-receipts', [GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
     Route::get('goods-receipts/{goods_receipt}', [GoodsReceiptController::class, 'show'])->name('goods-receipts.show');
+
+    // Reports
+    Route::get('reports/sales', [ReportController::class, 'salesByPeriod'])->name('reports.sales');
 });
 
 require __DIR__.'/auth.php';
