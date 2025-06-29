@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PurchaseOrderController extends Controller
 {
@@ -70,7 +71,7 @@ class PurchaseOrderController extends Controller
     {
         $validatedData = $request->validated();
             
-            return DB::transaction(function () use ($validatedData, $request) {
+            return DB::transaction(function () use ($validatedData) {
                 $poData = collect($validatedData)->except(['items'])->all();
                 $poData['created_by_user_id'] = Auth::id();
                 $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? ('PO-' . strtoupper(Str::random(8)));
@@ -103,9 +104,23 @@ class PurchaseOrderController extends Controller
      */
     public function show(PurchaseOrder $purchaseOrder)
         {
-            $purchaseOrder->load(['supplier', 'createdBy', 'items.product', 'shippingAddress', 'payments']);
+            $purchaseOrder->load(['supplier', 'createdBy', 'items.product', 'shippingAddress', 'payments', 'landedCosts', 'goodsReceipts.receivedBy']);
             return view('purchase_orders.show', compact('purchaseOrder'));
         }
+
+    /**
+     * Generate a PDF for the specified purchase order.
+     *
+     * @param  \App\Models\PurchaseOrder  $purchaseOrder
+     * @return \Illuminate\Http\Response
+     */
+    public function printPdf(PurchaseOrder $purchaseOrder)
+    {
+        $purchaseOrder->load(['supplier.addresses', 'items.product', 'shippingAddress']);
+        
+        $pdf = Pdf::loadView('purchase_orders.pdf', compact('purchaseOrder'));
+        return $pdf->stream('po_' . $purchaseOrder->purchase_order_number . '.pdf');
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -132,7 +147,7 @@ class PurchaseOrderController extends Controller
         {
             $validatedData = $request->validated();
 
-            return DB::transaction(function () use ($validatedData, $request, $purchaseOrder) {
+            return DB::transaction(function () use ($validatedData, $purchaseOrder) {
                 $poData = collect($validatedData)->except(['items'])->all();
                 $poData['purchase_order_number'] = $poData['purchase_order_number'] ?? $purchaseOrder->purchase_order_number ?? ('PO-' . strtoupper(Str::random(8)));
 

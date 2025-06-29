@@ -7,6 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Purchase Order: {{ $purchaseOrder->purchase_order_number }}</h1>
         <div>
+            <a href="{{ route('purchase-orders.print', $purchaseOrder) }}" class="btn btn-info" target="_blank">Print to PDF</a>
             @if(!in_array($purchaseOrder->status, ['Draft', 'Sent', 'Completed', 'Cancelled']))
                 <a href="{{ route('goods-receipts.create', $purchaseOrder) }}" class="btn btn-primary">Receive Goods</a>
             @endif

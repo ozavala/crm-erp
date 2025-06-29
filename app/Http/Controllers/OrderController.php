@@ -82,17 +82,22 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
         
-        return DB::transaction(function () use ($validatedData, $request) {
+        return DB::transaction(function () use ($validatedData) {
             $orderData = collect($validatedData)->except(['items'])->all();
             $orderData['created_by_user_id'] = Auth::id();
             $orderData['order_number'] = $orderData['order_number'] ?? ('ORD-' . strtoupper(Str::random(8)));
             
- $totals = $this->calculateTotals($validatedData['items'] ?? [], $validatedData['discount_type'] ?? null, $validatedData['discount_value'] ?? 0, $validatedData['tax_percentage'] ?? 0);
+            $totals = $this->calculateTotals(
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
+            );
             $orderData = array_merge($orderData, $totals);
 
             $order = Order::create($orderData);
 
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 $order->items()->create($itemData);
             }
@@ -136,11 +141,16 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        return DB::transaction(function () use ($validatedData, $request, $order) {
+        return DB::transaction(function () use ($validatedData, $order) {
             $orderData = collect($validatedData)->except(['items'])->all();
             $orderData['order_number'] = $orderData['order_number'] ?? $order->order_number ?? ('ORD-' . strtoupper(Str::random(8)));
 
-            $totals = $this->calculateTotals($request->input('items', []), $request->input('discount_type'), $request->input('discount_value', 0), $request->input('tax_percentage', 0));
+            $totals = $this->calculateTotals(
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
+            );
             $orderData = array_merge($orderData, $totals);
             
             $order->update($orderData);
@@ -148,7 +158,7 @@ class OrderController extends Controller
             $existingItemIds = $order->items->pluck('order_item_id')->all();
             $newItemIds = [];
 
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 if (isset($itemData['order_item_id']) && in_array($itemData['order_item_id'], $existingItemIds)) {
                     $item = $order->items()->find($itemData['order_item_id']);
