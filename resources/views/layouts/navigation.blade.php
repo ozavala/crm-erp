@@ -109,6 +109,25 @@
                         </a>
                     </div>
                 </li>
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownReports" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ __('Reports') }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownReports">
+                        <a class="dropdown-item" href="{{ route('reports.sales') }}">
+                            {{ __('Sales by Period') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('reports.sales-by-product') }}">
+                            {{ __('Sales by Product') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('reports.sales-by-customer') }}">
+                            {{ __('Sales by Customer') }}
+                        </a>
+                        <a class="dropdown-item" href="{{ route('reports.sales-by-employee') }}">
+                            {{ __('Sales by Employee') }}
+                        </a>
+                    </div>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
