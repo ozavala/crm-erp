@@ -245,39 +245,17 @@
                 {{-- Payments Tab --}}
                 <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
                     <div class="card card-body border-top-0">
-                        <h5>Payments</h5>
-                        @if($purchaseOrder->payments->isNotEmpty())
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th class="text-end">Amount</th>
-                                        <th>Method</th>
-                                        <th>Reference</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($purchaseOrder->payments as $payment)
-                                    <tr>
-                                        <td>{{ $payment->payment_date->format('M d, Y') }}</td>
-                                        <td class="text-end">${{ number_format($payment->amount, 2) }}</td>
-                                        <td>{{ $payment->payment_method }}</td>
-                                        <td>{{ $payment->reference_number }}</td>
-                                        <td class="text-end">
-                                            <form action="{{ route('payments.destroy', $payment->payment_id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <p>No payments have been recorded for this order yet.</p>
-                        @endif
+                        <div class="row">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                @include('partials._payment_form', [
+                                    'payable' => $purchaseOrder,
+                                    'form_url' => route('purchase-orders.payments.store', $purchaseOrder->purchase_order_id)
+                                ])
+                            </div>
+                            <div class="col-lg-6">
+                                @include('partials._payment_list', ['payments' => $purchaseOrder->payments])
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -331,4 +309,3 @@
     </div> {{-- End Main Row --}}
 </div> {{-- End Container --}}
 @endsection
-

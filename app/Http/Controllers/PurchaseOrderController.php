@@ -104,7 +104,7 @@ class PurchaseOrderController extends Controller
      */
     public function show(PurchaseOrder $purchaseOrder)
         {
-            $purchaseOrder->load(['supplier', 'createdBy', 'items.product', 'shippingAddress', 'payments', 'landedCosts', 'goodsReceipts.receivedBy']);
+            $purchaseOrder->load(['supplier', 'createdBy', 'items.product', 'shippingAddress', 'payments.createdBy', 'landedCosts', 'goodsReceipts.receivedBy']);
             return view('purchase_orders.show', compact('purchaseOrder'));
         }
 

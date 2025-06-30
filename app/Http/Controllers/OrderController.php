@@ -112,7 +112,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load(['customer', 'quotation', 'opportunity', 'createdBy', 'items', 'items.product']);
+        $order->load(['customer', 'quotation', 'opportunity', 'createdBy', 'items.product', 'payments.createdBy']);
         // If using Address model for shipping/billing:
         // $order->load(['shippingAddress', 'billingAddress']);
         return view('orders.show', compact('order'));

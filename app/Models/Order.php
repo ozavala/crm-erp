@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Order extends Model
 {
@@ -31,6 +32,7 @@ class Order extends Model
         'tax_percentage',
         'tax_amount',
         'total_amount',
+        'amount_paid',
         'notes',
         'created_by_user_id',
     ];
@@ -43,6 +45,7 @@ class Order extends Model
         'tax_percentage' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'amount_paid' => 'decimal:2',
     ];
 
     public static $statuses = [
@@ -52,6 +55,8 @@ class Order extends Model
         'Delivered' => 'Delivered',
         'Completed' => 'Completed',
         'Cancelled' => 'Cancelled',
+        'Partially Paid' => 'Partially Paid',
+        'Paid' => 'Paid',
     ];
 
     public function customer(): BelongsTo
@@ -95,5 +100,36 @@ class Order extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * Get all of the order's payments.
+     */
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
+    }
+
+    /**
+     * Get the amount due for the order.
+     */
+    public function getAmountDueAttribute()
+    {
+        return $this->total_amount - $this->amount_paid;
+    }
+
+    /**
+     * Updates the status of the order based on its payments.
+     */
+    public function updateStatusAfterPayment(): void
+    {
+        $this->amount_paid = $this->payments()->sum('amount');
+
+        if ($this->amount_paid >= $this->total_amount) {
+            $this->status = 'Paid';
+        } elseif ($this->amount_paid > 0) {
+            $this->status = 'Partially Paid';
+        }
+        $this->save();
     }
 }

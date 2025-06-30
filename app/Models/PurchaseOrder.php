@@ -168,4 +168,21 @@ class PurchaseOrder extends Model
             $this->save();
         }
     }
+
+    /**
+     * Updates the status of the purchase order based on its payments.
+     */
+    public function updateStatusAfterPayment(): void
+    {
+        // Recalculate the amount paid from its payments
+        $this->amount_paid = $this->payments()->sum('amount');
+
+        // Update status based on the new amount_paid
+        if ($this->amount_paid >= $this->total_amount) {
+            $this->status = 'Paid';
+        } elseif ($this->amount_paid > 0) {
+            $this->status = 'Partially Paid';
+        }
+        $this->save();
+    }
 }
