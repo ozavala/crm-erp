@@ -90,8 +90,9 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Leads created.');
 
         // Call the newly refactored seeders
-        $this->call(QuotationSeeder::class);
         $this->call(PurchaseOrderSeeder::class);
+        $this->call(QuotationSeeder::class);
+       
         // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
         // We will refactor them next.
     }

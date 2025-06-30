@@ -28,7 +28,7 @@ class QuotationSeeder extends Seeder
             Quotation::factory()->create([
                 'opportunity_id' => $opportunity->opportunity_id,
                 'created_by_user_id' => $users->random()->user_id,
-                'subject' =>  $opportunity->title,
+                'subject' =>  $opportunity->description,
                 'quotation_date' => now(),
                 'expiry_date' => now()->addDays(30),
                 'status' => 'Draft',
