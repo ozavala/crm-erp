@@ -97,15 +97,18 @@
     <div class="container">
         <table class="header-table">
             <tr>
-                <td>
-                    <h1>PURCHASE ORDER</h1>
-                    {{-- You can replace this with dynamic company info from a config or settings table --}}
-                    <p><strong>Your Company Name</strong><br>
-                    123 Your Street<br>
-                    Your City, ST 12345<br>
-                    your.email@example.com</p>
+                <td style="width: 50%;">
+                    @if(isset($logoData))
+                        <img src="{{ $logoData }}" alt="Logo" style="max-height: 80px; margin-bottom: 15px;">
+                    @endif
+                    <p><strong>{{ config('settings.company_name', 'Your Company Name') }}</strong><br>
+                    {{ config('settings.company_address_line_1', '123 Your Street') }}<br>
+                    {{ config('settings.company_address_line_2', 'Your City, ST 12345') }}<br>
+                    {{ config('settings.company_email', 'your.email@example.com') }}<br>
+                    {{ config('settings.company_phone', '') }}</p>
                 </td>
-                <td class="company-details">
+                <td class="company-details" style="width: 50%;">
+                    <h1 style="font-size: 28px;">PURCHASE ORDER</h1>
                     <h2>PO #: {{ $purchaseOrder->purchase_order_number }}</h2>
                     <p><strong>Status:</strong> {{ $purchaseOrder->status }}</p>
                     <p><strong>Date:</strong> {{ $purchaseOrder->order_date->format('Y-m-d') }}<br>

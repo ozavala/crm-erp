@@ -117,8 +117,19 @@ class PurchaseOrderController extends Controller
     public function printPdf(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->load(['supplier.addresses', 'items.product', 'shippingAddress']);
-        
-        $pdf = Pdf::loadView('purchase_orders.pdf', compact('purchaseOrder'));
+
+        $logoPath = config('settings.company_logo');
+        $logoData = null;
+        // Use the Storage facade to get the path, which is more robust than relying on the public symlink.
+        if ($logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {
+            $path = \Illuminate\Support\Facades\Storage::disk('public')->path($logoPath);
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            // It's crucial to use base64 encoding for embedding images in dompdf
+            $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = Pdf::loadView('purchase_orders.pdf', compact('purchaseOrder', 'logoData'));
         return $pdf->stream('po_' . $purchaseOrder->purchase_order_number . '.pdf');
     }
 

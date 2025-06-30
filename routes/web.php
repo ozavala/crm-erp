@@ -28,9 +28,14 @@ use App\Http\Controllers\NoteController; // Add NoteController
 use App\Http\Controllers\LandedCostController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\TaskController; // Add TaskController
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
 
 
+// In routes/web.php
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
 
 
 Route::get('/', function () {
@@ -106,6 +111,10 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/sales-by-customer', [ReportController::class, 'salesByCustomer'])->name('reports.sales-by-customer');
     Route::get('reports/sales-by-category', [ReportController::class, 'salesByCategory'])->name('reports.sales-by-category');
     Route::get('reports/sales-by-employee', [ReportController::class, 'salesByEmployee'])->name('reports.sales-by-employee');
+});
+Route::middleware('auth')->group(function () {
+    Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';

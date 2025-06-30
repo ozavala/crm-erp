@@ -19,6 +19,9 @@
                         {{ __('Admin') }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAdmin">
+                        <a class="dropdown-item" href="{{ route('settings.edit') }}">
+                            {{ __('Settings') }}
+                        </a>
                         <a class="dropdown-item" href="{{ route('crm-users.index') }}">
                             {{ __('CRM Users') }}
                         </a>

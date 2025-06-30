@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         // 1. Seed foundational data that is mostly static
         $this->call([
             PermissionSeeder::class,
+            SettingsTableSeeder::class,
             UserRoleSeeder::class,
             CrmUserSeeder::class, // Creates specific users like 'Admin', 'Sales'
             ProductCategorySeeder::class,
