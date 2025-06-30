@@ -92,7 +92,9 @@ class GoodsReceiptController extends Controller
 
                 $product = $poItem->product;
                 if ($product) {
-                    $costPerUnit = $poItem->landed_cost_per_unit ?? $poItem->unit_price;
+                    // The true cost per unit is the original unit price plus the apportioned landed cost.
+                    // If landed cost hasn't been apportioned, it defaults to 0.
+                    $costPerUnit = $poItem->unit_price + ($poItem->landed_cost_per_unit ?? 0);
                     $product->receiveStock($receivedItemData['quantity_received'], $costPerUnit);
                 }
             }

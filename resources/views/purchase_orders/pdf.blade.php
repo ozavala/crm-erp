@@ -9,6 +9,9 @@
             font-size: 12px;
             color: #333;
         }
+        @page {
+            margin: 20px 25px;
+        }
         .container {
             width: 100%;
             margin: 0 auto;
@@ -21,10 +24,14 @@
             padding: 5px;
             vertical-align: top;
         }
+        .address-table {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
         .address-table td {
             padding: 10px;
             vertical-align: top;
-            width: 50%;
         }
         .items-table {
             margin-top: 20px;
@@ -52,6 +59,10 @@
         .totals-table td {
             padding: 5px 8px;
         }
+        .totals-table .total-row td {
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
         .notes-section {
             margin-top: 30px;
             page-break-inside: avoid;
@@ -66,6 +77,20 @@
             font-size: 10px;
             color: #777;
         }
+        .company-details {
+            text-align: right;
+        }
+        .company-details h2 {
+            margin-bottom: 0;
+        }
+        .company-details p {
+            margin-top: 5px;
+        }
+        .vendor-details, .shipping-details {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
@@ -74,13 +99,15 @@
             <tr>
                 <td>
                     <h1>PURCHASE ORDER</h1>
+                    {{-- You can replace this with dynamic company info from a config or settings table --}}
                     <p><strong>Your Company Name</strong><br>
                     123 Your Street<br>
                     Your City, ST 12345<br>
                     your.email@example.com</p>
                 </td>
-                <td class="text-end">
+                <td class="company-details">
                     <h2>PO #: {{ $purchaseOrder->purchase_order_number }}</h2>
+                    <p><strong>Status:</strong> {{ $purchaseOrder->status }}</p>
                     <p><strong>Date:</strong> {{ $purchaseOrder->order_date->format('Y-m-d') }}<br>
                     <strong>Expected Delivery:</strong> {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('Y-m-d') : 'N/A' }}</p>
                 </td>
@@ -89,7 +116,7 @@
 
         <table class="address-table">
             <tr>
-                <td>
+                <td class="vendor-details">
                     <strong>Vendor:</strong><br>
                     @if($supplierAddress = $purchaseOrder->supplier->addresses->first())
                         <strong>{{ $purchaseOrder->supplier->name }}</strong><br>
@@ -101,7 +128,7 @@
                         No address on file.
                     @endif
                 </td>
-                <td>
+                <td class="shipping-details">
                     <strong>Ship To:</strong><br>
                     @if($purchaseOrder->shippingAddress)
                         <strong>{{ $purchaseOrder->shippingAddress->address_name ?? 'Main Warehouse' }}</strong><br>
@@ -119,8 +146,10 @@
             <thead>
                 <tr>
                     <th>Item</th>
-                    <th class="text-end">Qty</th>
-                    <th class="text-end">Unit Price</th>
+                    <th class="text-end" style="width: 5%;">Qty</th>
+                    <th class="text-end" style="width: 15%;">Unit Price</th>
+                    <th class="text-end" style="width: 15%;">Landed Cost/Unit</th>
+                    <th class="text-end" style="width: 15%;">Final Cost/Unit</th>
                     <th class="text-end">Total</th>
                 </tr>
             </thead>
@@ -133,6 +162,8 @@
                     </td>
                     <td class="text-end">{{ $item->quantity }}</td>
                     <td class="text-end">${{ number_format($item->unit_price, 2) }}</td>
+                    <td class="text-end">${{ number_format($item->landed_cost_per_unit, 4) }}</td>
+                    <td class="text-end">${{ number_format($item->unit_price + $item->landed_cost_per_unit, 4) }}</td>
                     <td class="text-end">${{ number_format($item->item_total, 2) }}</td>
                 </tr>
                 @endforeach
@@ -153,9 +184,15 @@
                     <td>Shipping:</td>
                     <td class="text-end">${{ number_format($purchaseOrder->shipping_cost, 2) }}</td>
                 </tr>
+                @if($purchaseOrder->other_charges > 0)
                 <tr>
+                    <td>Other Charges:</td>
+                    <td class="text-end">${{ number_format($purchaseOrder->other_charges, 2) }}</td>
+                </tr>
+                @endif
+                <tr class="total-row">
                     <td><strong>Total:</strong></td>
-                    <td class="text-end"><strong>${{ number_format($purchaseOrder->total_amount, 2) }}</strong></td>
+                    <td class="text-end">${{ number_format($purchaseOrder->total_amount, 2) }}</td>
                 </tr>
             </table>
         </div>
@@ -175,4 +212,3 @@
     </div>
 </body>
 </html>
-
