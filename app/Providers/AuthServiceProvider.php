@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Providers;
+
+
+use App\Models\Permission;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Schema;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        $this->registerPolicies();
+
+        // Use Gate::before to check for permissions dynamically. This is far more
+        // performant as it avoids querying the database on every single request.
+        // The closure will be executed before any other Gate checks.
+        Gate::before(function ($user, $ability) {
+            if (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($ability)) {
+                return true;
+            }
+        });
+    }
+}

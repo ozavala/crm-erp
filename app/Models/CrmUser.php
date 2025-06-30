@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
-
 use App\Models\UserRole; // Ensure you have the correct namespace for UserRole
 
  
@@ -58,6 +55,12 @@ class CrmUser extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(UserRole::class, 'crm_user_user_role', 'crm_user_id', 'role_id')->withTimestamps();
+    }
+    public function hasPermissionTo(string $permissionName): bool
+    {
+        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
+            $query->where('name', $permissionName);
+        })->exists();
     }
 
     /**

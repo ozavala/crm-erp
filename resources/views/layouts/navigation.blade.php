@@ -14,6 +14,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Home') }}</a>
                 </li>
+                @can('view-admin-section')
                 <li class="nav-item dropdown">
                     <a id="navbarDropdownAdmin" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ __('Admin') }}
@@ -25,17 +26,22 @@
                         <a class="dropdown-item" href="{{ route('crm-users.index') }}">
                             {{ __('CRM Users') }}
                         </a>
+                        @can('view-roles')
                         <a class="dropdown-item" href="{{ route('user-roles.index') }}">
                             {{ __('User Roles') }}
                         </a>
+                        @endcan
+                        @can('view-permissions')
                         <a class="dropdown-item" href="{{ route('permissions.index') }}">
                             {{ __('Permissions') }}
                         </a>
+                        @endcan
                         <a class="dropdown-item" href="{{ route('addresses.index') }}">
                             {{ __('Addresses') }}
                         </a>
                     </div>
                 </li>
+                @endcan
                 <li class="nav-item dropdown">
                     <a id="navbarDropdownSales" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ __('Sales') }}
@@ -142,7 +148,7 @@
                 <!-- Authentication Links -->
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                        {{ Auth::user()->name }}
+                        {{ Auth::user()->full_name }}
                     </a>
 
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">

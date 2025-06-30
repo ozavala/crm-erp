@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Address; // Add this
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request; // Corrected import
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +26,7 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+       Gate::authorize('view-customers');
        $query = Customer::with('createdBy')->latest();
 
         if ($request->filled('search')) {
@@ -45,6 +47,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create-customers');
         $statuses = $this->customerStatuses;
         return view('customers.create', compact('statuses'));
     }
@@ -54,6 +57,7 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
+        Gate::authorize('create-customers');
         $validatedData = $request->validated();
         $validatedData['created_by_user_id'] = Auth::id();
         
@@ -71,6 +75,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        Gate::authorize('view-customers');
         $customer->load(['createdBy', 'addresses']);
         $customer_contacts =  $customer->contacts->where('contactable_type', 'App\Models\Customer')->where('contactable_id', $customer->customer_id);
         return view('customers.show', compact('customer'));
@@ -81,6 +86,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
+        Gate::authorize('edit-customers');
         $statuses = $this->customerStatuses;
         $customer->load('addresses'); // Load addresses for the form
         return view('customers.edit', compact('customer', 'statuses'));
@@ -91,6 +97,7 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
+        Gate::authorize('edit-customers');
         $validatedData = $request->validated();
         $customerData = collect($validatedData)->except(['addresses'])->all();
         $customer->update($customerData);
@@ -105,6 +112,7 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        Gate::authorize('delete-customers');
         // Add checks here if customer is linked to orders, invoices, etc.
         // For example:
         // if ($customer->orders()->exists()) {

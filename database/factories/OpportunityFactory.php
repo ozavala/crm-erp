@@ -23,7 +23,7 @@ class OpportunityFactory extends Factory
     {
         return [
             'name' => $this->faker->bs(),
-            'description' => $this->faker->paragraph(),
+            'description' => $this->faker->sentence(5),
             'lead_id' => Lead::factory(),
             'customer_id' => Customer::factory(),
             'contact_id' => function (array $attributes) {

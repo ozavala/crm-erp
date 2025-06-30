@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Permission;
 use App\Http\Requests\StorePermissionRequest;
 use App\Http\Requests\UpdatePermissionRequest;
+use Illuminate\Support\Facades\Gate;
 
 class PermissionController extends Controller
 {
@@ -13,6 +14,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
+        Gate::authorize('view-permissions');
         $permissions = Permission::withCount('roles')->paginate(10);
         return view('permissions.index', compact('permissions'));
     }
@@ -22,6 +24,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create-permissions');
         return view('permissions.create');
     }
 
@@ -30,6 +33,7 @@ class PermissionController extends Controller
      */
     public function store(StorePermissionRequest $request)
     {
+        Gate::authorize('create-permissions');
         Permission::create($request->validated());
         return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
     }
@@ -39,6 +43,7 @@ class PermissionController extends Controller
      */
     public function show(Permission $permission)
     {
+        Gate::authorize('view-permissions');
         $permission->load('roles'); // Eager load roles relationship
         return view('permissions.show', compact('permission'));
     }
@@ -48,6 +53,7 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
+        Gate::authorize('edit-permissions');
         return view('permissions.edit', compact('permission'));
     }
 
@@ -56,6 +62,7 @@ class PermissionController extends Controller
      */
     public function update(UpdatePermissionRequest $request, Permission $permission)
     {
+        Gate::authorize('edit-permissions');
         $permission->update($request->validated());
         return redirect()->route('permissions.index')->with('success', 'Permission updated successfully.');
     }
@@ -65,6 +72,7 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
+        Gate::authorize('delete-permissions');
         // Optional: Check if the permission is assigned to any roles before deleting
         if ($permission->roles()->count() > 0) {
             return redirect()->route('permissions.index')->with('error', 'Cannot delete permission. It is assigned to one or more roles.');

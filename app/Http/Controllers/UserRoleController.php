@@ -6,6 +6,7 @@ use App\Models\UserRole;
 use App\Http\Requests\StoreUserRoleRequest;
 use App\Http\Requests\UpdateUserRoleRequest;
 use App\Models\Permission; // Uncomment when Permission model is created
+use Illuminate\Support\Facades\Gate;
 
 class UserRoleController extends Controller
 {
@@ -14,6 +15,7 @@ class UserRoleController extends Controller
      */
     public function index()
     {
+        Gate::authorize('view-roles');
         $userRoles = UserRole::withCount('users', 'permissions')->paginate(10);
         return view('user_roles.index', compact('userRoles'));
     }
@@ -23,6 +25,7 @@ class UserRoleController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create-roles');
         // $permissions = Permission::all(); // Uncomment when Permission model is created
         // return view('user_roles.create', compact('permissions')); // Adjust view name
         $permissions = Permission::orderBy('name')->get();
@@ -34,6 +37,7 @@ class UserRoleController extends Controller
      */
     public function store(StoreUserRoleRequest $request)
     {
+        Gate::authorize('create-roles');
         $userRole = UserRole::create($request->only('name', 'description'));
 
          if ($request->has('permissions')) { // Uncomment when permissions are handled
@@ -48,6 +52,7 @@ class UserRoleController extends Controller
      */
     public function show(UserRole $userRole)
     {
+        Gate::authorize('view-roles');
         $userRole->load('users', 'permissions'); // Eager load relationships
         return view('user_roles.show', compact('userRole'));
     }
@@ -57,6 +62,7 @@ class UserRoleController extends Controller
      */
     public function edit(UserRole $userRole)
     {
+        Gate::authorize('edit-roles');
         // $permissions = Permission::all(); // Uncomment when Permission model is created
         // $assignedPermissions = $userRole->permissions->pluck('permission_id')->toArray(); // Uncomment
         // return view('user_roles.edit', compact('userRole', 'permissions', 'assignedPermissions')); // Adjust view name
@@ -70,6 +76,7 @@ class UserRoleController extends Controller
      */
     public function update(UpdateUserRoleRequest $request, UserRole $userRole)
     {
+        Gate::authorize('edit-roles');
         $userRole->update($request->only('name', 'description'));
 
         // if ($request->has('permissions')) { // Uncomment when permissions are handled
@@ -91,6 +98,7 @@ class UserRoleController extends Controller
      */
     public function destroy(UserRole $userRole)
     {
+        Gate::authorize('delete-roles');
         // Optional: Check if the role is assigned to any users before deleting
         if ($userRole->users()->count() > 0) {
             return redirect()->route('user-roles.index')->with('error', 'Cannot delete role. It is assigned to one or more users.');

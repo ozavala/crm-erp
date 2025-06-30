@@ -54,9 +54,9 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('crm-users', CrmUserController::class);
-    Route::resource('user-roles',UserRoleController::class);
+    Route::resource('user-roles', UserRoleController::class);
     Route::resource('permissions', PermissionController::class);
-    Route::resource('customers', CustomerController::class);
+    Route::resource('customers', CustomerController::class); // Already protected internally
     Route::resource('contacts', ContactController::class);
     Route::resource('leads', LeadController::class);
     Route::post('leads/{lead}/activities', [LeadController::class, 'storeActivity'])->name('leads.activities.store');

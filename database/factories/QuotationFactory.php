@@ -18,7 +18,7 @@ class QuotationFactory extends Factory
     {
         return [
             'opportunity_id' => null, // Will be set in the seeder
-            'subject' => $this->faker->sentence,
+            'subject' => $this->faker->sentence(3),
             'quotation_date' => now(),
             'expiry_date' => now()->addDays(30),
             'status' => 'Draft',

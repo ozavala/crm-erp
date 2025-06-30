@@ -18,28 +18,28 @@ class CrmUserSeeder extends Seeder
         // For example, you might want to create a few users with different roles.
 
         $adminUser = CrmUser::create([
-            'username' => 'Admin User',
+            'username' => 'admin',
             'full_name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'), // Use a secure password in production
         ]);
 
         $salesUser = CrmUser::create([
-            'username' => 'Sales User',
+            'username' => 'sales',
             'full_name' => 'Sales User',
             'email' => 'sales@example.com',
             'password' => bcrypt('password'),
         ]);
 
         $supportUser = CrmUser::create([
-            'username' => 'Support User',
+            'username' => 'support',
             'full_name' => 'Support User',
             'email' => 'support@example.com',
             'password' => bcrypt('password'),
         ]);
 
         $marketingUser = CrmUser::create([
-            'username' => 'Marketing User',
+            'username' => 'marketing',
             'full_name' => 'Marketing User',
             'email' => 'marketing@example.com',
             'password' => bcrypt('password'),
