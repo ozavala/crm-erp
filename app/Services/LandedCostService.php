@@ -24,20 +24,22 @@ class LandedCostService
         }
 
         foreach ($purchaseOrder->items as $item) {
-            $itemValue = $item->item_total;
-            
+            // Using bcmath for high-precision calculations to avoid floating-point inaccuracies
+            $itemValue = (string) $item->item_total;
+            $poSubtotalStr = (string) $poSubtotal;
+            $totalLandedCostsStr = (string) $totalLandedCosts;
+            $itemQuantityStr = (string) $item->quantity;
+
             // Calculate the proportion of the total value this item represents
-            $valueProportion = $itemValue / $poSubtotal;
-            
+            $valueProportion = bcdiv($itemValue, $poSubtotalStr, 10); // 10 decimal places for precision
+
             // Apportion the landed costs to this item line
-            $apportionedCost = $totalLandedCosts * $valueProportion;
-            
-            // Calculate the final total cost for all units of this item and then the cost per unit
-            $finalItemCost = $itemValue + $apportionedCost;
-            $landedCostPerUnit = ($item->quantity > 0) ? ($finalItemCost / $item->quantity) : 0;
+            $apportionedCost = bcmul($totalLandedCostsStr, $valueProportion, 10);
+
+            // Calculate the landed cost per unit for this item line
+            $landedCostPerUnit = ($item->quantity > 0) ? bcdiv($apportionedCost, $itemQuantityStr, 4) : '0.0000'; // 4 decimal places for unit cost
 
             $item->update(['landed_cost_per_unit' => $landedCostPerUnit]);
         }
     }
 }
-

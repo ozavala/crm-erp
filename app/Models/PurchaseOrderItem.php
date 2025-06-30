@@ -20,12 +20,14 @@ class PurchaseOrderItem extends Model
         'quantity',
         'unit_price',
         'item_total',
+        'landed_cost_per_unit',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'item_total' => 'decimal:2',
+        'landed_cost_per_unit' => 'decimal:4',
     ];
 
     public function purchaseOrder(): BelongsTo
