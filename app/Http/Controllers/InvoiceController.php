@@ -92,23 +92,23 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request)
     {
         $validatedData = $request->validated();
-
-        return DB::transaction(function () use ($validatedData, $request) {
+ 
+        return DB::transaction(function () use ($validatedData) {
             $invoiceData = collect($validatedData)->except(['items'])->all();
             $invoiceData['created_by_user_id'] = Auth::id();
             $invoiceData['amount_paid'] = 0; // Initially no amount paid
 
             $totals = $this->calculateTotals(
-                $request->input('items', []),
-                $request->input('discount_type'),
-                $request->input('discount_value', 0),
-                $request->input('tax_percentage', 0)
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
             );
             $invoiceData = array_merge($invoiceData, $totals);
 
             $invoice = Invoice::create($invoiceData);
 
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 $invoice->items()->create($itemData);
             }
@@ -149,14 +149,14 @@ class InvoiceController extends Controller
     {
         $validatedData = $request->validated();
 
-        return DB::transaction(function () use ($validatedData, $request, $invoice) {
+        return DB::transaction(function () use ($validatedData, $invoice) {
             $invoiceData = collect($validatedData)->except(['items'])->all();
 
             $totals = $this->calculateTotals(
-                $request->input('items', []),
-                $request->input('discount_type'),
-                $request->input('discount_value', 0),
-                $request->input('tax_percentage', 0)
+                $validatedData['items'] ?? [],
+                $validatedData['discount_type'] ?? null,
+                $validatedData['discount_value'] ?? 0,
+                $validatedData['tax_percentage'] ?? 0
             );
             $invoiceData = array_merge($invoiceData, $totals);
 
@@ -165,7 +165,7 @@ class InvoiceController extends Controller
             $existingItemIds = $invoice->items->pluck('invoice_item_id')->all();
             $newItemIds = [];
 
-            foreach ($request->input('items', []) as $itemData) {
+            foreach ($validatedData['items'] ?? [] as $itemData) {
                 $itemData['item_total'] = ($itemData['quantity'] ?? 0) * ($itemData['unit_price'] ?? 0);
                 if (isset($itemData['invoice_item_id']) && in_array($itemData['invoice_item_id'], $existingItemIds)) {
                     $item = $invoice->items()->find($itemData['invoice_item_id']);

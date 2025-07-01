@@ -1,32 +1,44 @@
 <?php
-// This file is part of a Laravel application.
-// database/factories/CustomerFactory.php
 
 namespace Database\Factories;
 
-use Illuminate\Support\Str;
-use App\Models\{Customer, User,Address};
+use App\Models\CrmUser;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
+ */
 class CustomerFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = Customer::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
-        return [
-            'first_name' => $this->faker->firstname(),
-            'last_name' => $this->faker->lastname(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'phone_number' => $this->faker->phoneNumber(),
-            'company_name' => $this->faker->company(),
-            'address_street' => $this->faker->streetAddress(),
-            'address_city' => $this->faker->city(),
-            'address_state' => $this->faker->state(),
-            'address_postal_code' => $this->faker->postcode(),
-            'status' => $this->faker->randomElement(['lead', 'customer', 'vip']),
-            //'notes' => $this->faker->paragraph(),
-            'created_by_user_id' => \App\Models\CrmUser::factory()->create()->user_id, // Ensure a CrmUser is created and its ID is used
+        $type = $this->faker->randomElement(['Person', 'Company']);
+
+        $data = [
+            'type' => $type,
+            'legal_id' => $this->faker->unique()->bothify('??-#######-#'), // e.g., AB-1234567-8
+            'email' => $this->faker->unique()->safeEmail,
+            'phone_number' => $this->faker->phoneNumber,
+            'status' => $this->faker->randomElement(['Active', 'Inactive', 'Lead', 'Prospect']),
+            'created_by_user_id' => CrmUser::inRandomOrder()->first()->user_id ?? CrmUser::factory(),
+            'first_name' => $type === 'Person' ? $this->faker->firstName : null,
+            'last_name' => $type === 'Person' ? $this->faker->lastName : null,
+            'company_name' => $type === 'Company' ? $this->faker->company : null,
         ];
+
+        return $data;
     }
 }

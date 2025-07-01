@@ -1,108 +1,122 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Details - ' . $customer->name)
+@section('title', 'Customer: ' . $customer->full_name)
 
 @section('content')
 <div class="container">
-    <h1>Customer: {{ $customer->full_name }}</h1>
-
-    <div class="card">
-        <div class="card-header">
-            Customer ID: {{ $customer->customer_id }}
+    {{-- Header --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">{{ $customer->full_name }}</h1>
+            <p class="text-muted mb-0">{{ $customer->company_name }}</p>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>First Name:</strong> {{ $customer->first_name }}</p>
-                    <p><strong>Last Name:</strong> {{ $customer->last_name }}</p>
-                    <p><strong>Email:</strong> {{ $customer->email ?: 'N/A' }}</p>
-                    <p><strong>Phone Number:</strong> {{ $customer->phone_number ?: 'N/A' }}</p>
-                    <p><strong>Company Name:</strong> {{ $customer->company_name ?: 'N/A' }}</p>
-                    <p><strong>Status:</strong> <span class="badge bg-{{ $customer->status == 'Active' ? 'success' : ($customer->status == 'Inactive' ? 'secondary' : ($customer->status == 'Lead' ? 'info' : 'warning')) }}">{{ $customer->status ?: 'N/A' }}</span></p>
-                </div>
-                <div class="col-md-6">
-                    <h5>Addresses</h5>
-                    @forelse ($customer->addresses as $address)
-                        <div class="mb-2 p-2 border rounded {{ $address->is_primary ? 'border-primary' : '' }}">
-                            <strong>{{ $address->address_type ?: 'Address' }} {{ $address->is_primary ? '(Primary)' : '' }}</strong><br>
-                            {{ $address->street_address_line_1 }}<br>
-                            @if($address->street_address_line_2)
-                                {{ $address->street_address_line_2 }}<br>
-                            @endif
-                            {{ $address->city }}, {{ $address->state_province }} {{ $address->postal_code }}<br>
-                            {{ $address->country_code }}
-                        </div>
-                    @empty
-                        <p>No addresses on file.</p>
-                    @endforelse
-                    {{-- Old address fields (can be removed after migration) --}}
-                    @if(empty($customer->addresses->first()) && ($customer->address_street || $customer->address_city))
-                        <p class="text-muted small"><em>Legacy Address: {{ $customer->address_street }}, {{ $customer->address_city }}, {{ $customer->address_state }} {{ $customer->address_postal_code }} {{ $customer->address_country }}</em></p>
-                    @endif
-                </div>
-            </div>
-
-           
-            <hr>
-
-            <p><strong>Created By:</strong> {{ $customer->createdBy ? $customer->createdBy->full_name : 'N/A' }} ({{ $customer->createdBy ? $customer->createdBy->username : 'N/A' }})</p>
-            <p><strong>Created At:</strong> {{ $customer->created_at->format('Y-m-d H:i:s') }}</p>
-            <p><strong>Updated At:</strong> {{ $customer->updated_at->format('Y-m-d H:i:s') }}</p>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-            <div>
-                <a href="{{ route('customers.edit', $customer->customer_id) }}" class="btn btn-warning">Edit</a>
-                <form action="{{ route('customers.destroy', $customer->customer_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this customer?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-            <a href="{{ route('customers.index') }}" class="btn btn-secondary">Back to List</a>
+        <div>
+            <span class="badge bg-primary fs-6 me-2">{{ $customer->status }}</span>
+            <a href="{{ route('customers.edit', $customer->customer_id) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ route('customers.index') }}" class="btn btn-secondary">Back to Customers</a>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Contacts</h2>
-            <a href="{{ route('contacts.create', ['customer_id' => $customer->customer_id]) }}" class="btn btn-primary btn-sm">Add New Contact</a>
+    {{-- Session Messages --}}
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    {{-- Tabs --}}
+    <ul class="nav nav-tabs" id="customerDetailsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">Details</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">Payments</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab" aria-controls="contacts" aria-selected="false">Contacts</button>
+        </li>
+        {{-- Other tabs can be added here: Contacts, Opportunities, Orders, etc. --}}
+    </ul>
+
+    <div class="tab-content" id="customerDetailsTabContent">
+        {{-- Details Tab --}}
+        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+            <div class="card card-body border-top-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Primary Information</h5>
+                        @if($customer->type === 'Company')
+                            <p><strong>Company Name:</strong> {{ $customer->company_name }}</p>
+                        @else
+                            <p><strong>Name:</strong> {{ $customer->first_name }} {{ $customer->last_name }}</p>
+                        @endif
+                        <p><strong>Legal ID:</strong> {{ $customer->legal_id }}</p>
+                        <p><strong>Email:</strong> {{ $customer->email ?? 'N/A' }}</p>
+                        <p><strong>Phone:</strong> {{ $customer->phone_number }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Addresses</h5>
+                        @forelse($customer->addresses as $address)
+                            <p>
+                                <strong>{{ $address->address_name ?? 'Primary Address' }}:</strong><br>
+                                {{ $address->street_address_line_1 }}<br>
+                                @if($address->street_address_line_2){{ $address->street_address_line_2 }}<br>@endif
+                                {{ $address->city }}, {{ $address->state_province }} {{ $address->postal_code }}
+                            </p>
+                        @empty
+                            <p>No addresses on file.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            @if($customer->contacts->isNotEmpty())
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Title</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($customer->contacts as $contact)
-                            <tr>
-                                <td><a href="{{ route('contacts.show', $contact) }}">{{ $contact->first_name }} {{ $contact->last_name }}</a></td>
-                                <td>{{ $contact->title }}</td>
-                                <td>{{ $contact->email }}</td>
-                                <td>{{ $contact->phone }}</td>
-                                <td>
-                                    <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">Edit</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <p>No contacts found for this customer.</p>
-            @endif
+
+        {{-- Payments Tab --}}
+        <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+            <div class="card card-body border-top-0">
+                <h5>Payment History</h5>
+                @if($payments->isEmpty())
+                    <p>No payments have been recorded for this customer.</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Paid For</th>
+                                    <th>Recorded By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($payments as $payment)
+                                    <tr>
+                                        <td>{{ $payment->payment_date->format('Y-m-d') }}</td>
+                                        <td>${{ number_format($payment->amount, 2) }}</td>
+                                        <td>{{ $payment->payment_method }}</td>
+                                        <td>
+                                            @if ($payment->payable)
+                                                @if ($payment->payable instanceof \App\Models\Order)
+                                                    <a href="{{ route('orders.show', $payment->payable->order_id) }}">
+                                                        Order #{{ $payment->payable->order_number }}
+                                                    </a>
+                                                @elseif ($payment->payable instanceof \App\Models\Invoice)
+                                                    <a href="{{ route('invoices.show', $payment->payable->invoice_id) }}">
+                                                        Invoice #{{ $payment->payable->invoice_number }}
+                                                    </a>
+                                                @else
+                                                    {{ class_basename($payment->payable) }} #{{ $payment->payable->getKey() }}
+                                                @endif
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>{{ $payment->createdBy->full_name ?? 'N/A' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
-
-    {{-- Notes Section --}}
-    @include('partials._notes', ['model' => $customer])
-
-     {{-- Tasks Section --}}
-    @include('partials._tasks', ['model' => $customer])
-</div>
-@endsection

@@ -64,7 +64,7 @@ class CustomerController extends Controller
         $customerData = collect($validatedData)->except(['addresses'])->all();
         $customer = Customer::create($customerData);
 
-        $this->syncAddresses($customer, $request->input('addresses', []));
+        $this->syncAddresses($customer, $validatedData['addresses'] ?? []);
         
         return redirect()->route('customers.index')
                          ->with('success', 'Customer created successfully.');
@@ -76,9 +76,11 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         Gate::authorize('view-customers');
-        $customer->load(['createdBy', 'addresses']);
-        $customer_contacts =  $customer->contacts->where('contactable_type', 'App\Models\Customer')->where('contactable_id', $customer->customer_id);
-        return view('customers.show', compact('customer'));
+        // Eager load all necessary relationships for the detail view
+        $customer->load(['createdBy', 'addresses', 'contacts']);
+        // The getAllPayments method was added in a previous step to fetch payments from orders and invoices
+        $payments = method_exists($customer, 'getAllPayments') ? $customer->getAllPayments() : collect();
+        return view('customers.show', compact('customer', 'payments'));
     }
 
     /**
@@ -102,7 +104,7 @@ class CustomerController extends Controller
         $customerData = collect($validatedData)->except(['addresses'])->all();
         $customer->update($customerData);
 
-        $this->syncAddresses($customer, $request->input('addresses', []));
+        $this->syncAddresses($customer, $validatedData['addresses'] ?? []);
         return redirect()->route('customers.index')
                          ->with('success', 'Customer updated successfully.');
     }

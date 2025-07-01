@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCustomerRequest extends FormRequest
 {
@@ -11,41 +12,54 @@ class StoreCustomerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Adjust authorization as needed
+        // Authorization is handled by the controller's Gate::authorize method.
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'email' => 'nullable|email|max:255|unique:customers,email',
-            'phone_number' => 'nullable|string|max:50',
-            'company_name' => 'nullable|string|max:255',
-            'address_street' => 'nullable|string|max:255',
-            'address_city' => 'nullable|string|max:100',
-            'address_state' => 'nullable|string|max:100',
-            'address_postal_code' => 'nullable|string|max:20',
-            'address_country' => 'nullable|string|max:100',
-             'status' => 'nullable|string|max:50|in:Active,Inactive,Lead,Prospect',
-            //'notes' => 'nullable|string',
-            // New Address Fields (assuming one address block for now, indexed at 0)
-            'addresses' => 'nullable|array|max:1', // Allow only one address block for now
-            'addresses.*.address_id' => 'nullable|integer|exists:addresses,address_id', // For updates
-            'addresses.*.address_type' => 'nullable|string|max:50',
-            'addresses.*.street_address_line_1' => 'required_with:addresses.*.city,addresses.*.postal_code|string|max:255',
-            'addresses.*.street_address_line_2' => 'nullable|string|max:255',
-            'addresses.*.city' => 'required_with:addresses.*.street_address_line_1,addresses.*.postal_code|string|max:100',
-            'addresses.*.state_province' => 'nullable|string|max:100',
-            'addresses.*.postal_code' => 'required_with:addresses.*.street_address_line_1,addresses.*.city|string|max:20',
-            'addresses.*.country_code' => 'nullable|string|size:2',
-            'addresses.*.is_primary' => 'nullable|boolean',
-            // 'created_by_user_id' will be set automatically
+            'type' => ['required', Rule::in(['Person', 'Company'])],
+            'first_name' => ['required_if:type,Person', 'nullable', 'string', 'max:100'],
+            'last_name' => ['required_if:type,Person', 'nullable', 'string', 'max:100'],
+            'company_name' => ['required_if:type,Company', 'nullable', 'string', 'max:255'],
+            'legal_id' => ['required', 'string', 'max:100', 'unique:customers,legal_id'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:customers,email'],
+            'phone_number' => ['nullable', 'string', 'max:50'],
+            'status' => ['required', 'string', Rule::in(['Active', 'Inactive', 'Lead', 'Prospect'])],
+            'addresses' => ['nullable', 'array'],
+            'addresses.*.address_type' => ['nullable', 'string', 'max:255'],
+            'addresses.*.street_address_line_1' => ['required', 'string', 'max:255'],
+            'addresses.*.street_address_line_2' => ['nullable', 'string', 'max:255'],
+            'addresses.*.city' => ['required', 'string', 'max:255'],
+            'addresses.*.state_province' => ['required', 'string', 'max:255'],
+            'addresses.*.postal_code' => ['required', 'string', 'max:20'],
+            'addresses.*.country_code' => ['required', 'string', 'max:3'],
+            'addresses.*.is_primary' => ['nullable', 'boolean'],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('type') === 'Person') {
+            $this->merge([
+                'company_name' => null,
+            ]);
+        }
+
+        if ($this->input('type') === 'Company') {
+            $this->merge([
+                'first_name' => null,
+                'last_name' => null,
+            ]);
+        }
     }
 }

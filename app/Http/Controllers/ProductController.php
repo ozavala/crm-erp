@@ -75,10 +75,10 @@ class ProductController extends Controller
         }
         
         $product = Product::create($validatedData);
-        $this->syncFeatures($product, $request->input('features', []));
+        $this->syncFeatures($product, $validatedData['features'] ?? []);
 
         if (!$product->is_service) {
-            $this->syncInventory($product, $request->input('inventory', []));
+            $this->syncInventory($product, $validatedData['inventory'] ?? []);
         }
         
         return redirect()->route('products.index')
@@ -113,9 +113,9 @@ class ProductController extends Controller
     {
         $validatedData = $request->validated();
         $product->update($validatedData); 
-        $this->syncFeatures($product, $request->input('features', []));
+        $this->syncFeatures($product, $validatedData['features'] ?? []);
         if (!$product->is_service) {
-            $this->syncInventory($product, $request->input('inventory', []));
+            $this->syncInventory($product, $validatedData['inventory'] ?? []);
         } else {
             $product->warehouses()->detach(); // Remove all inventory if it's changed to a service
         }
