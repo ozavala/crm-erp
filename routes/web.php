@@ -30,6 +30,7 @@ use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\TaskController; // Add TaskController
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
 
 
 // In routes/web.php
@@ -74,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])->name('orders.payments.store');
     Route::resource('addresses', AddressController::class);
+    Route::put('quotations/{quotation}/status', [QuotationStatusController::class, 'update'])->name('quotations.status.update');
     Route::resource('invoices', InvoiceController::class);
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');

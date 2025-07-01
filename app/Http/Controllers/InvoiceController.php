@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Quotation;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
 use Illuminate\Http\Request;
@@ -57,6 +58,7 @@ class InvoiceController extends Controller
         $products = Product::where('is_active', true)->orderBy('name')->get();
 
         $selectedOrderId = $request->query('order_id');
+        $selectedQuotationId = $request->query('quotation_id');
         $invoice = new Invoice();
         $orderItems = [];
 
@@ -81,6 +83,27 @@ class InvoiceController extends Controller
                 $invoice->tax_percentage = $order->tax_percentage;
             }
         }
+        if ($selectedQuotationId) {
+            $quotation = Quotation::with('items.product', 'opportunity.customer')->find($selectedQuotationId);
+            if ($quotation) {
+                $invoice->quotation_id = $quotation->quotation_id;
+                $invoice->customer_id = $quotation->opportunity->customer_id;
+                // Pre-fill items from quotation
+                foreach ($quotation->items as $quotationItem) {
+                    $orderItems[] = [
+                        'product_id' => $quotationItem->product_id,
+                        'item_name' => $quotationItem->item_name,
+                        'item_description' => $quotationItem->item_description,
+                        'quantity' => $quotationItem->quantity,
+                        'unit_price' => $quotationItem->unit_price,
+                    ];
+                }
+                $invoice->discount_type = $quotation->discount_type;
+                $invoice->discount_value = $quotation->discount_value;
+                $invoice->tax_percentage = $quotation->tax_percentage;
+            }
+        }
+
         $invoice->invoice_number = 'INV-' . strtoupper(Str::random(8)); // Suggest an invoice number
 
         return view('invoices.create', compact('invoice', 'statuses', 'orders', 'customers', 'products', 'orderItems'));
@@ -136,6 +159,7 @@ class InvoiceController extends Controller
         $orders = Order::orderBy('order_number')->get();
         $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
         $products = Product::where('is_active', true)->orderBy('name')->get();
+        
         $invoice->load('items');
         $orderItems = $invoice->items->toArray(); // For the form structure
 

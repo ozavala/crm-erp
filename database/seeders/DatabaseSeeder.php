@@ -8,7 +8,9 @@ use App\Models\CrmUser;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Opportunity;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\Quotation;
 use Illuminate\Database\Seeder;
 use Database\Seeders\CrmUserSeeder;
 use Database\Seeders\ProductCategorySeeder;
@@ -43,6 +45,9 @@ class DatabaseSeeder extends Seeder
             WarehouseSeeder::class,
             SupplierSeeder::class,
             ProductSeeder::class, // This seeder creates specific products, which is fine
+            QuotationSeeder::class,
+            OrderSeeder::class,
+            PaymentSeeder::class,
         ]);
 
         // 2. Use factories to create a rich, dynamic dataset for testing

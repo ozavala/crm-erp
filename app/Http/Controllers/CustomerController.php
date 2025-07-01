@@ -136,32 +136,41 @@ class CustomerController extends Controller
     /**
      * Sync customer addresses.
      * For now, this handles a single address block from the form, intended as primary.
-     * Can be expanded to handle multiple address blocks.
+     * This method creates, updates, and deletes addresses based on the form submission.
+     * @param Customer $customer The customer model.
+     * @param array $addressesData The array of address data from the request.
      */
     protected function syncAddresses(Customer $customer, array $addressesData)
     {
-        // Assuming $addressesData is an array of address attributes for now.
-        // If handling multiple, this would be an array of arrays.
-        // For this iteration, we'll assume one address block is passed.
+        $submittedAddressIds = [];
 
-        if (!empty($addressesData)) {
-            $addressInput = $addressesData[0] ?? null; // Get the first (and currently only) address block
-
-            if ($addressInput && !empty($addressInput['street_address_line_1'])) {
-                // If this address is marked as primary, unmark other primary addresses
-                if (!empty($addressInput['is_primary'])) {
-                    $customer->addresses()->where('is_primary', true)->update(['is_primary' => false]);
-                }
-
-                // Update or create the address
-                // If an ID is passed, update; otherwise, create.
-                // For simplicity, we'll create or update the first address or a new one.
-                // A more robust solution for multiple addresses would involve checking existing address IDs.
-                $customer->addresses()->updateOrCreate(
-                    ['address_id' => $addressInput['address_id'] ?? null], // Condition to find existing
-                    $addressInput // Data to update or create
-                );
+        // First, handle the primary flag. Find if any submitted address is primary.
+        $primaryAddressIndex = null;
+        foreach ($addressesData as $index => $addressInput) {
+            if (!empty($addressInput['is_primary'])) {
+                $primaryAddressIndex = $index;
+                break;
             }
         }
+
+        // If a primary address is set, un-set all others for this customer first.
+        if ($primaryAddressIndex !== null) {
+            $customer->addresses()->update(['is_primary' => false]);
+        }
+
+        // Now, iterate and sync each address
+        foreach ($addressesData as $index => $addressInput) {
+            // Skip empty address blocks that might be submitted
+            if (empty($addressInput['street_address_line_1'])) {
+                continue;
+            }
+            $dataToSync = $addressInput;
+            $dataToSync['is_primary'] = ($index === $primaryAddressIndex);
+            $address = $customer->addresses()->updateOrCreate(['address_id' => $addressInput['address_id'] ?? null], $dataToSync);
+            $submittedAddressIds[] = $address->address_id;
+        }
+
+        // Delete addresses that were removed from the form
+        $customer->addresses()->whereNotIn('address_id', $submittedAddressIds)->delete();
     }
 }

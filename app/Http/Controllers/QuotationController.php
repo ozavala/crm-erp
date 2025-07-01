@@ -91,7 +91,7 @@ class QuotationController extends Controller
      */
     public function show(Quotation $quotation)
     {
-        $quotation->load(['opportunity', 'opportunity.customer', 'createdBy', 'items', 'items.product']);
+        $quotation->load(['opportunity.customer', 'createdBy', 'items.product', 'invoice']);
         return view('quotations.show', compact('quotation'));
     }
 

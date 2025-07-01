@@ -89,4 +89,8 @@ class Invoice extends Model
     {
         return $this->total_amount - $this->amount_paid;
     }
+    public function quotation(): BelongsTo
+    {
+        return $this->belongsTo(Quotation::class, 'quotation_id', 'quotation_id');
+    }
 }

@@ -68,6 +68,10 @@ class Quotation extends Model
     {
         return $this->hasMany(QuotationItem::class, 'quotation_id', 'quotation_id');
     }
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class, 'quotation_id', 'quotation_id');
+    }
 
     /**
      * Get the order associated with the quotation.

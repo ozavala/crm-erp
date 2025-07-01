@@ -81,61 +81,93 @@
 
 <hr class="my-4">
 
-<h4>Primary Address</h4>
-
-@php
-    // For both create and edit, we can work with an address object.
-    // On create, it's a new empty object. On edit, it's the first associated address or a new one.
-    $address = $customer->addresses->first() ?? new \App\Models\Address();
-@endphp
-
-{{-- Hidden field for address ID for updates --}}
-<input type="hidden" name="addresses[0][address_id]" value="{{ $address->address_id }}">
-
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="address_type" class="form-label">Address Type</label>
-        <input type="text" class="form-control @error('addresses.0.address_type') is-invalid @enderror" id="address_type" name="addresses[0][address_type]" value="{{ old('addresses.0.address_type', $address->address_type) }}" placeholder="e.g., Billing, Shipping">
-        @error('addresses.0.address_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
-    <div class="col-md-6 mb-3">
-        <label for="street_address_line_1" class="form-label">Street Address</label>
-        <input type="text" class="form-control @error('addresses.0.street_address_line_1') is-invalid @enderror" id="street_address_line_1" name="addresses[0][street_address_line_1]" value="{{ old('addresses.0.street_address_line_1', $address->street_address_line_1) }}">
-        @error('addresses.0.street_address_line_1')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Addresses</h4>
+    <button type="button" id="add-address-btn" class="btn btn-sm btn-success">Add Address</button>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="city" class="form-label">City</label>
-        <input type="text" class="form-control @error('addresses.0.city') is-invalid @enderror" id="city" name="addresses[0][city]" value="{{ old('addresses.0.city', $address->city) }}">
-        @error('addresses.0.city')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
-    <div class="col-md-6 mb-3">
-        <label for="state_province" class="form-label">State / Province</label>
-        <input type="text" class="form-control @error('addresses.0.state_province') is-invalid @enderror" id="state_province" name="addresses[0][state_province]" value="{{ old('addresses.0.state_province', $address->state_province) }}">
-        @error('addresses.0.state_province')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
+<div id="addresses-container">
+    @php
+        // Use old input if validation fails, otherwise use existing addresses or a single empty block for create form
+        $addresses = old('addresses', $customer->addresses->count() > 0 ? $customer->addresses->toArray() : [['street_address_line_1' => '']]);
+    @endphp
+
+    @foreach($addresses as $index => $address)
+        <div class="address-block border p-3 rounded mb-3 position-relative">
+            <input type="hidden" name="addresses[{{ $index }}][address_id]" value="{{ $address['address_id'] ?? '' }}">
+
+            <button type="button" class="btn-close remove-address-btn position-absolute top-0 end-0 mt-2 me-2" aria-label="Close" title="Remove Address"></button>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="address_type_{{ $index }}" class="form-label">Address Type</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.address_type') is-invalid @enderror" id="address_type_{{ $index }}" name="addresses[{{ $index }}][address_type]" value="{{ $address['address_type'] ?? '' }}" placeholder="e.g., Billing, Shipping">
+                    @error('addresses.'.$index.'.address_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="street_address_line_1_{{ $index }}" class="form-label">Street Address</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.street_address_line_1') is-invalid @enderror" id="street_address_line_1_{{ $index }}" name="addresses[{{ $index }}][street_address_line_1]" value="{{ $address['street_address_line_1'] ?? '' }}">
+                    @error('addresses.'.$index.'.street_address_line_1')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="city_{{ $index }}" class="form-label">City</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.city') is-invalid @enderror" id="city_{{ $index }}" name="addresses[{{ $index }}][city]" value="{{ $address['city'] ?? '' }}">
+                    @error('addresses.'.$index.'.city')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="state_province_{{ $index }}" class="form-label">State / Province</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.state_province') is-invalid @enderror" id="state_province_{{ $index }}" name="addresses[{{ $index }}][state_province]" value="{{ $address['state_province'] ?? '' }}">
+                    @error('addresses.'.$index.'.state_province')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="postal_code_{{ $index }}" class="form-label">Postal Code</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.postal_code') is-invalid @enderror" id="postal_code_{{ $index }}" name="addresses[{{ $index }}][postal_code]" value="{{ $address['postal_code'] ?? '' }}">
+                    @error('addresses.'.$index.'.postal_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="country_code_{{ $index }}" class="form-label">Country Code</label>
+                    <input type="text" class="form-control @error('addresses.'.$index.'.country_code') is-invalid @enderror" id="country_code_{{ $index }}" name="addresses[{{ $index }}][country_code]" value="{{ $address['country_code'] ?? '' }}" placeholder="e.g., US, CA">
+                    @error('addresses.'.$index.'.country_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="hidden" name="addresses[{{ $index }}][is_primary]" value="0">
+                    <input class="form-check-input primary-address-checkbox" type="checkbox" name="addresses[{{ $index }}][is_primary]" id="is_primary_{{ $index }}" value="1" {{ !empty($address['is_primary']) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="is_primary_{{ $index }}">Set as Primary Address</label>
+                </div>
+            </div>
+        </div>
+    @endforeach
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="postal_code" class="form-label">Postal Code</label>
-        <input type="text" class="form-control @error('addresses.0.postal_code') is-invalid @enderror" id="postal_code" name="addresses[0][postal_code]" value="{{ old('addresses.0.postal_code', $address->postal_code) }}">
-        @error('addresses.0.postal_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
-    <div class="col-md-6 mb-3">
-        <label for="country_code" class="form-label">Country Code</label>
-        <input type="text" class="form-control @error('addresses.0.country_code') is-invalid @enderror" id="country_code" name="addresses[0][country_code]" value="{{ old('addresses.0.country_code', $address->country_code) }}" placeholder="e.g., US, CA">
-        @error('addresses.0.country_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
-</div>
-
-<div class="mb-3">
-    <div class="form-check">
-        <input type="hidden" name="addresses[0][is_primary]" value="0">
-        <input class="form-check-input" type="checkbox" name="addresses[0][is_primary]" id="is_primary" value="1" {{ old('addresses.0.is_primary', $address->is_primary) ? 'checked' : '' }}>
-        <label class="form-check-label" for="is_primary">Set as Primary Address</label>
+<div id="address-template" style="display: none;">
+    <div class="address-block border p-3 rounded mb-3 position-relative">
+        <input type="hidden" name="addresses[__INDEX__][address_id]" value="">
+        <button type="button" class="btn-close remove-address-btn position-absolute top-0 end-0 mt-2 me-2" aria-label="Close" title="Remove Address"></button>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label for="address_type___INDEX__" class="form-label">Address Type</label><input type="text" class="form-control" id="address_type___INDEX__" name="addresses[__INDEX__][address_type]" placeholder="e.g., Billing, Shipping"></div>
+            <div class="col-md-6 mb-3"><label for="street_address_line_1___INDEX__" class="form-label">Street Address</label><input type="text" class="form-control" id="street_address_line_1___INDEX__" name="addresses[__INDEX__][street_address_line_1]"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label for="city___INDEX__" class="form-label">City</label><input type="text" class="form-control" id="city___INDEX__" name="addresses[__INDEX__][city]"></div>
+            <div class="col-md-6 mb-3"><label for="state_province___INDEX__" class="form-label">State / Province</label><input type="text" class="form-control" id="state_province___INDEX__" name="addresses[__INDEX__][state_province]"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label for="postal_code___INDEX__" class="form-label">Postal Code</label><input type="text" class="form-control" id="postal_code___INDEX__" name="addresses[__INDEX__][postal_code]"></div>
+            <div class="col-md-6 mb-3"><label for="country_code___INDEX__" class="form-label">Country Code</label><input type="text" class="form-control" id="country_code___INDEX__" name="addresses[__INDEX__][country_code]" placeholder="e.g., US, CA"></div>
+        </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input type="hidden" name="addresses[__INDEX__][is_primary]" value="0">
+                <input class="form-check-input primary-address-checkbox" type="checkbox" name="addresses[__INDEX__][is_primary]" id="is_primary___INDEX__" value="1">
+                <label class="form-check-label" for="is_primary___INDEX__">Set as Primary Address</label>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -161,6 +193,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initial check on page load
     toggleFields();
+
+    // --- Address Management ---
+    const addressesContainer = document.getElementById('addresses-container');
+    const addAddressBtn = document.getElementById('add-address-btn');
+    const addressTemplate = document.getElementById('address-template').innerHTML;
+    let addressIndex = {{ count($addresses) }};
+
+    addAddressBtn.addEventListener('click', () => {
+        const newAddressBlock = document.createElement('div');
+        newAddressBlock.innerHTML = addressTemplate.replace(/__INDEX__/g, addressIndex);
+        addressesContainer.appendChild(newAddressBlock.firstElementChild);
+        addressIndex++;
+    });
+
+    addressesContainer.addEventListener('click', function(e) {
+        // Handle remove button click
+        if (e.target && e.target.classList.contains('remove-address-btn')) {
+            e.target.closest('.address-block').remove();
+        }
+
+        // Handle primary checkbox click
+        if (e.target && e.target.classList.contains('primary-address-checkbox')) {
+            // If the clicked checkbox is checked
+            if (e.target.checked) {
+                // Uncheck all other primary checkboxes
+                document.querySelectorAll('.primary-address-checkbox').forEach(checkbox => {
+                    if (checkbox !== e.target) {
+                        checkbox.checked = false;
+                    }
+                });
+            }
+        }
+    });
+
 });
 </script>
 @endpush
