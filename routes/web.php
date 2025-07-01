@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('opportunities/{opportunity}/stage', [OpportunityController::class, 'updateStage'])->name('opportunities.updateStage');
     Route::resource('opportunities', OpportunityController::class);
     Route::resource('quotations', QuotationController::class);
+    Route::post('quotations/{quotation}/send-email', [QuotationController::class, 'sendEmail'])->name('quotations.sendEmail');
     Route::resource('orders', OrderController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);

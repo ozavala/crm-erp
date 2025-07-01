@@ -10,6 +10,8 @@ use App\Http\Requests\UpdateQuotationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\QuotationEmail;
 
 class QuotationController extends Controller
 {
@@ -166,6 +168,26 @@ class QuotationController extends Controller
         $quotation->delete();
         return redirect()->route('quotations.index')
                          ->with('success', 'Quotation deleted successfully.');
+    }
+
+    /**
+     * Send the quotation email to the customer.
+     */
+    public function sendEmail(Quotation $quotation)
+    {
+        // Eager load the necessary relationships
+        $quotation->load('opportunity.customer');
+
+        // Ensure the customer and email exist
+        if (!$quotation->opportunity || !$quotation->opportunity->customer || !$quotation->opportunity->customer->email) {
+            return redirect()->back()->with('error', 'Customer email not found.');
+        }
+
+        // Send the email
+        Mail::to($quotation->opportunity->customer->email)->send(new QuotationEmail($quotation));
+
+        return redirect()->route('quotations.show', $quotation)
+                         ->with('success', 'Quotation sent successfully.');
     }
 
     /**

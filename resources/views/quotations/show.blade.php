@@ -33,6 +33,10 @@
             Actions
         </div>
         <div class="card-body d-flex gap-2">
+            <form action="{{ route('quotations.sendEmail', $quotation->quotation_id) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-primary">Send Email</button>
+            </form>
             @if(in_array($quotation->status, ['Draft', 'Sent']))
                 <form action="{{ route('quotations.status.update', $quotation->quotation_id) }}" method="POST" class="d-inline">
                     @csrf

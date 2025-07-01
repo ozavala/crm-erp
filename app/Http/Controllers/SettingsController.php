@@ -29,6 +29,14 @@ class SettingsController extends Controller
             'company_email' => 'nullable|email|max:255',
             'company_phone' => 'nullable|string|max:255',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'mail_mailer' => 'nullable|string|max:255',
+            'mail_host' => 'nullable|string|max:255',
+            'mail_port' => 'nullable|integer',
+            'mail_username' => 'nullable|string|max:255',
+            'mail_password' => 'nullable|string|max:255',
+            'mail_encryption' => 'nullable|string|max:255',
+            'mail_from_address' => 'nullable|email|max:255',
+            'mail_from_name' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('company_logo')) {
