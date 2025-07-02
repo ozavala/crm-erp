@@ -7,7 +7,13 @@
     <h1>Create New Quotation</h1>
 
     <form action="{{ route('quotations.store') }}" method="POST">
-        @include('quotations._form', ['quotation' => new \App\Models\Quotation()])
+        @include('quotations._form', [
+            'quotation' => new \App\Models\Quotation(),
+            'statuses' => $statuses,
+            'opportunities' => $opportunities,
+            'products' => $products,
+            'selectedOpportunity' => $selectedOpportunity ?? null
+        ])
     </form>
 </div>
 @endsection

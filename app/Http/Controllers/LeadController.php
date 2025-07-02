@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Models\Customer;
+use App\Models\Opportunity;
 use App\Http\Requests\StoreActivityRequest;
 use App\Models\CrmUser;
 use App\Models\Activity; // Add Activity model
@@ -11,6 +12,7 @@ use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LeadController extends Controller
 {
@@ -167,47 +169,61 @@ class LeadController extends Controller
      */
     public function convertToCustomer(Request $request, Lead $lead)
     {
-        // Prevent conversion if already Won or Lost, or if already has a customer_id and we don't want to override
         if (in_array($lead->status, ['Won', 'Lost'])) {
             return redirect()->route('leads.show', $lead)->with('error', 'Lead is already Won or Lost and cannot be converted again.');
         }
 
-        $customer = null;
-        // Check if an existing customer_id is provided (e.g., from a form if we want to allow selecting one)
-        // For a simple conversion, we'll create a new one if not already linked.
-        if ($lead->customer_id) {
-            $customer = Customer::find($lead->customer_id);
+        return DB::transaction(function () use ($lead) {
+            $customer = null;
+            if ($lead->customer_id) {
+                $customer = Customer::find($lead->customer_id);
+                if (!$customer) {
+                    // This is an unlikely scenario, but good to handle.
+                    // We'll proceed to create a new customer profile.
+                }
+            }
+
             if (!$customer) {
-                 return redirect()->route('leads.show', $lead)->with('error', 'Associated customer not found. Cannot convert.');
-            }
-        } else {
-            // Create a new customer from lead details
-            // Ensure lead has necessary contact info
-            if (empty($lead->contact_name)) {
-                return redirect()->route('leads.show', $lead)->with('error', 'Lead contact name is missing. Cannot create customer.');
-            }
-            // Split contact_name into first_name and last_name (simple split)
-            $nameParts = explode(' ', $lead->contact_name, 2);
-            $firstName = $nameParts[0];
-            $lastName = isset($nameParts[1]) ? $nameParts[1] : ''; // Handle cases with only one name
+                if (empty($lead->contact_name)) {
+                    return redirect()->route('leads.show', $lead)->with('error', 'Lead contact name is missing. Cannot create customer.');
+                }
+                $nameParts = explode(' ', $lead->contact_name, 2);
+                $firstName = $nameParts[0];
+                $lastName = $nameParts[1] ?? '';
 
-            $customer = Customer::create([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'email' => $lead->contact_email,
-                'phone_number' => $lead->contact_phone,
-                'company_name' => $lead->customer ? $lead->customer->company_name : null, // Or a new field in Lead for company
-                'status' => 'Active', // Default status for new customer
+                // Create or find customer based on email to avoid duplicates
+                $customer = Customer::firstOrCreate(
+                    ['email' => $lead->contact_email],
+                    [
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'phone_number' => $lead->contact_phone,
+                        'company_name' => $lead->title, // Use lead title as a guess for company name
+                        'status' => 'Active',
+                        'type' => 'Company', // Default to company, adjust if needed
+                        'legal_id' => 'TEMP-' . uniqid(), // Placeholder legal ID to satisfy validation
+                        'created_by_user_id' => Auth::id(),
+                    ]
+                );
+            }
+
+            // Create an opportunity
+            $opportunity = Opportunity::create([
+                'name' => $lead->title,
+                'customer_id' => $customer->customer_id,
+                'lead_id' => $lead->lead_id,
+                'stage' => array_key_first(Opportunity::$stages), // e.g., 'Qualification'
+                'amount' => $lead->value,
+                'expected_close_date' => $lead->expected_close_date,
+                'assigned_to_user_id' => $lead->assigned_to_user_id ?? Auth::id(),
                 'created_by_user_id' => Auth::id(),
-                // Potentially copy address fields if they exist on the Lead model and are separate from Customer
             ]);
-        }
 
-        // Update lead
-        $lead->customer_id = $customer->customer_id;
-        $lead->status = 'Won'; // Or a specific "Converted" status if you add one
-        $lead->save();
+            // Update lead status and link to the new customer
+            $lead->update(['status' => 'Won', 'customer_id' => $customer->customer_id]);
 
-        return redirect()->route('customers.show', $customer->customer_id)->with('success', 'Lead successfully converted to customer. Lead status updated to Won.');
+            return redirect()->route('opportunities.show', $opportunity->opportunity_id)
+                             ->with('success', 'Lead successfully converted to an opportunity.');
+        });
     }
 }

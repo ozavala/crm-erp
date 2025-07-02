@@ -50,9 +50,14 @@ class QuotationController extends Controller
         $statuses = Quotation::$statuses;
         $opportunities = Opportunity::orderBy('name')->get();
         $products = Product::where('is_active', true)->orderBy('name')->get();
-        $selectedOpportunityId = $request->query('opportunity_id');
+        
+        $selectedOpportunity = null;
+        if ($request->filled('opportunity_id')) {
+            // Eager load the customer to prevent extra queries in the view
+            $selectedOpportunity = Opportunity::with('customer')->find($request->input('opportunity_id'));
+        }
 
-        return view('quotations.create', compact('statuses', 'opportunities', 'products', 'selectedOpportunityId'));
+        return view('quotations.create', compact('statuses', 'opportunities', 'products', 'selectedOpportunity'));
     }
 
     /**
@@ -185,6 +190,9 @@ class QuotationController extends Controller
 
         // Send the email
         Mail::to($quotation->opportunity->customer->email)->send(new QuotationEmail($quotation));
+
+        $quotation->status = 'Sent';
+        $quotation->save();
 
         return redirect()->route('quotations.show', $quotation)
                          ->with('success', 'Quotation sent successfully.');

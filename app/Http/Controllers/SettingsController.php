@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
@@ -13,6 +15,7 @@ class SettingsController extends Controller
      */
     public function edit()
     {
+        Gate::authorize('edit-settings');
         $settings = Setting::all()->pluck('value', 'key');
         return view('settings.edit', compact('settings'));
     }
@@ -22,21 +25,26 @@ class SettingsController extends Controller
      */
     public function update(Request $request)
     {
+        Gate::authorize('edit-settings');
+
         $validated = $request->validate([
+            // Company Settings
             'company_name' => 'nullable|string|max:255',
             'company_address_line_1' => 'nullable|string|max:255',
             'company_address_line_2' => 'nullable|string|max:255',
             'company_email' => 'nullable|email|max:255',
             'company_phone' => 'nullable|string|max:255',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'mail_mailer' => 'nullable|string|max:255',
-            'mail_host' => 'nullable|string|max:255',
-            'mail_port' => 'nullable|integer',
-            'mail_username' => 'nullable|string|max:255',
-            'mail_password' => 'nullable|string|max:255',
-            'mail_encryption' => 'nullable|string|max:255',
-            'mail_from_address' => 'nullable|email|max:255',
-            'mail_from_name' => 'nullable|string|max:255',
+
+            // Mail Settings
+            'mail_mailer' => 'required|string',
+            'mail_host' => 'required|string',
+            'mail_port' => 'required|integer',
+            'mail_username' => 'nullable|string',
+            'mail_password' => 'nullable|string',
+            'mail_encryption' => 'nullable|string|in:tls,ssl,starttls',
+            'mail_from_address' => 'required|email',
+            'mail_from_name' => 'required|string',
         ]);
 
         if ($request->hasFile('company_logo')) {
@@ -56,9 +64,12 @@ class SettingsController extends Controller
         foreach ($validated as $key => $value) {
             Setting::updateOrCreate(
                 ['key' => $key],
-                ['value' => $value]
+                ['value' => $value ?? '']
             );
         }
+
+        // Clear the config cache to apply the new mail settings
+        Artisan::call('config:clear');
 
         return redirect()->route('settings.edit')->with('success', 'Settings updated successfully.');
     }

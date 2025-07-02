@@ -1,7 +1,7 @@
 <x-mail::message>
 # Your Quotation is Ready
 
-Hello {{ $quotation->customer->name }},
+Hello {{ $quotation->customer?->name ?? 'Valued Customer' }},
 
 Thank you for your interest in our products. Please find your quotation details below:
 

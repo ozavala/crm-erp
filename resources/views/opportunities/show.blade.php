@@ -32,6 +32,7 @@
         <div class="card-footer d-flex justify-content-between">
             <div>
                 <a href="{{ route('opportunities.edit', $opportunity) }}" class="btn btn-warning">Edit</a>
+                <a href="{{ route('quotations.create', ['opportunity_id' => $opportunity->opportunity_id]) }}" class="btn btn-primary">Create Quotation</a>
                 <form action="{{ route('opportunities.destroy', $opportunity) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this opportunity?');">
                     @csrf
                     @method('DELETE')

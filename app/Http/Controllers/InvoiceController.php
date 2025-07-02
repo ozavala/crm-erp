@@ -136,6 +136,12 @@ class InvoiceController extends Controller
                 $invoice->items()->create($itemData);
             }
 
+            // If invoice was created from a quotation, update the quotation status
+            if ($invoice->quotation_id) {
+                $quotation = Quotation::find($invoice->quotation_id);
+                $quotation?->update(['status' => 'Invoiced']);
+            }
+
             return redirect()->route('invoices.index')
                              ->with('success', 'Invoice created successfully.');
         });

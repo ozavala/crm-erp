@@ -48,10 +48,10 @@
         <div class="card-footer d-flex justify-content-between">
             <div>
                 <a href="{{ route('leads.edit', $lead->lead_id) }}" class="btn btn-warning">Edit Lead</a>
-                @if(!in_array($lead->status, ['Won', 'Lost'])) {{-- Show convert button only if not already Won or Lost --}}
-                    <form action="{{ route('leads.convertToCustomer', $lead->lead_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to convert this lead to a customer? This will mark the lead as Won.');">
+                @if(!in_array($lead->status, ['Won', 'Lost']))
+                    <form action="{{ route('leads.convertToCustomer', $lead->lead_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to convert this lead? This will create a new Opportunity and mark the lead as Won.');">
                         @csrf
-                        <button type="submit" class="btn btn-success">Convert to Customer</button>
+                        <button type="submit" class="btn btn-success">Convert Lead</button>
                     </form>
                 @endif
                 @if($lead->status !== 'Lost') {{-- Allow deleting unless it's already "Lost" or "Won" (soft delete still works) --}}

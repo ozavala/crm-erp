@@ -28,7 +28,7 @@ class StoreOpportunityRequest extends FormRequest
             'description' => 'nullable|string',
             'lead_id' => 'nullable|exists:leads,lead_id',// If converted from a lead
             'contact_id' => 'nullable|exists:contacts,contact_id', // Added validation for contact_id
-            'customer_id' => 'nullable|exists:customers,customer_id',
+            'customer_id' => 'required|exists:customers,customer_id',
             'stage' => ['required', 'string', Rule::in(array_keys(Opportunity::$stages))],
             'amount' => 'nullable|numeric|min:0',
             'expected_close_date' => 'nullable|date',
