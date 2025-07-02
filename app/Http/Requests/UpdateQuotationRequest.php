@@ -26,13 +26,15 @@ class UpdateQuotationRequest extends FormRequest
         return [
             'opportunity_id' => 'required|exists:opportunities,opportunity_id',
             'subject' => 'required|string|max:255',
+            'quotation_date' => 'required|date',
+            'expiry_date' => 'nullable|date|after_or_equal:quotation_date',
             'status' => ['required', 'string', Rule::in(array_keys(Quotation::$statuses))],
-            'valid_until' => 'nullable|date',
             'notes' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'discount_type' => 'nullable|string|in:percentage,fixed',
             'discount_value' => 'nullable|numeric|min:0',
             'tax_percentage' => 'nullable|numeric|min:0|max:100',
-            'items' => 'required|array|min:1',
+            'items' => 'required|array|min:1', // Ensure at least one item is present
             'items.*.quotation_item_id' => 'nullable|integer|exists:quotation_items,quotation_item_id',
             'items.*.product_id' => 'nullable|exists:products,product_id',
             'items.*.item_name' => 'required|string|max:255',

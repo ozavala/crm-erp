@@ -26,7 +26,8 @@ class UpdateInvoiceRequest extends FormRequest
         $invoiceId = $this->route('invoice') ? $this->route('invoice')->invoice_id : null;
 
         return [
-            'order_id' => 'required|exists:orders,order_id',
+            'order_id' => 'nullable|exists:orders,order_id',
+            'quotation_id' => 'nullable|exists:quotations,quotation_id',
             'customer_id' => 'required|exists:customers,customer_id',
             'invoice_number' => ['required', 'string', 'max:255', Rule::unique('invoices', 'invoice_number')->ignore($invoiceId, 'invoice_id')],
             'invoice_date' => 'required|date',

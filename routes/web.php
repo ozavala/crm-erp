@@ -70,14 +70,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('opportunities/{opportunity}/stage', [OpportunityController::class, 'updateStage'])->name('opportunities.updateStage');
     Route::resource('opportunities', OpportunityController::class);
     Route::resource('quotations', QuotationController::class);
+    Route::get('quotations/{quotation}/items', [QuotationController::class, 'getItemsJson'])->name('quotations.items.json');
     Route::post('quotations/{quotation}/send-email', [QuotationController::class, 'sendEmail'])->name('quotations.sendEmail');
     Route::resource('orders', OrderController::class);
+    Route::get('orders/{order}/items', [InvoiceController::class, 'getOrderItemsJson'])->name('orders.items.json');
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])->name('orders.payments.store');
     Route::resource('addresses', AddressController::class);
     Route::put('quotations/{quotation}/status', [QuotationStatusController::class, 'update'])->name('quotations.status.update');
     Route::resource('invoices', InvoiceController::class);
+    Route::post('invoices/{invoice}/send-reminder', [InvoiceController::class, 'sendReminder'])->name('invoices.sendReminder');
+    Route::get('invoices/{invoice}/pdf', [App\Http\Controllers\InvoiceController::class, 'printPdf'])->name('invoices.pdf');
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
     Route::get('purchase-orders/{purchase_order}/print', [PurchaseOrderController::class, 'printPdf'])->name('purchase-orders.print');

@@ -26,8 +26,14 @@ class InvoiceSeeder extends Seeder
             return;
         }
 
+        $i = 0;
         foreach ($ordersToInvoice as $order) {
             if (!$order->customer) continue;
+
+            // Only invoice every second order to leave some for manual creation
+            if ($i++ % 2 !== 0) {
+                continue;
+            }
 
             // Check if an invoice already exists for this order to avoid duplicates
             if (Invoice::where('order_id', $order->order_id)->exists()) {

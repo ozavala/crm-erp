@@ -71,7 +71,9 @@
                     <td>{{ $invoice->due_date->format('Y-m-d') }}</td>
                     <td>
                         <a href="{{ route('invoices.edit', $invoice->invoice_id) }}" class="btn btn-warning btn-sm">Edit</a>
-                        {{-- Delete form is on show page for invoices due to payment checks --}}
+                        <a href="{{ route('invoices.create', ['clone_from' => $invoice->invoice_id]) }}" class="btn btn-secondary btn-sm" title="Clone Invoice">
+                            <i class="bi bi-copy"></i>
+                        </a>
                     </td>
                 </tr>
             @empty

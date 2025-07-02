@@ -24,7 +24,8 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,order_id',
+            'order_id' => 'nullable|exists:orders,order_id',
+            'quotation_id' => 'nullable|exists:quotations,quotation_id',
             'customer_id' => 'required|exists:customers,customer_id',
             'invoice_number' => ['required', 'string', 'max:255', Rule::unique('invoices', 'invoice_number')],
             'invoice_date' => 'required|date',

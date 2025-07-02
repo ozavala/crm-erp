@@ -233,4 +233,20 @@ class QuotationController extends Controller
             'total_amount' => $totalAmount,
         ];
     }
+
+    /**
+     * Get the items for a specific quotation as JSON.
+     *
+     * @param \App\Models\Quotation $quotation
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getItemsJson(Quotation $quotation)
+    {
+        return response()->json([
+            'items' => $quotation->items,
+            'discount_type' => $quotation->discount_type,
+            'discount_value' => $quotation->discount_value,
+            'tax_percentage' => $quotation->tax_percentage,
+        ]);
+    }
 }

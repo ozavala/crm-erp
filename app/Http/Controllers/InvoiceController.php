@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoiceReminder;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -54,20 +57,41 @@ class InvoiceController extends Controller
         $orders = Order::whereNotIn('status', ['Cancelled', 'Completed']) // Example filter
                        ->orderBy('order_number')
                        ->get();
+        $quotations = Quotation::where('status', 'Accepted') // Only from accepted quotations
+                               ->whereDoesntHave('invoice') // That don't have an invoice yet
+                               ->orderBy('subject')
+                               ->get();
         $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
         $products = Product::where('is_active', true)->orderBy('name')->get();
 
-        $selectedOrderId = $request->query('order_id');
-        $selectedQuotationId = $request->query('quotation_id');
         $invoice = new Invoice();
         $orderItems = [];
 
-        if ($selectedOrderId) {
-            $order = Order::with('items.product', 'customer')->find($selectedOrderId);
+        if ($request->filled('clone_from')) {
+            $sourceInvoice = Invoice::with('items')->find($request->input('clone_from'));
+            if ($sourceInvoice) {
+                $invoice->customer_id = $sourceInvoice->customer_id;
+                $invoice->terms_and_conditions = $sourceInvoice->terms_and_conditions;
+                $invoice->notes = $sourceInvoice->notes;
+                $invoice->discount_type = $sourceInvoice->discount_type;
+                $invoice->discount_value = $sourceInvoice->discount_value;
+                $invoice->tax_percentage = $sourceInvoice->tax_percentage;
+                
+                foreach ($sourceInvoice->items as $item) {
+                    $orderItems[] = [
+                        'product_id' => $item->product_id,
+                        'item_name' => $item->item_name,
+                        'item_description' => $item->item_description,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                    ];
+                }
+            }
+        } elseif ($request->filled('order_id')) {
+            $order = Order::with('items.product', 'customer')->find($request->input('order_id'));
             if ($order) {
                 $invoice->order_id = $order->order_id;
                 $invoice->customer_id = $order->customer_id;
-                // Pre-fill items from order
                 foreach ($order->items as $orderItem) {
                     $orderItems[] = [
                         'product_id' => $orderItem->product_id,
@@ -77,18 +101,15 @@ class InvoiceController extends Controller
                         'unit_price' => $orderItem->unit_price,
                     ];
                 }
-                // Pre-fill discount and tax from order if applicable
                 $invoice->discount_type = $order->discount_type;
                 $invoice->discount_value = $order->discount_value;
                 $invoice->tax_percentage = $order->tax_percentage;
             }
-        }
-        if ($selectedQuotationId) {
-            $quotation = Quotation::with('items.product', 'opportunity.customer')->find($selectedQuotationId);
+        } elseif ($request->filled('quotation_id')) {
+            $quotation = Quotation::with('items.product', 'opportunity.customer')->find($request->input('quotation_id'));
             if ($quotation) {
                 $invoice->quotation_id = $quotation->quotation_id;
                 $invoice->customer_id = $quotation->opportunity->customer_id;
-                // Pre-fill items from quotation
                 foreach ($quotation->items as $quotationItem) {
                     $orderItems[] = [
                         'product_id' => $quotationItem->product_id,
@@ -106,7 +127,7 @@ class InvoiceController extends Controller
 
         $invoice->invoice_number = 'INV-' . strtoupper(Str::random(8)); // Suggest an invoice number
 
-        return view('invoices.create', compact('invoice', 'statuses', 'orders', 'customers', 'products', 'orderItems'));
+        return view('invoices.create', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems'));
     }
 
     /**
@@ -163,13 +184,14 @@ class InvoiceController extends Controller
     {
         $statuses = Invoice::$statuses;
         $orders = Order::orderBy('order_number')->get();
+        $quotations = Quotation::orderBy('subject')->get();
         $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
         $products = Product::where('is_active', true)->orderBy('name')->get();
         
         $invoice->load('items');
         $orderItems = $invoice->items->toArray(); // For the form structure
 
-        return view('invoices.edit', compact('invoice', 'statuses', 'orders', 'customers', 'products', 'orderItems'));
+        return view('invoices.edit', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems'));
     }
 
     /**
@@ -272,5 +294,67 @@ class InvoiceController extends Controller
             'tax_amount' => $taxAmount,
             'total_amount' => $totalAmount,
         ];
+    }
+
+    /**
+     * Generate a PDF for the specified invoice.
+     *
+     * @param  \App\Models\Invoice  $invoice
+     * @return \Illuminate\Http\Response
+     */
+    public function printPdf(Invoice $invoice)
+    {
+        $invoice->load(['customer.addresses', 'items.product']);
+
+        $logoPath = config('settings.company_logo');
+        $logoData = null;
+        if ($logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {
+            $path = \Illuminate\Support\Facades\Storage::disk('public')->path($logoPath);
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'logoData'));
+        
+        return $pdf->stream('invoice_' . $invoice->invoice_number . '.pdf');
+    }
+
+    /**
+     * Get the items for a specific order as JSON.
+     *
+     * @param  \App\Models\Order  $order
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getOrderItemsJson(Order $order)
+    {
+        return response()->json([
+            'items' => $order->items,
+            'discount_type' => $order->discount_type,
+            'discount_value' => $order->discount_value,
+            'tax_percentage' => $order->tax_percentage,
+        ]);
+    }
+
+    /**
+     * Send a payment reminder for the specified invoice.
+     *
+     * @param  \App\Models\Invoice  $invoice
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function sendReminder(Invoice $invoice)
+    {
+        if ($invoice->status !== 'Overdue' && $invoice->amount_due <= 0) {
+            return redirect()->back()->with('error', 'A reminder can only be sent for overdue invoices with an amount due.');
+        }
+
+        if (!$invoice->customer || !$invoice->customer->email) {
+            return redirect()->back()->with('error', 'Customer email not found. Cannot send reminder.');
+        }
+
+        Mail::to($invoice->customer->email)->send(new InvoiceReminder($invoice));
+
+        return redirect()->route('invoices.show', $invoice)
+                         ->with('success', 'Payment reminder sent successfully.');
     }
 }

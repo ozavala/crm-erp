@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p><strong>Quotation Date:</strong> {{ $quotation->quotation_date->format('Y-m-d') }}</p>
-                    <p><strong>Expiry Date:</strong> {{ $quotation->expiry_date->format('Y-m-d') }}</p>
+                    <p><strong>Expiry Date:</strong> {{ $quotation->expiry_date?->format('Y-m-d') ?? 'N/A' }}</p>
                 </div>
             </div>
         </div>

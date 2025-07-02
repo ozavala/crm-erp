@@ -5,10 +5,22 @@
         <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number', $invoice->invoice_number ?? '') }}" required>
         @error('invoice_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
+     <div class="col-md-4 mb-3">
+        <label for="quotation_id" class="form-label">Related Quotation</label>
+        <select class="form-select @error('quotation_id') is-invalid @enderror" id="quotation_id" name="quotation_id">
+            <option value="">None</option>
+            @foreach($quotations as $quotation)
+                <option value="{{ $quotation->quotation_id }}" data-customer-id="{{ $quotation->opportunity->customer_id }}" {{ (old('quotation_id', $invoice->quotation_id ?? '') == $quotation->quotation_id) ? 'selected' : '' }}>
+                    #{{ $quotation->quotation_id }} - {{ $quotation->subject }}
+                </option>
+            @endforeach
+        </select>
+        @error('quotation_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
     <div class="col-md-4 mb-3">
-        <label for="order_id" class="form-label">Related Order <span class="text-danger">*</span></label>
-        <select class="form-select @error('order_id') is-invalid @enderror" id="order_id" name="order_id" required>
-            <option value="">Select Order</option>
+        <label for="order_id" class="form-label">Related Order</label>
+        <select class="form-select @error('order_id') is-invalid @enderror" id="order_id" name="order_id">
+            <option value="">None</option>
             @foreach($orders as $order)
                 <option value="{{ $order->order_id }}" data-customer-id="{{ $order->customer_id }}" {{ (old('order_id', $invoice->order_id ?? '') == $order->order_id) ? 'selected' : '' }}>
                     {{ $order->order_number ?: 'Order #'.$order->order_id }} ({{ $order->customer->full_name ?? 'N/A' }})
@@ -17,7 +29,9 @@
         </select>
         @error('order_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
-    <div class="col-md-4 mb-3">
+</div>
+<div class="row">
+    <div class="col-md-12 mb-3">
         <label for="customer_id" class="form-label">Customer <span class="text-danger">*</span></label>
         <select class="form-select @error('customer_id') is-invalid @enderror" id="customer_id" name="customer_id" required>
             <option value="">Select Customer</option>
@@ -156,35 +170,119 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const itemsContainer = document.getElementById('invoice-items-container');
-    const addItemBtn = document.getElementById('add-item-btn');
-    let itemRowIndex = {{ $itemIndex + 1 }};
-    const orderSelect = document.getElementById('order_id');
-    const customerSelect = document.getElementById('customer_id');
+    const itemsContainer = document.getElementById('invoice-items-container'); // Container for item rows
+    const addItemBtn = document.getElementById('add-item-btn'); // "Add Item" button
+    const orderSelect = document.getElementById('order_id'); // Order dropdown
+    const quotationSelect = document.getElementById('quotation_id');
+    const customerSelect = document.getElementById('customer_id'); // Customer dropdown
+    const discountTypeSelect = document.getElementById('discount_type');
+    const discountValueInput = document.getElementById('discount_value');
+    const taxPercentageInput = document.getElementById('tax_percentage');
+    let itemRowIndex = {{ count($currentItems) }};
+
+    // --- Reusable function to add a new item row ---
+    function addItemRow(item = {}) {
+        const index = itemRowIndex++;
+        const newRow = document.createElement('div');
+        newRow.classList.add('row', 'align-items-center', 'mb-2', 'invoice-item-row', 'border', 'p-2', 'rounded');
+        const productsOptions = `@foreach($products as $product)<option value="{{ $product->product_id }}" data-price="{{ $product->price }}" data-description="{{ $product->description }}">{{ $product->name }} (SKU: {{ $product->sku ?? 'N/A' }})</option>@endforeach`;
+
+        newRow.innerHTML = `
+            <input type="hidden" name="items[${index}][invoice_item_id]" value="">
+            <div class="col-md-3 mb-2"><label class="form-label">Product/Service</label><select name="items[${index}][product_id]" class="form-select product-select"><option value="">Select Product</option>${productsOptions}</select></div>
+            <div class="col-md-3 mb-2"><label class="form-label">Item Name <span class="text-danger">*</span></label><input type="text" name="items[${index}][item_name]" class="form-control item-name" value="${item.item_name || ''}" required></div>
+            <div class="col-md-3 mb-2"><label class="form-label">Quantity <span class="text-danger">*</span></label><input type="number" name="items[${index}][quantity]" class="form-control item-quantity" value="${item.quantity || 1}" min="1" required></div>
+            <div class="col-md-2 mb-2"><label class="form-label">Unit Price <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${index}][unit_price]" class="form-control item-unit-price" value="${parseFloat(item.unit_price || 0).toFixed(2)}" min="0" required></div>
+            <div class="col-md-1 mb-2 d-flex align-items-end"><button type="button" class="btn btn-danger remove-item-btn">&times;</button></div>
+            <div class="col-md-12 mb-2"><label class="form-label">Description</label><textarea name="items[${index}][item_description]" class="form-control item-description" rows="1">${item.item_description || ''}</textarea></div>
+        `;
+        itemsContainer.appendChild(newRow);
+
+        if (item.product_id) {
+            newRow.querySelector('.product-select').value = item.product_id;
+        }
+    }
 
     orderSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
+        const orderId = this.value;
+
         if (selectedOption.value && selectedOption.dataset.customerId) {
             customerSelect.value = selectedOption.dataset.customerId;
+            quotationSelect.value = ''; // Clear other selection
         }
-        // Potentially auto-fill items from selected order - more complex, for future enhancement
+
+        if (orderId) {
+            const url = `{{ route('orders.items.json', ['order' => ':id']) }}`.replace(':id', orderId);
+            fetch(url)
+                .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
+                .then(data => {
+                    itemsContainer.innerHTML = ''; // Clear existing items
+                    itemRowIndex = 0; // Reset index
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach(item => addItemRow(item));
+                    } else {
+                        addItemRow(); // Add a blank row if order has no items
+                    }
+                    discountTypeSelect.value = data.discount_type || '';
+                    discountValueInput.value = data.discount_value || 0;
+                    taxPercentageInput.value = data.tax_percentage || 0;
+                })
+                .catch(error => console.error('Error fetching order items:', error));
+        } else if (!quotationSelect.value) {
+            itemsContainer.innerHTML = '';
+            addItemRow();
+            discountTypeSelect.value = '';
+            discountValueInput.value = 0;
+            taxPercentageInput.value = 0;
+        }
+        toggleCustomerLock();
     });
 
-    addItemBtn.addEventListener('click', function () {
-        const newRow = document.createElement('div');
-        newRow.classList.add('row', 'align-items-center', 'mb-2', 'invoice-item-row', 'border', 'p-2', 'rounded');
-        newRow.innerHTML = `
-            <input type="hidden" name="items[${itemRowIndex}][invoice_item_id]" value="">
-            <div class="col-md-3 mb-2"><label class="form-label">Product/Service</label><select name="items[${itemRowIndex}][product_id]" class="form-select product-select"><option value="">Select Product</option>@foreach($products as $product)<option value="{{ $product->product_id }}" data-price="{{ $product->price }}" data-description="{{ $product->description }}">{{ $product->name }} (SKU: {{ $product->sku ?? 'N/A' }})</option>@endforeach</select></div>
-            <div class="col-md-3 mb-2"><label class="form-label">Item Name <span class="text-danger">*</span></label><input type="text" name="items[${itemRowIndex}][item_name]" class="form-control item-name" required></div>
-            <div class="col-md-3 mb-2"><label class="form-label">Quantity <span class="text-danger">*</span></label><input type="number" name="items[${itemRowIndex}][quantity]" class="form-control item-quantity" value="1" min="1" required></div>
-            <div class="col-md-2 mb-2"><label class="form-label">Unit Price <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${itemRowIndex}][unit_price]" class="form-control item-unit-price" min="0" required></div>
-            <div class="col-md-1 mb-2 d-flex align-items-end"><button type="button" class="btn btn-danger remove-item-btn">&times;</button></div>
-            <div class="col-md-12 mb-2"><label class="form-label">Description</label><textarea name="items[${itemRowIndex}][item_description]" class="form-control item-description" rows="1"></textarea></div>
-        `;
-        itemsContainer.appendChild(newRow);
-        itemRowIndex++;
+    quotationSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const quotationId = this.value;
+
+        if (selectedOption.value && selectedOption.dataset.customerId) {
+            customerSelect.value = selectedOption.dataset.customerId;
+            orderSelect.value = ''; // Clear other selection
+        }
+
+        if (quotationId) {
+            const url = `{{ route('quotations.items.json', ['quotation' => ':id']) }}`.replace(':id', quotationId);
+            fetch(url)
+                .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
+                .then(data => {
+                    itemsContainer.innerHTML = ''; // Clear existing items
+                    itemRowIndex = 0; // Reset index
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach(item => addItemRow(item));
+                    } else {
+                        addItemRow(); // Add a blank row if quotation has no items
+                    }
+                    discountTypeSelect.value = data.discount_type || '';
+                    discountValueInput.value = data.discount_value || 0;
+                    taxPercentageInput.value = data.tax_percentage || 0;
+                })
+                .catch(error => console.error('Error fetching quotation items:', error));
+        } else if (!orderSelect.value) {
+            itemsContainer.innerHTML = '';
+            addItemRow();
+            discountTypeSelect.value = '';
+            discountValueInput.value = 0;
+            taxPercentageInput.value = 0;
+        }
+
+        toggleCustomerLock();
     });
+
+    function toggleCustomerLock() {
+        customerSelect.disabled = !!(orderSelect.value || quotationSelect.value);
+    }
+
+    toggleCustomerLock();
+
+    addItemBtn.addEventListener('click', () => addItemRow());
 
     itemsContainer.addEventListener('click', function (event) {
         if (event.target.classList.contains('remove-item-btn')) {
