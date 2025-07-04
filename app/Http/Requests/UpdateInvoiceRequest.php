@@ -23,8 +23,10 @@ class UpdateInvoiceRequest extends FormRequest
      */
     public function rules(): array
     {
-        $invoiceId = $this->route('invoice') ? $this->route('invoice')->invoice_id : null;
-
+       /** $invoiceId = $this->route('invoice') ? $this->route('invoice')->invoice_id : null;*/
+        /** @var \App\Models\Invoice|null $invoice */
+        $invoice = $this->route('invoice');
+        $invoiceId = $invoice ? $invoice->invoice_id : null;
         return [
             'order_id' => 'nullable|exists:orders,order_id',
             'quotation_id' => 'nullable|exists:quotations,quotation_id',

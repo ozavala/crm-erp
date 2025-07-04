@@ -36,6 +36,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'delete-permissions', 'description' => 'Delete permissions'],
             // Admin Section
             ['name' => 'view-admin-section', 'description' => 'Can view the Admin dropdown in navigation'],
+            
+            //Feedback Permissions
+            ['name' => 'view-feedback', 'description' => 'View feedback'],
+            ['name' => 'edit-feedback', 'description' => 'Edit existing feedback'],
+            
+            // Add more permissions as needed
         ];
 
         foreach ($permissions as $permission) {

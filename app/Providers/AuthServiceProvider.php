@@ -33,5 +33,14 @@ class AuthServiceProvider extends ServiceProvider
                 return true;
             }
         });
+
+        Gate::define('view-feedback', function ($Crmuser, $user) {
+            return $user->hasPermissionTo('view-feedback');
+        });
+        Gate::define('edit-feedback', function ($Crmuser, $user) {
+            return $user->hasPermissionTo('edit-feedback');
+        });
+
+
     }
 }

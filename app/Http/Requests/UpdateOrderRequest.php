@@ -23,8 +23,10 @@ class UpdateOrderRequest extends FormRequest
      */
     public function rules(): array
     {
-        $orderId = $this->route('order') ? $this->route('order')->order_id : null;
-
+        /**$orderId = $this->route('order') ? $this->route('order')->order_id : null;*/
+        /** @var \App\Models\Order|null $order */
+        $order = $this->route('order');
+        $orderId = $order ? $order->order_id : null;
         return [
             'customer_id' => 'required|exists:customers,customer_id',
             'quotation_id' => 'nullable|exists:quotations,quotation_id',

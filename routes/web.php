@@ -30,6 +30,7 @@ use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\TaskController; // Add TaskController
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\FeedbackController; // Add FeedbackController
 use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
 
 
@@ -119,8 +120,9 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/sales-by-customer', [ReportController::class, 'salesByCustomer'])->name('reports.sales-by-customer');
     Route::get('reports/sales-by-category', [ReportController::class, 'salesByCategory'])->name('reports.sales-by-category');
     Route::get('reports/sales-by-employee', [ReportController::class, 'salesByEmployee'])->name('reports.sales-by-employee');
+    Route::resource('feedback', FeedBackController::class)->except(['edit', 'destroy']);
 });
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
 });
