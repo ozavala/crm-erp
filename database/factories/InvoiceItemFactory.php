@@ -2,15 +2,14 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Invoice;
 use App\Models\Product;
-use App\Models\Order;
-use App\Models\CrmUser;
-use App\Models\OrderItem;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InvoiceItem>
  */
-class OrderItemFactory extends Factory
+class InvoiceItemFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -21,16 +20,16 @@ class OrderItemFactory extends Factory
     {
         $quantity = fake()->numberBetween(1, 10);
         $unit_price = fake()->randomFloat(2, 10, 1000);
-        $item_total = $quantity * $unit_price;
+        $total = $quantity * $unit_price;
 
         return [
-            'order_id' => Order::factory(),
+            'invoice_id' => Invoice::factory(),
             'product_id' => Product::factory(),
-            'quantity' => $quantity,
-            'unit_price' => $unit_price,
-            'item_total' => $item_total,
             'item_name' => fake()->words(2, true),
             'item_description' => fake()->optional()->sentence(),
+            'quantity' => $quantity,
+            'unit_price' => $unit_price,
+            'item_total' => $total,
         ];
     }
-}
+} 
