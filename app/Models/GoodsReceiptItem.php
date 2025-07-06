@@ -17,10 +17,15 @@ class GoodsReceiptItem extends Model
         'purchase_order_item_id',
         'product_id',
         'quantity_received',
+        'unit_cost_with_landed',
+        'total_cost',
+        'notes',
     ];
 
     protected $casts = [
         'quantity_received' => 'integer',
+        'unit_cost_with_landed' => 'decimal:2',
+        'total_cost' => 'decimal:2',
     ];
 
     public function goodsReceipt(): BelongsTo

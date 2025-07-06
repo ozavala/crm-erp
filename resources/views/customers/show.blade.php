@@ -36,6 +36,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab" aria-controls="invoices" aria-selected="false">Invoices</button>
+        </li>
         {{-- Other tabs can be added here: Contacts, Opportunities, Orders, etc. --}}
     </ul>
 
@@ -69,6 +72,47 @@
                         @endforelse
                     </div>
                 </div>
+                
+                {{-- Payment Summary --}}
+                @if($payments->isNotEmpty())
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5>Recent Payments</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>For</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($payments->take(3) as $payment)
+                                        <tr>
+                                            <td>{{ $payment->payment_date->format('Y-m-d') }}</td>
+                                            <td>${{ number_format($payment->amount, 2) }}</td>
+                                            <td>
+                                                @if ($payment->payable)
+                                                    @if ($payment->payable instanceof \App\Models\Invoice)
+                                                        Invoice #{{ $payment->payable->invoice_number }}
+                                                    @elseif ($payment->payable instanceof \App\Models\Order)
+                                                        Order #{{ $payment->payable->order_number }}
+                                                    @else
+                                                        {{ class_basename($payment->payable) }} #{{ $payment->payable->getKey() }}
+                                                    @endif
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -166,6 +210,45 @@
                         <button type="submit" class="btn btn-primary">Add Note</button>
                     </form>
                 </div>
+            </div>
+        </div>
+
+        {{-- Invoices Tab --}}
+        <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
+            <div class="card card-body border-top-0">
+                <h5>Invoices</h5>
+                @if($invoices->isEmpty())
+                    <p>No invoices found for this customer.</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Amount Paid</th>
+                                    <th>Amount Due</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($invoices as $invoice)
+                                    <tr>
+                                        <td>{{ $invoice->invoice_number }}</td>
+                                        <td>{{ $invoice->invoice_date->format('Y-m-d') }}</td>
+                                        <td>{{ $invoice->status }}</td>
+                                        <td>${{ number_format($invoice->total_amount, 2) }}</td>
+                                        <td>${{ number_format($invoice->amount_paid, 2) }}</td>
+                                        <td>${{ number_format($invoice->amount_due, 2) }}</td>
+                                        <td><a href="{{ route('invoices.show', $invoice->invoice_id) }}" class="btn btn-sm btn-info">View</a></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

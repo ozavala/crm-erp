@@ -114,13 +114,13 @@ class PaymentControllerTest extends TestCase
 
         $purchaseOrder->refresh();
         $this->assertEquals(200.00, $purchaseOrder->amount_paid); // Se actualiza automáticamente
-        $this->assertEquals('Partially Paid', $purchaseOrder->status);
+        $this->assertEquals('partially_paid', $purchaseOrder->status);
 
         // Assert a final payment changes status to 'Paid'
         $this->post(route('purchase-orders.payments.store', $purchaseOrder), array_merge($paymentData, ['amount' => 300.00]));
         $purchaseOrder->refresh();
         $this->assertEquals(500.00, $purchaseOrder->amount_paid); // Se actualiza automáticamente
-        $this->assertEquals('Paid', $purchaseOrder->status);
+        $this->assertEquals('paid', $purchaseOrder->status);
 
         $response->assertRedirect(route('purchase-orders.show', $purchaseOrder->purchase_order_id));
         $response->assertSessionHas('success', 'Payment recorded successfully.');
@@ -234,7 +234,7 @@ class PaymentControllerTest extends TestCase
         $this->assertSoftDeleted($payment);
         $purchaseOrder->refresh();
         $this->assertEquals(0.00, $purchaseOrder->amount_paid); // Se actualiza automáticamente
-        $this->assertEquals('Confirmed', $purchaseOrder->status);
+        $this->assertEquals('confirmed', $purchaseOrder->status);
         $response->assertRedirect(route('purchase-orders.show', $purchaseOrder->purchase_order_id));
     }
 

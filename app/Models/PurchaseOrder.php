@@ -58,15 +58,15 @@ class PurchaseOrder extends Model
     ];
 
     public static $statuses = [
-        'Draft' => 'Draft',
-        'Sent' => 'Sent',
-        'Confirmed' => 'Confirmed', // Supplier confirmed
-        'Partially Received' => 'Partially Received',
-        'Received' => 'Received',
-        'Completed' => 'Completed', // All items received and potentially billed
-        'Cancelled' => 'Cancelled',
-        'Partially Paid' => 'Partially Paid',
-        'Paid' => 'Paid',
+        'draft' => 'Draft',
+        'confirmed' => 'Confirmed', // Supplier confirmed
+        'ready_for_dispatch' => 'Ready for Dispatch',
+        'dispatched' => 'Dispatched', // Sent by supplier
+        'partially_received' => 'Partially Received',
+        'fully_received' => 'Fully Received',
+        'cancelled' => 'Cancelled',
+        'partially_paid' => 'Partially Paid',
+        'paid' => 'Paid',
     ];
     
 
@@ -164,9 +164,80 @@ class PurchaseOrder extends Model
         }
 
         if ($hasAnyReceipts) {
-            $this->status = $isFullyReceived ? 'Received' : 'Partially Received';
+            $this->status = $isFullyReceived ? 'fully_received' : 'partially_received';
             $this->save();
         }
+    }
+
+    /**
+     * Check if the purchase order can be confirmed.
+     */
+    public function canBeConfirmed(): bool
+    {
+        return in_array($this->status, ['draft']);
+    }
+
+    /**
+     * Confirm the purchase order.
+     */
+    public function confirm(): bool
+    {
+        if (!$this->canBeConfirmed()) {
+            return false;
+        }
+
+        $this->status = 'confirmed';
+        return $this->save();
+    }
+
+    /**
+     * Check if the purchase order can be marked as ready for dispatch.
+     */
+    public function canBeReadyForDispatch(): bool
+    {
+        return in_array($this->status, ['confirmed']);
+    }
+
+    /**
+     * Mark the purchase order as ready for dispatch.
+     */
+    public function markAsReadyForDispatch(): bool
+    {
+        if (!$this->canBeReadyForDispatch()) {
+            return false;
+        }
+
+        $this->status = 'ready_for_dispatch';
+        return $this->save();
+    }
+
+    /**
+     * Check if the purchase order can be marked as dispatched.
+     */
+    public function canBeDispatched(): bool
+    {
+        return in_array($this->status, ['ready_for_dispatch']);
+    }
+
+    /**
+     * Mark the purchase order as dispatched.
+     */
+    public function markAsDispatched(): bool
+    {
+        if (!$this->canBeDispatched()) {
+            return false;
+        }
+
+        $this->status = 'dispatched';
+        return $this->save();
+    }
+
+    /**
+     * Check if the purchase order can receive payments.
+     */
+    public function canReceivePayments(): bool
+    {
+        return in_array($this->status, ['confirmed', 'ready_for_dispatch', 'dispatched', 'partially_received', 'fully_received']);
     }
 
     /**
@@ -182,14 +253,14 @@ class PurchaseOrder extends Model
 
         // Update status based on the new amount_paid
         if (bccomp($this->amount_paid, $this->total_amount, 2) >= 0) {
-            $this->status = 'Paid';
+            $this->status = 'paid';
             \Log::info("Status changed to Paid");
         } elseif ($this->amount_paid > 0) {
-            $this->status = 'Partially Paid';
+            $this->status = 'partially_paid';
             \Log::info("Status changed to Partially Paid");
         } else {
             // If no payments, revert to original status (Confirmed, Sent, etc.)
-            $this->status = 'Confirmed';
+            $this->status = 'confirmed';
             \Log::info("Status changed to Confirmed");
         }
         $this->save();

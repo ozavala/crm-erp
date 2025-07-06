@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Payment;
+use App\Models\Invoice;
+use App\Models\Order;
 
 class Customer extends Model
 {
@@ -61,9 +65,9 @@ class Customer extends Model
     /**
      * Get all of the customer's orders.
      */
-    public function orders(): HasMany
+    public function orders()
     {
-        return $this->hasMany(Order::class, 'customer_id', 'customer_id');
+        return $this->hasMany(\App\Models\Order::class, 'customer_id', 'customer_id');
     }
     /**
      * Get all of the customer's contacts.
@@ -81,5 +85,27 @@ class Customer extends Model
     public function tasks(): MorphMany
     {
         return $this->morphMany(Task::class, 'taskable');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(\App\Models\Invoice::class, 'customer_id', 'customer_id');
+    }
+
+    public function getAllPayments()
+    {
+        // Get payments from invoices
+        $invoicePayments = Payment::whereHas('payable', function ($query) {
+            $query->where('payable_type', Invoice::class)
+                  ->whereIn('payable_id', $this->invoices->pluck('invoice_id'));
+        })->get();
+
+        // Get payments from orders
+        $orderPayments = Payment::whereHas('payable', function ($query) {
+            $query->where('payable_type', Order::class)
+                  ->whereIn('payable_id', $this->orders->pluck('order_id'));
+        })->get();
+
+        return $invoicePayments->merge($orderPayments)->sortByDesc('payment_date');
     }
 }

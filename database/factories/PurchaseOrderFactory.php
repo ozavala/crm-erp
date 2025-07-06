@@ -26,7 +26,7 @@ class PurchaseOrderFactory extends Factory
             'order_date' => $this->faker->dateTimeBetween('-2 months', '-1 week'),
             'expected_delivery_date' => $this->faker->dateTimeBetween('now', '+1 month'),
             'type' => $this->faker->randomElement(array_keys(PurchaseOrder::$types)),
-            'status' => $this->faker->randomElement(array_keys(PurchaseOrder::$statuses)),
+            'status' => 'draft', // Start with draft status
             'terms_and_conditions' => 'Net 30. All items subject to inspection upon delivery.',
             'notes' => $this->faker->optional()->paragraph,
             'created_by_user_id' => CrmUser::factory(),
@@ -61,6 +61,54 @@ class PurchaseOrderFactory extends Factory
                 'tax_amount' => $taxAmount,
                 'total_amount' => $totalAmount,
             ]);
+        });
+    }
+
+    /**
+     * Create a confirmed purchase order.
+     */
+    public function confirmed()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'confirmed',
+            ];
+        });
+    }
+
+    /**
+     * Create a ready for dispatch purchase order.
+     */
+    public function readyForDispatch()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'ready_for_dispatch',
+            ];
+        });
+    }
+
+    /**
+     * Create a dispatched purchase order.
+     */
+    public function dispatched()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'dispatched',
+            ];
+        });
+    }
+
+    /**
+     * Create a cancelled purchase order.
+     */
+    public function cancelled()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'cancelled',
+            ];
         });
     }
 }

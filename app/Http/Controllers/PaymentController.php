@@ -61,17 +61,17 @@ class PaymentController extends Controller
         // Check if payment amount exceeds amount due
         if (method_exists($payableModel, 'getAmountDueAttribute')) {
             $amountDue = $payableModel->amount_due; // Using the accessor consistently
-            if ($validatedData['amount'] > $amountDue) {
+            if (bccomp($validatedData['amount'], $amountDue, 2) === 1) {
                 return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due.');
             }
         } elseif ($payableModel instanceof PurchaseOrder) {
             $amountDue = $payableModel->amount_due; // Using the accessor from the model
-            if ($validatedData['amount'] > $amountDue) {
+            if (bccomp($validatedData['amount'], $amountDue, 2) === 1) {
                 return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due for the Purchase Order.');
             }
         } elseif ($payableModel instanceof Bill) {
             $amountDue = $payableModel->amount_due;
-            if ($validatedData['amount'] > $amountDue) {
+            if (bccomp($validatedData['amount'], $amountDue, 2) === 1) {
                 return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due for the Bill.');
             }
         }

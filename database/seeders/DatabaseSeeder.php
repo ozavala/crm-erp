@@ -95,9 +95,21 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->command->info('Leads created.');
 
+        // Create integration data (lead -> customer -> opportunity -> invoice -> payments)
+        $this->call(LeadToClientIntegrationSeeder::class);
+        $this->command->info('Integration data created.');
+
         // Call the newly refactored seeders
         $this->call(PurchaseOrderSeeder::class);
         $this->call(QuotationSeeder::class);
+       
+        // Create unit price calculation data
+        $this->call(UnitPriceCalculationSeeder::class);
+        $this->command->info('Unit price calculation data created.');
+
+        // Create purchase order status flow demo
+        $this->call(PurchaseOrderStatusFlowSeeder::class);
+        $this->command->info('Purchase order status flow demo created.');
        
         // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
         // We will refactor them next.

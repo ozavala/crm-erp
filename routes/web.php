@@ -32,6 +32,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\FeedbackController; // Add FeedbackController
 use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
+use App\Http\Controllers\PurchaseOrderStatusController; // Add PurchaseOrderStatusController
 
 
 // In routes/web.php
@@ -77,6 +78,14 @@ Route::middleware('auth')->group(function () {
     Route::get('orders/{order}/items', [InvoiceController::class, 'getOrderItemsJson'])->name('orders.items.json');
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
+    
+    // Purchase Order Status Management
+    Route::post('purchase-orders/{purchase_order}/confirm', [PurchaseOrderStatusController::class, 'confirm'])->name('purchase-orders.confirm');
+    Route::post('purchase-orders/{purchase_order}/ready-for-dispatch', [PurchaseOrderStatusController::class, 'markReadyForDispatch'])->name('purchase-orders.ready-for-dispatch');
+    Route::post('purchase-orders/{purchase_order}/dispatched', [PurchaseOrderStatusController::class, 'markDispatched'])->name('purchase-orders.dispatched');
+    Route::post('purchase-orders/{purchase_order}/cancel', [PurchaseOrderStatusController::class, 'cancel'])->name('purchase-orders.cancel');
+    Route::get('purchase-orders/{purchase_order}/transitions', [PurchaseOrderStatusController::class, 'getAvailableTransitions'])->name('purchase-orders.transitions');
+    
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])->name('orders.payments.store');
     Route::resource('addresses', AddressController::class);
     Route::put('quotations/{quotation}/status', [QuotationStatusController::class, 'update'])->name('quotations.status.update');

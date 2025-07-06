@@ -94,4 +94,20 @@ class Invoice extends Model
     {
         return $this->belongsTo(Quotation::class, 'quotation_id', 'quotation_id');
     }
+
+    public function updateStatusAfterPayment(): void
+    {
+        $totalPaid = $this->payments()->sum('amount');
+        $this->amount_paid = $totalPaid;
+
+        if (bccomp($totalPaid, $this->total_amount, 2) >= 0) {
+            $this->status = 'Paid';
+        } elseif ($totalPaid > 0) {
+            $this->status = 'Partially Paid';
+        } else {
+            $this->status = 'Sent';
+        }
+
+        $this->save();
+    }
 }

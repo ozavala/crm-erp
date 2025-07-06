@@ -25,6 +25,7 @@ class PurchaseOrderItemFactory extends Factory
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
             'item_total' => $quantity * $unitPrice,
+            'landed_cost_per_unit' => null, // Will be calculated by LandedCostService
         ];
     }
 }
