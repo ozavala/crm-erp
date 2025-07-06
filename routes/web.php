@@ -82,14 +82,16 @@ Route::middleware('auth')->group(function () {
     Route::put('quotations/{quotation}/status', [QuotationStatusController::class, 'update'])->name('quotations.status.update');
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/send-reminder', [InvoiceController::class, 'sendReminder'])->name('invoices.sendReminder');
+    Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
     Route::get('invoices/{invoice}/pdf', [App\Http\Controllers\InvoiceController::class, 'printPdf'])->name('invoices.pdf');
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
     Route::get('purchase-orders/{purchase_order}/print', [PurchaseOrderController::class, 'printPdf'])->name('purchase-orders.print');
 
     Route::post('bills/{bill}/payments', [PaymentController::class, 'store'])->name('bills.payments.store');
+    Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
-    Route::resource('payments', PaymentController::class)->except(['create', 'edit']);
+    Route::resource('payments', PaymentController::class);
     
     Route::resource('bills', BillController::class);
     Route::post('bills/{bill}/restore', [BillController::class, 'restore'])->name('bills.restore');

@@ -4,10 +4,18 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Auth;
 
 class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Auth::shouldUse('web');
+        $this->flushSession();
+    }
 
     public function test_registration_screen_can_be_rendered(): void
     {

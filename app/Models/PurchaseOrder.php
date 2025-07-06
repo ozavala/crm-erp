@@ -177,11 +177,20 @@ class PurchaseOrder extends Model
         // Recalculate the amount paid from its payments
         $this->amount_paid = $this->payments()->sum('amount');
 
+        // Debug logs
+        \Log::info("PurchaseOrder {$this->purchase_order_id}: amount_paid = {$this->amount_paid}, total_amount = {$this->total_amount}");
+
         // Update status based on the new amount_paid
-        if ($this->amount_paid >= $this->total_amount) {
+        if (bccomp($this->amount_paid, $this->total_amount, 2) >= 0) {
             $this->status = 'Paid';
+            \Log::info("Status changed to Paid");
         } elseif ($this->amount_paid > 0) {
             $this->status = 'Partially Paid';
+            \Log::info("Status changed to Partially Paid");
+        } else {
+            // If no payments, revert to original status (Confirmed, Sent, etc.)
+            $this->status = 'Confirmed';
+            \Log::info("Status changed to Confirmed");
         }
         $this->save();
     }

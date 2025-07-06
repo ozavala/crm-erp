@@ -85,6 +85,8 @@ class ProductControllerTest extends TestCase
     public function it_can_store_a_new_product()
     {
         $category = ProductCategory::factory()->create();
+        $colorFeature = ProductFeature::create(['name' => 'Color']);
+        $sizeFeature = ProductFeature::create(['name' => 'Size']);
         
         $productData = [
             'name' => 'Test Product',
@@ -92,24 +94,27 @@ class ProductControllerTest extends TestCase
             'sku' => 'TEST-001',
             'price' => 99.99,
             'cost' => 50.00,
-            'category_id' => $category->category_id,
+            'is_service' => false,
+            'is_active' => true,
+            'quantity_on_hand' => 100,
+            'product_category_id' => $category->category_id,
             'features' => [
-                'Color' => 'Red',
-                'Size' => 'Large'
+                ['feature_id' => $colorFeature->feature_id, 'value' => 'Red'],
+                ['feature_id' => $sizeFeature->feature_id, 'value' => 'Large']
             ]
         ];
 
         $response = $this->post(route('products.store'), $productData);
 
         $response->assertRedirect(route('products.index'));
-        $response->assertSessionHas('success', 'Product created successfully.');
+        $response->assertSessionHas('success', 'Product/Service created successfully.');
 
         $this->assertDatabaseHas('products', [
             'name' => 'Test Product',
             'sku' => 'TEST-001',
             'price' => 99.99,
             'cost' => 50.00,
-            'category_id' => $category->category_id,
+            'product_category_id' => $category->category_id,
         ]);
 
         $product = Product::where('sku', 'TEST-001')->first();
@@ -148,6 +153,8 @@ class ProductControllerTest extends TestCase
     {
         $product = Product::factory()->create();
         $category = ProductCategory::factory()->create();
+        $colorFeature = ProductFeature::create(['name' => 'Color']);
+        $weightFeature = ProductFeature::create(['name' => 'Weight']);
         
         $updateData = [
             'name' => 'Updated Product',
@@ -155,17 +162,20 @@ class ProductControllerTest extends TestCase
             'sku' => 'UPDATED-001',
             'price' => 149.99,
             'cost' => 75.00,
-            'category_id' => $category->category_id,
+            'is_service' => false,
+            'is_active' => true,
+            'quantity_on_hand' => 150,
+            'product_category_id' => $category->category_id,
             'features' => [
-                'Color' => 'Blue',
-                'Weight' => '2kg'
+                ['feature_id' => $colorFeature->feature_id, 'value' => 'Blue'],
+                ['feature_id' => $weightFeature->feature_id, 'value' => '2kg']
             ]
         ];
 
         $response = $this->put(route('products.update', $product), $updateData);
 
         $response->assertRedirect(route('products.index'));
-        $response->assertSessionHas('success', 'Product updated successfully.');
+        $response->assertSessionHas('success', 'Product/Service updated successfully.');
 
         $this->assertDatabaseHas('products', [
             'product_id' => $product->product_id,
@@ -187,7 +197,7 @@ class ProductControllerTest extends TestCase
         $response = $this->delete(route('products.destroy', $product));
 
         $response->assertRedirect(route('products.index'));
-        $response->assertSessionHas('success', 'Product deleted successfully.');
+        $response->assertSessionHas('success', 'Product/Service deleted successfully.');
 
         $this->assertSoftDeleted('products', ['product_id' => $product->product_id]);
     }
@@ -197,7 +207,7 @@ class ProductControllerTest extends TestCase
     {
         $response = $this->post(route('products.store'), []);
 
-        $response->assertSessionHasErrors(['name', 'sku', 'price']);
+        $response->assertSessionHasErrors(['name', 'price', 'is_service', 'is_active']);
     }
 
     #[Test]
@@ -234,6 +244,9 @@ class ProductControllerTest extends TestCase
     public function it_can_handle_product_features()
     {
         $category = ProductCategory::factory()->create();
+        $colorFeature = ProductFeature::create(['name' => 'Color']);
+        $sizeFeature = ProductFeature::create(['name' => 'Size']);
+        $materialFeature = ProductFeature::create(['name' => 'Material']);
         
         $productData = [
             'name' => 'Feature Test Product',
@@ -241,11 +254,14 @@ class ProductControllerTest extends TestCase
             'sku' => 'FEATURE-001',
             'price' => 99.99,
             'cost' => 50.00,
-            'category_id' => $category->category_id,
+            'is_service' => false,
+            'is_active' => true,
+            'quantity_on_hand' => 100,
+            'product_category_id' => $category->category_id,
             'features' => [
-                'Color' => 'Red',
-                'Size' => 'Large',
-                'Material' => 'Cotton'
+                ['feature_id' => $colorFeature->feature_id, 'value' => 'Red'],
+                ['feature_id' => $sizeFeature->feature_id, 'value' => 'Large'],
+                ['feature_id' => $materialFeature->feature_id, 'value' => 'Cotton']
             ]
         ];
 

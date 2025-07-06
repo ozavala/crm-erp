@@ -60,7 +60,7 @@ class PaymentController extends Controller
 
         // Check if payment amount exceeds amount due
         if (method_exists($payableModel, 'getAmountDueAttribute')) {
-            $amountDue = $payableModel->total_amount - $payableModel->amount_paid;
+            $amountDue = $payableModel->amount_due; // Using the accessor consistently
             if ($validatedData['amount'] > $amountDue) {
                 return back()->withInput()->with('error', 'Payment amount cannot exceed the amount due.');
             }
@@ -84,16 +84,16 @@ class PaymentController extends Controller
 
         // Redirect back to the payable entity's show page
         if ($payableModel instanceof Invoice) {
-            return redirect()->route('invoices.show', $payableModel->invoice_id)
+            return redirect()->route('invoices.show', $payableModel)
                              ->with('success', 'Payment recorded successfully.');
         } elseif ($payableModel instanceof Order) {
-            return redirect()->route('orders.show', $payableModel->order_id)
+            return redirect()->route('orders.show', $payableModel)
                              ->with('success', 'Payment recorded successfully.');
         } elseif ($payableModel instanceof PurchaseOrder) {
-            return redirect()->route('purchase-orders.show', $payableModel->purchase_order_id)
+            return redirect()->route('purchase-orders.show', $payableModel)
                              ->with('success', 'Payment recorded successfully.');
         } elseif ($payableModel instanceof Bill) {
-            return redirect()->route('bills.show', $payableModel->bill_id)
+            return redirect()->route('bills.show', $payableModel)
                              ->with('success', 'Payment recorded successfully.');
         }
 
@@ -103,6 +103,49 @@ class PaymentController extends Controller
     {
         $payable = $payment->payable;
         return view('payments.show', compact('payable'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $customers = Customer::orderBy('first_name')->get();
+        $invoices = Invoice::with('customer')->orderBy('invoice_date', 'desc')->get();
+        $orders = Order::with('customer')->orderBy('order_date', 'desc')->get();
+        
+        return view('payments.create', compact('customers', 'invoices', 'orders'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Payment $payment)
+    {
+        $customers = Customer::orderBy('first_name')->get();
+        $invoices = Invoice::with('customer')->orderBy('invoice_date', 'desc')->get();
+        $orders = Order::with('customer')->orderBy('order_date', 'desc')->get();
+        
+        return view('payments.edit', compact('payment', 'customers', 'invoices', 'orders'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Payment $payment)
+    {
+        $validatedData = $request->validate([
+            'payment_date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'payment_method' => 'required|string|max:255',
+            'reference_number' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        $payment->update($validatedData);
+
+        return redirect()->route('payments.index')
+                         ->with('success', 'Payment updated successfully.');
     }
 
     /**
@@ -120,16 +163,16 @@ class PaymentController extends Controller
         });
 
         if ($payable instanceof Invoice) {
-            return redirect()->route('invoices.show', $payable->invoice_id)
+            return redirect()->route('invoices.show', $payable)
                              ->with('success', 'Payment deleted successfully and invoice updated.');
         } elseif ($payable instanceof Order) {
-            return redirect()->route('orders.show', $payable->order_id)
+            return redirect()->route('orders.show', $payable)
                              ->with('success', 'Payment deleted successfully and order updated.');
         } elseif ($payable instanceof PurchaseOrder) {
-            return redirect()->route('purchase-orders.show', $payable->purchase_order_id)
+            return redirect()->route('purchase-orders.show', $payable)
                              ->with('success', 'Payment deleted successfully and purchase order updated.');
         } elseif ($payable instanceof Bill) {
-            return redirect()->route('bills.show', $payable->bill_id)
+            return redirect()->route('bills.show', $payable)
                              ->with('success', 'Payment deleted successfully and purchase order updated.');
         }
 

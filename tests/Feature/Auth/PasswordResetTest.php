@@ -2,15 +2,23 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\CrmUser;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Auth;
 
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Auth::shouldUse('web');
+        $this->flushSession();
+    }
 
     public function test_reset_password_link_screen_can_be_rendered(): void
     {
@@ -23,7 +31,7 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = CrmUser::factory()->create();
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -34,7 +42,7 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = CrmUser::factory()->create();
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -51,7 +59,7 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = CrmUser::factory()->create();
 
         $this->post('/forgot-password', ['email' => $user->email]);
 

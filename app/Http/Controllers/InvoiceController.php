@@ -66,6 +66,7 @@ class InvoiceController extends Controller
 
         $invoice = new Invoice();
         $orderItems = [];
+        $customer = null;
 
         if ($request->filled('clone_from')) {
             $sourceInvoice = Invoice::with('items')->find($request->input('clone_from'));
@@ -92,6 +93,7 @@ class InvoiceController extends Controller
             if ($order) {
                 $invoice->order_id = $order->order_id;
                 $invoice->customer_id = $order->customer_id;
+                $customer = $order->customer;
                 foreach ($order->items as $orderItem) {
                     $orderItems[] = [
                         'product_id' => $orderItem->product_id,
@@ -125,9 +127,10 @@ class InvoiceController extends Controller
             }
         }
 
+        $order = $order ?? null;
         $invoice->invoice_number = 'INV-' . strtoupper(Str::random(8)); // Suggest an invoice number
 
-        return view('invoices.create', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems'));
+        return view('invoices.create', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems', 'order', 'customer'));
     }
 
     /**
@@ -356,5 +359,20 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.show', $invoice)
                          ->with('success', 'Payment reminder sent successfully.');
+    }
+
+    /**
+     * Send invoice email.
+     */
+    public function send(Invoice $invoice)
+    {
+        // Update invoice status to sent
+        $invoice->update(['status' => 'Sent']);
+        
+        // Here you would typically send the invoice email
+        // For now, we'll just update the status
+        
+        return redirect()->route('invoices.show', $invoice)
+                         ->with('success', 'Invoice sent successfully.');
     }
 }

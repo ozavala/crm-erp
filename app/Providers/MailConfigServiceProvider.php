@@ -22,6 +22,14 @@ class MailConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Skip during testing to avoid database connection issues
+        if (app()->environment('testing') || 
+            app()->runningUnitTests() || 
+            config('app.env') === 'testing' ||
+            defined('PHPUNIT_COMPOSER_INSTALL')) {
+            return;
+        }
+
         if (Schema::hasTable('settings')) {
             try {
                 $settings = DB::table('settings')
