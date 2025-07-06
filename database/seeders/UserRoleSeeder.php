@@ -41,8 +41,8 @@ class UserRoleSeeder extends Seeder
         // Assign specific permissions to Sales role
         if ($salesRole) {
             $salesPermissions = Permission::whereIn('name', [
-                'view_customers', 'create_customers', 'edit_customers',
-                'view_leads', 'create_leads', 'edit_leads',
+                'view-customers', 'create-customers', 'edit-customers',
+                'view-leads', 'create-leads', 'edit-leads',
             ])->pluck('permission_id');
             $salesRole->permissions()->attach($salesPermissions);
         }
@@ -50,8 +50,8 @@ class UserRoleSeeder extends Seeder
         // Assign specific permissions to Support role
         if ($supportRole) {
             $supportPermissions = Permission::whereIn('name', [
-                'view_customers', 'edit_customers', // Example: Support might view/edit but not create/delete
-                'view_leads',
+                'view-customers', 'edit-customers', // Example: Support might view/edit but not create/delete
+                'view-leads',
             ])->pluck('permission_id');
             $supportRole->permissions()->attach($supportPermissions);
         }

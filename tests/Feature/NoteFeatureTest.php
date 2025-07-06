@@ -21,6 +21,27 @@ class NoteFeatureTest extends TestCase
     {
         parent::setUp();
         $this->user = CrmUser::factory()->create();
+        
+        // Create the permission directly
+        $permission = \App\Models\Permission::create([
+            'name' => 'view-customers',
+            'description' => 'View customer records',
+        ]);
+        
+        // Create a role with view-customers permission
+        $role = \App\Models\UserRole::create([
+            'name' => 'Test Role',
+            'description' => 'Test role for testing',
+        ]);
+        
+        // Attach the permission to the role
+        $role->permissions()->attach($permission->permission_id);
+        \Log::info("Permission attached to role. Role permissions count: " . $role->permissions()->count());
+        
+        // Assign the role to the user
+        $this->user->roles()->attach($role->role_id);
+        \Log::info("Role attached to user. User roles count: " . $this->user->roles()->count());
+        
         $this->actingAs($this->user, 'web');
     }
 
@@ -94,6 +115,10 @@ class NoteFeatureTest extends TestCase
         $customer = Customer::factory()->create();
         $noteBody = $this->faker->sentence(10);
 
+        // Debug: Check if user has the permission
+        \Log::info("User has view-customers permission: " . ($this->user->hasPermissionTo('view-customers') ? 'YES' : 'NO'));
+        \Log::info("User roles: " . $this->user->roles->pluck('name')->join(', '));
+        
         $this->post(route('notes.store'), ['body' => $noteBody, 'noteable_id' => $customer->customer_id, 'noteable_type' => 'Customer']);
 
         $this->get(route('customers.show', $customer))

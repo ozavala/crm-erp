@@ -77,7 +77,7 @@ class CustomerController extends Controller
     {
         Gate::authorize('view-customers');
         // Eager load all necessary relationships for the detail view
-        $customer->load(['createdBy', 'addresses', 'contacts']);
+        $customer->load(['createdBy', 'addresses', 'contacts', 'notes']);
         // The getAllPayments method was added in a previous step to fetch payments from orders and invoices
         $payments = method_exists($customer, 'getAllPayments') ? $customer->getAllPayments() : collect();
         return view('customers.show', compact('customer', 'payments'));

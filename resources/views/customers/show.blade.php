@@ -33,6 +33,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab" aria-controls="contacts" aria-selected="false">Contacts</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
+        </li>
         {{-- Other tabs can be added here: Contacts, Opportunities, Orders, etc. --}}
     </ul>
 
@@ -119,4 +122,51 @@
                 @endif
             </div>
         </div>
+
+        {{-- Notes Tab --}}
+        <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+            <div class="card card-body border-top-0">
+                <h5>Notes</h5>
+                @if($customer->notes->isEmpty())
+                    <p>No notes have been added for this customer.</p>
+                @else
+                    <div class="notes-list">
+                        @foreach($customer->notes as $note)
+                            <div class="note-item border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1">{{ $note->body }}</p>
+                                        <small class="text-muted">
+                                            Added by {{ $note->createdBy->full_name ?? 'Unknown' }} on {{ $note->created_at->format('M d, Y \a\t g:i A') }}
+                                        </small>
+                                    </div>
+                                    <form action="{{ route('notes.destroy', $note) }}" method="POST" class="ms-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this note?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                
+                {{-- Add Note Form --}}
+                <div class="mt-4">
+                    <h6>Add New Note</h6>
+                    <form action="{{ route('notes.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="noteable_id" value="{{ $customer->customer_id }}">
+                        <input type="hidden" name="noteable_type" value="Customer">
+                        <div class="mb-3">
+                            <textarea name="body" class="form-control" rows="3" placeholder="Enter your note here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Note</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
