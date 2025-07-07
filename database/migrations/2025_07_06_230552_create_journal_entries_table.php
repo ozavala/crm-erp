@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('reference_number')->nullable();
             $table->text('description')->nullable();
             $table->foreignId('created_by_user_id')->constrained('crm_users', 'user_id');
+            $table->string('transaction_type')->nullable();
+            $table->unsignedBigInteger('referenceable_id')->nullable();
+            $table->string('referenceable_type')->nullable();
             $table->timestamps();
         });
     }

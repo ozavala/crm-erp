@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\CrmUser;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 

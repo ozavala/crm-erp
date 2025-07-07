@@ -48,7 +48,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_payments_index()
     {
-        Payment::factory()->count(3)->create();
+        $invoice = \App\Models\Invoice::factory()->create();
+        Payment::factory()->count(3)->state([
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ])->create();
 
         $response = $this->get(route('payments.index'));
 
@@ -60,8 +64,17 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_search_payments()
     {
-        Payment::factory()->create(['reference_number' => 'PAY-001']);
-        Payment::factory()->create(['reference_number' => 'PAY-002']);
+        $invoice = \App\Models\Invoice::factory()->create();
+        Payment::factory()->create([
+            'reference_number' => 'PAY-001',
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ]);
+        Payment::factory()->create([
+            'reference_number' => 'PAY-002',
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ]);
 
         $response = $this->get(route('payments.index', ['search' => 'PAY-001']));
 
@@ -156,7 +169,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_payment_details()
     {
-        $payment = Payment::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create();
+        $payment = Payment::factory()->create([
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ]);
 
         $response = $this->get(route('payments.show', $payment));
 
@@ -168,7 +185,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_edit_payment_form()
     {
-        $payment = Payment::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create();
+        $payment = Payment::factory()->create([
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ]);
 
         $response = $this->get(route('payments.edit', $payment));
 
@@ -182,7 +203,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_update_payment()
     {
-        $payment = Payment::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create();
+        $payment = Payment::factory()->create([
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+        ]);
         
         $updateData = [
             'payment_date' => '2024-02-15',
@@ -211,10 +236,11 @@ class PaymentControllerTest extends TestCase
     public function it_can_delete_payment()
     {
         $invoice = Invoice::factory()->create();
-        $payment = Payment::factory()->create([
-            'payable_type' => 'App\Models\Invoice',
-            'payable_id' => $invoice->invoice_id
-        ]);
+        $payment = Payment::factory()->state([
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => Invoice::class,
+            'amount' => 100
+        ])->create();
 
         $response = $this->delete(route('payments.destroy', $payment));
 

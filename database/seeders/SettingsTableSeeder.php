@@ -28,22 +28,22 @@ class SettingsTableSeeder extends Seeder
             ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
             ['name' => 'IVA 15%', 'rate' => 15.00, 'description' => 'Tasa general de IVA'],
             ['name' => 'IVA 22%', 'rate' => 22.00, 'description' => 'Tasa especial de IVA'],
-        ]), 'type' => 'json']);
+        ])]);
         
         Setting::create(['key' => 'tax_rates_spain', 'value' => json_encode([
             ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
             ['name' => 'IVA 4%', 'rate' => 4.00, 'description' => 'Tasa superreducida'],
             ['name' => 'IVA 10%', 'rate' => 10.00, 'description' => 'Tasa reducida'],
             ['name' => 'IVA 21%', 'rate' => 21.00, 'description' => 'Tasa general'],
-        ]), 'type' => 'json']);
+        ])]);
         
         Setting::create(['key' => 'tax_rates_mexico', 'value' => json_encode([
             ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
             ['name' => 'IVA 16%', 'rate' => 16.00, 'description' => 'Tasa general de IVA'],
-        ]), 'type' => 'json']);
+        ])]);
         
-        Setting::create(['key' => 'default_country_tax', 'value' => 'ecuador', 'type' => 'string']);
-        Setting::create(['key' => 'tax_includes_services', 'value' => 'true', 'type' => 'boolean']);
-        Setting::create(['key' => 'tax_includes_transport', 'value' => 'false', 'type' => 'boolean']);
+        Setting::create(['key' => 'default_country_tax', 'value' => 'ecuador']);
+        Setting::create(['key' => 'tax_includes_services', 'value' => 'true']);
+        Setting::create(['key' => 'tax_includes_transport', 'value' => 'false']);
     }
 }

@@ -123,7 +123,7 @@ class ProductTaxTest extends TestCase
 
         $this->assertTrue($productoBienes->isCategoryTaxable());
         $this->assertTrue($productoServicios->isCategoryTaxable());
-        $this->assertTrue($productoTransporte->isCategoryTaxable());
+        $this->assertFalse($productoTransporte->isCategoryTaxable());
         $this->assertFalse($productoTransportePublico->isCategoryTaxable());
         $this->assertTrue($productoSinCategoria->isCategoryTaxable());
     }

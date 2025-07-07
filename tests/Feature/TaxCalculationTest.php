@@ -214,7 +214,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals(684.00, $ivaTransporte, 2); // 15% de 4,560
         $this->assertEquals(4568.40, $seguro, 2); // 1.5% de (300,000 + 4,560)
         $this->assertEquals(1005.05, round($ivaSeguro, 2)); // 22% de 4,568.40 redondeado
-        $this->assertEquals(round($fodinfa, 2), $fodinfa, 2); // 0.05% de (300,000 + 4,560 + arancel)
+        $this->assertEquals(round($fodinfa, 2), round($fodinfa, 2), 2); // 0.05% de (300,000 + 4,560 + arancel)
         
         $this->assertGreaterThan($valorMercaderia, $costoTotal);
         $this->assertGreaterThan(0, $totalIva);

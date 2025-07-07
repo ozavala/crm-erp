@@ -102,11 +102,11 @@ class NotificationServiceTest extends TestCase
     {
         // Crear factura y pago
         $invoice = Invoice::factory()->create();
-        $payment = Payment::factory()->create([
+        $payment = Payment::factory()->state([
+            'payable_id' => $invoice->invoice_id,
             'payable_type' => Invoice::class,
-            'payable_id' => $invoice->id,
             'amount' => 100
-        ]);
+        ])->create();
 
         // Mock del servicio de email
         Mail::fake();

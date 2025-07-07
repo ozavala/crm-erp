@@ -24,14 +24,11 @@ class PaymentFactory extends Factory
      */
     public function definition(): array
     {
-        // Default to creating a Bill for the payment,
-        // but this can be overridden when using the factory.
-        $payable = Bill::factory()->create();
-
+        $bill = \App\Models\Bill::factory()->create();
         return [
-            'payable_id' => $payable->bill_id,
-            'payable_type' => Bill::class,
-            'created_by_user_id' => $payable->created_by_user_id,
+            'payable_id' => $bill->bill_id,
+            'payable_type' => \App\Models\Bill::class,
+            'created_by_user_id' => \App\Models\User::factory(),
             'amount' => $this->faker->randomFloat(2, 50, 1000),
             'payment_date' => $this->faker->date(),
             'payment_method' => $this->faker->randomElement(['cash', 'bank_transfer', 'credit_card', 'cheque']),

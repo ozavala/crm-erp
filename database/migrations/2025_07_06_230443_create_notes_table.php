@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('notes', function (Blueprint $table) {
             $table->id('note_id');
-            $table->text('content');
-            $table->string('notable_type');
-            $table->unsignedBigInteger('notable_id');
+            $table->text('body');
+            $table->string('noteable_type');
+            $table->unsignedBigInteger('noteable_id');
             $table->foreignId('created_by_user_id')->constrained('crm_users', 'user_id');
             $table->timestamps();
             $table->softDeletes();
             
-            $table->index(['notable_type', 'notable_id']);
+            $table->index(['noteable_type', 'noteable_id']);
         });
     }
 
