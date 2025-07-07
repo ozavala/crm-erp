@@ -110,6 +110,10 @@ class DatabaseSeeder extends Seeder
         // Create purchase order status flow demo
         $this->call(PurchaseOrderStatusFlowSeeder::class);
         $this->command->info('Purchase order status flow demo created.');
+        
+        // Create comprehensive report data
+        $this->call(ReportDataSeeder::class);
+        $this->command->info('Report data created.');
        
         // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
         // We will refactor them next.

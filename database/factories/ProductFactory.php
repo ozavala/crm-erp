@@ -22,6 +22,7 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'cost' => $this->faker->randomFloat(2, 5, 500),
             'quantity_on_hand' => $isService ? 0 : $this->faker->numberBetween(0, 500),
+            'reorder_point' => $this->faker->numberBetween(5, 50),
             'is_service' => $isService,
             'is_active' => $this->faker->boolean(90), // 90% chance of being active
             'product_category_id' => ProductCategory::factory(),

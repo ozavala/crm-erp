@@ -21,6 +21,7 @@ class Product extends Model
         'price',
         'cost',
         'quantity_on_hand',
+        'reorder_point',
         'is_service',
         'is_active',
         'created_by_user_id',
