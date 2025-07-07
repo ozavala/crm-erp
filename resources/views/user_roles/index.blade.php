@@ -5,19 +5,19 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>User Roles</h1>
-        <a href="{{ route('user-roles.create') }}" class="btn btn-primary">Add New Role</a>
+        <h1>{{ __('User Roles') }}</h1>
+        <a href="{{ route('user-roles.create') }}" class="btn btn-primary">{{ __('Add New Role') }}</a>
     </div>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Users</th>
-                <th>Permissions</th>
-                <th>Actions</th>
+                <th>{{ __('ID') }}</th>
+                <th>{{ __('Name') }}</th>
+                <th>{{ __('Description') }}</th>
+                <th>{{ __('Users') }}</th>
+                <th>{{ __('Permissions') }}</th>
+                <th>{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -29,12 +29,12 @@
                     <td>{{ $role->users_count }}</td>
                     <td>{{ $role->permissions_count }}</td>
                     <td>
-                        <a href="{{ route('user-roles.show', $role->role_id) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('user-roles.edit', $role->role_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ route('user-roles.show', $role->role_id) }}" class="btn btn-info btn-sm">{{ __('View') }}</a>
+                        <a href="{{ route('user-roles.edit', $role->role_id) }}" class="btn btn-warning btn-sm">{{ __('Edit') }}</a>
                         <form action="{{ route('user-roles.destroy', $role->role_id) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure? This will not detach users or permissions automatically unless handled in controller.')">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure? This will not detach users or permissions automatically unless handled in controller.')">{{ __('Delete') }}</button>
                         </form>
                     </td>
                 </tr>

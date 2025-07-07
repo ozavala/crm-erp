@@ -1,27 +1,27 @@
 @csrf
 <div class="row">
     <div class="col-md-8 mb-3">
-        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+        <label for="name" class="form-label">{{ __('Name') }} <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $product->name ?? '') }}" required>
         @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="sku" class="form-label">SKU (Stock Keeping Unit)</label>
+        <label for="sku" class="form-label">{{ __('SKU') }} ({{ __('Stock Keeping Unit') }})</label>
         <input type="text" class="form-control @error('sku') is-invalid @enderror" id="sku" name="sku" value="{{ old('sku', $product->sku ?? '') }}">
         @error('sku') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 </div>
 
 <div class="mb-3">
-    <label for="description" class="form-label">Description</label>
+    <label for="description" class="form-label">{{ __('Description') }}</label>
     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $product->description ?? '') }}</textarea>
     @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
 <div class="mb-3">
-    <label for="product_category_id" class="form-label">Category</label>
+    <label for="product_category_id" class="form-label">{{ __('Category') }}</label>
     <select class="form-select @error('product_category_id') is-invalid @enderror" id="product_category_id" name="product_category_id">
-        <option value="">Select Category</option>
+        <option value="">{{ __('Select Category') }}</option>
         @foreach($categories as $category)
             <option value="{{ $category->category_id }}" {{ old('product_category_id', $product->product_category_id ?? '') == $category->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
         @endforeach
@@ -31,12 +31,12 @@
 
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label for="price" class="form-label">Price ($) <span class="text-danger">*</span></label>
+        <label for="price" class="form-label">{{ __('Price') }} ($) <span class="text-danger">*</span></label>
         <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', isset($product->price) ? number_format($product->price, 2, '.', '') : '') }}" required>
         @error('price') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="cost" class="form-label">Cost ($) (Optional)</label>
+        <label for="cost" class="form-label">{{ __('Cost') }} ($) ({{ __('Optional') }})</label>
         <input type="number" step="0.01" class="form-control @error('cost') is-invalid @enderror" id="cost" name="cost" value="{{ old('cost', isset($product->cost) ? number_format($product->cost, 2, '.', '') : '') }}">
         @error('cost') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
@@ -44,23 +44,23 @@
 
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label for="is_service" class="form-label">Type <span class="text-danger">*</span></label>
+        <label for="is_service" class="form-label">{{ __('Type') }} <span class="text-danger">*</span></label>
         <select class="form-select @error('is_service') is-invalid @enderror" id="is_service" name="is_service" required>
-            <option value="0" {{ old('is_service', $product->is_service ?? '0') == '0' ? 'selected' : '' }}>Product (Track Stock)</option>
-            <option value="1" {{ old('is_service', $product->is_service ?? '0') == '1' ? 'selected' : '' }}>Service (No Stock)</option>
+            <option value="0" {{ old('is_service', $product->is_service ?? '0') == '0' ? 'selected' : '' }}>{{ __('Product') }} ({{ __('Track Stock') }})</option>
+            <option value="1" {{ old('is_service', $product->is_service ?? '0') == '1' ? 'selected' : '' }}>{{ __('Service') }} ({{ __('No Stock') }})</option>
         </select>
         @error('is_service') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3" id="quantity_on_hand_field" style="{{ old('is_service', $product->is_service ?? '0') == '1' ? 'display:none;' : '' }}">
-        <label for="quantity_on_hand" class="form-label">Quantity on Hand</label>
+        <label for="quantity_on_hand" class="form-label">{{ __('Quantity on Hand') }}</label>
         <input type="number" class="form-control @error('quantity_on_hand') is-invalid @enderror" id="quantity_on_hand" name="quantity_on_hand" value="{{ old('quantity_on_hand', $product->quantity_on_hand ?? 0) }}">
         @error('quantity_on_hand') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="is_active" class="form-label">Status <span class="text-danger">*</span></label>
+        <label for="is_active" class="form-label">{{ __('Status') }} <span class="text-danger">*</span></label>
         <select class="form-select @error('is_active') is-invalid @enderror" id="is_active" name="is_active" required>
-            <option value="1" {{ old('is_active', $product->is_active ?? '1') == '1' ? 'selected' : '' }}>Active</option>
-            <option value="0" {{ old('is_active', $product->is_active ?? '1') == '0' ? 'selected' : '' }}>Inactive</option>
+            <option value="1" {{ old('is_active', $product->is_active ?? '1') == '1' ? 'selected' : '' }}>{{ __('Active') }}</option>
+            <option value="0" {{ old('is_active', $product->is_active ?? '1') == '0' ? 'selected' : '' }}>{{ __('Inactive') }}</option>
         </select>
         @error('is_active') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
@@ -68,7 +68,7 @@
 
 <hr class="my-4">
 
-<h4>Product Features</h4>
+<h4>{{ __('Product Features') }}</h4>
 <div id="product-features-container">
     @php
         $existingFeatures = old('features', isset($product) ? $product->features->mapWithKeys(function ($feature, $key) {
@@ -82,26 +82,26 @@
             @php $featureIndex = $index; @endphp
             <div class="row align-items-end mb-2 product-feature-row">
                 <div class="col-md-5">
-                    <label class="form-label">Feature</label>
+                    <label class="form-label">{{ __('Feature') }}</label>
                     <select name="features[{{ $index }}][feature_id]" class="form-select">
-                        <option value="">Select Feature</option>
+                        <option value="">{{ __('Select Feature') }}</option>
                         @foreach($productFeatures as $pf)
                             <option value="{{ $pf->feature_id }}" {{ ($featureData['feature_id'] ?? '') == $pf->feature_id ? 'selected' : '' }}>{{ $pf->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Value</label>
+                    <label class="form-label">{{ __('Value') }}</label>
                     <input type="text" name="features[{{ $index }}][value]" class="form-control" value="{{ $featureData['value'] ?? '' }}">
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-feature-btn">Remove</button>
+                    <button type="button" class="btn btn-danger remove-feature-btn">{{ __('Remove') }}</button>
                 </div>
             </div>
         @endforeach
     @endif
 </div>
-<button type="button" id="add-feature-btn" class="btn btn-success btn-sm mt-2">Add Feature</button>
+<button type="button" id="add-feature-btn" class="btn btn-success btn-sm mt-2">{{ __('Add Feature') }}</button>
 
 @error('features') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
 @foreach ($errors->get('features.*') as $message)
@@ -110,34 +110,34 @@
 
 <hr class="my-4">
 
-<h4>Configuración de IVA</h4>
+<h4>{{ __('Tax Configuration') }}</h4>
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label for="is_taxable" class="form-label">¿Paga IVA?</label>
+        <label for="is_taxable" class="form-label">{{ __('Pays Tax?') }}</label>
         <select class="form-select @error('is_taxable') is-invalid @enderror" id="is_taxable" name="is_taxable">
-            <option value="1" {{ old('is_taxable', $product->is_taxable ?? '1') == '1' ? 'selected' : '' }}>Sí</option>
-            <option value="0" {{ old('is_taxable', $product->is_taxable ?? '1') == '0' ? 'selected' : '' }}>No</option>
+            <option value="1" {{ old('is_taxable', $product->is_taxable ?? '1') == '1' ? 'selected' : '' }}>{{ __('Yes') }}</option>
+            <option value="0" {{ old('is_taxable', $product->is_taxable ?? '1') == '0' ? 'selected' : '' }}>{{ __('No') }}</option>
         </select>
         @error('is_taxable') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="tax_rate_percentage" class="form-label">Tasa de IVA (%)</label>
+        <label for="tax_rate_percentage" class="form-label">{{ __('Tax Rate') }} (%)</label>
         <input type="number" step="0.01" min="0" max="100" class="form-control @error('tax_rate_percentage') is-invalid @enderror" 
                id="tax_rate_percentage" name="tax_rate_percentage" 
                value="{{ old('tax_rate_percentage', $product->tax_rate_percentage ?? '') }}" 
-               placeholder="Ej: 15.00">
+               placeholder="{{ __('Ex: 15.00') }}">
         @error('tax_rate_percentage') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-4 mb-3">
-        <label for="tax_category" class="form-label">Categoría Fiscal</label>
+        <label for="tax_category" class="form-label">{{ __('Tax Category') }}</label>
         <select class="form-select @error('tax_category') is-invalid @enderror" id="tax_category" name="tax_category">
-            <option value="">Seleccionar Categoría</option>
-            <option value="goods" {{ old('tax_category', $product->tax_category ?? '') == 'goods' ? 'selected' : '' }}>Bienes</option>
-            <option value="services" {{ old('tax_category', $product->tax_category ?? '') == 'services' ? 'selected' : '' }}>Servicios</option>
-            <option value="transport" {{ old('tax_category', $product->tax_category ?? '') == 'transport' ? 'selected' : '' }}>Transporte</option>
-            <option value="insurance" {{ old('tax_category', $product->tax_category ?? '') == 'insurance' ? 'selected' : '' }}>Seguro</option>
-            <option value="storage" {{ old('tax_category', $product->tax_category ?? '') == 'storage' ? 'selected' : '' }}>Almacenamiento</option>
-            <option value="transport_public" {{ old('tax_category', $product->tax_category ?? '') == 'transport_public' ? 'selected' : '' }}>Transporte Público</option>
+            <option value="">{{ __('Select Category') }}</option>
+            <option value="goods" {{ old('tax_category', $product->tax_category ?? '') == 'goods' ? 'selected' : '' }}>{{ __('Goods') }}</option>
+            <option value="services" {{ old('tax_category', $product->tax_category ?? '') == 'services' ? 'selected' : '' }}>{{ __('Services') }}</option>
+            <option value="transport" {{ old('tax_category', $product->tax_category ?? '') == 'transport' ? 'selected' : '' }}>{{ __('Transport') }}</option>
+            <option value="insurance" {{ old('tax_category', $product->tax_category ?? '') == 'insurance' ? 'selected' : '' }}>{{ __('Insurance') }}</option>
+            <option value="storage" {{ old('tax_category', $product->tax_category ?? '') == 'storage' ? 'selected' : '' }}>{{ __('Storage') }}</option>
+            <option value="transport_public" {{ old('tax_category', $product->tax_category ?? '') == 'transport_public' ? 'selected' : '' }}>{{ __('Public Transport') }}</option>
         </select>
         @error('tax_category') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
@@ -145,18 +145,18 @@
 
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label for="tax_country_code" class="form-label">País para IVA</label>
+        <label for="tax_country_code" class="form-label">{{ __('Country for Tax') }}</label>
         <select class="form-select @error('tax_country_code') is-invalid @enderror" id="tax_country_code" name="tax_country_code">
-            <option value="EC" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'EC' ? 'selected' : '' }}>Ecuador</option>
-            <option value="ES" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'ES' ? 'selected' : '' }}>España</option>
-            <option value="MX" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'MX' ? 'selected' : '' }}>México</option>
+            <option value="EC" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'EC' ? 'selected' : '' }}>{{ __('Ecuador') }}</option>
+            <option value="ES" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'ES' ? 'selected' : '' }}>{{ __('Spain') }}</option>
+            <option value="MX" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'MX' ? 'selected' : '' }}>{{ __('Mexico') }}</option>
         </select>
         @error('tax_country_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-8 mb-3">
-        <label for="tax_rate_id" class="form-label">Tasa de IVA (Modelo)</label>
+        <label for="tax_rate_id" class="form-label">{{ __('Tax Rate') }} ({{ __('Model') }})</label>
         <select class="form-select @error('tax_rate_id') is-invalid @enderror" id="tax_rate_id" name="tax_rate_id">
-            <option value="">Seleccionar Tasa</option>
+            <option value="">{{ __('Select Rate') }}</option>
             @foreach($taxRates ?? [] as $taxRate)
                 <option value="{{ $taxRate->tax_rate_id }}" 
                         {{ old('tax_rate_id', $product->tax_rate_id ?? '') == $taxRate->tax_rate_id ? 'selected' : '' }}>
@@ -164,7 +164,7 @@
                 </option>
             @endforeach
         </select>
-        <small class="form-text text-muted">Opcional: usar tasa del modelo en lugar de tasa específica</small>
+        <small class="form-text text-muted">{{ __('Optional: use model rate instead of specific rate') }}</small>
         @error('tax_rate_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 </div>
@@ -172,7 +172,7 @@
 <hr class="my-4">
 
 <div id="inventory-management-section" style="{{ old('is_service', $product->is_service ?? '0') == '1' ? 'display:none;' : '' }}">
-    <h4>Inventory Levels per Warehouse</h4>
+    <h4>{{ __('Inventory Levels per Warehouse') }}</h4>
     @if(isset($warehouses) && $warehouses->count() > 0)
         @foreach($warehouses as $warehouse)
             @php
@@ -192,14 +192,14 @@
             </div>
         @endforeach
     @else
-        <p>No active warehouses found. <a href="{{ route('warehouses.create') }}">Create a warehouse</a> to manage inventory.</p>
+        <p>{{ __('No active warehouses found.') }} <a href="{{ route('warehouses.create') }}">{{ __('Create a warehouse') }}</a> {{ __('to manage inventory.') }}</p>
     @endif
     <hr class="my-4">
 </div>
 
 <div class="mt-4">
-    <button type="submit" class="btn btn-primary">{{ isset($product->product_id) ? 'Update' : 'Create' }} Product/Service</button>
-    <a href="{{ route('products.index') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">{{ isset($product->product_id) ? __('Update') : __('Create') }} {{ __('Product/Service') }}</button>
+    <a href="{{ route('products.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
 </div>
 
 @push('scripts')
@@ -235,20 +235,20 @@
             newRow.classList.add('row', 'align-items-end', 'mb-2', 'product-feature-row');
             newRow.innerHTML = `
                 <div class="col-md-5">
-                    <label class="form-label">Feature</label>
+                    <label class="form-label">{{ __('Feature') }}</label>
                     <select name="features[${featureRowIndex}][feature_id]" class="form-select">
-                        <option value="">Select Feature</option>
+                        <option value="">{{ __('Select Feature') }}</option>
                         @foreach($productFeatures as $pf)
                             <option value="{{ $pf->feature_id }}">{{ $pf->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Value</label>
+                    <label class="form-label">{{ __('Value') }}</label>
                     <input type="text" name="features[${featureRowIndex}][value]" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-feature-btn">Remove</button>
+                    <button type="button" class="btn btn-danger remove-feature-btn">{{ __('Remove') }}</button>
                 </div>
             `;
             featuresContainer.appendChild(newRow);

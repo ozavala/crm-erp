@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Create New User Role</h1>
+    <h1>{{ __('Create New User Role') }}</h1>
 
     <div class="card">
         <div class="card-body">
@@ -12,7 +12,7 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label for="name" class="form-label">Role Name</label>
+                    <label for="name" class="form-label">{{ __('Role Name') }}</label>
                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                     @error('name')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -20,12 +20,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
+                    <label for="description" class="form-label">{{ __('Description') }}</label>
                     <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="mb-3">
-                    <h5>Permissions</h5>
+                    <h5>{{ __('Permissions') }}</h5>
                     <p class="text-muted">Select the permissions that this role should have.</p>
                     <div class="row">
                         @foreach($permissions as $permission)
@@ -42,8 +42,8 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create Role</button>
-                <a href="{{ route('user-roles.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ __('Create Role') }}</button>
+                <a href="{{ route('user-roles.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
             </form>
         </div>
     </div>

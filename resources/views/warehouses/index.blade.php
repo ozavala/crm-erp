@@ -5,8 +5,8 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Warehouses</h1>
-        <a href="{{ route('warehouses.create') }}" class="btn btn-primary">Add New Warehouse</a>
+        <h1>{{ __('Warehouses') }}</h1>
+        <a href="{{ route('warehouses.create') }}" class="btn btn-primary">{{ __('Add New Warehouse') }}</a>
     </div>
 
     @if (session('success'))
@@ -25,9 +25,9 @@
     <div class="mb-3">
         <form action="{{ route('warehouses.index') }}" method="GET" class="d-flex">
             <input type="text" name="search" class="form-control me-2" placeholder="Search by name or location..." value="{{ request('search') }}">
-            <button type="submit" class="btn btn-outline-primary">Search</button>
+            <button type="submit" class="btn btn-outline-primary">{{ __('Search') }}</button>
             @if(request('search'))
-                <a href="{{ route('warehouses.index') }}" class="btn btn-outline-secondary ms-2">Clear</a>
+                <a href="{{ route('warehouses.index') }}" class="btn btn-outline-secondary ms-2">{{ __('Clear') }}</a>
             @endif
         </form>
     </div>
@@ -35,11 +35,11 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{{ __('ID') }}</th>
+                <th>{{ __('Name') }}</th>
+                <th>{{ __('Location') }}</th>
+                <th>{{ __('Status') }}</th>
+                <th>{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -50,12 +50,12 @@
                     <td>{{ $warehouse->location ?: 'N/A' }}</td>
                     <td><span class="badge bg-{{ $warehouse->is_active ? 'success' : 'danger' }}">{{ $warehouse->is_active ? 'Active' : 'Inactive' }}</span></td>
                     <td>
-                        <a href="{{ route('warehouses.show', $warehouse->warehouse_id) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('warehouses.edit', $warehouse->warehouse_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ route('warehouses.show', $warehouse->warehouse_id) }}" class="btn btn-info btn-sm">{{ __('View') }}</a>
+                        <a href="{{ route('warehouses.edit', $warehouse->warehouse_id) }}" class="btn btn-warning btn-sm">{{ __('Edit') }}</a>
                         <form action="{{ route('warehouses.destroy', $warehouse->warehouse_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure? This might affect inventory records.');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm">{{ __('Delete') }}</button>
                         </form>
                     </td>
                 </tr>

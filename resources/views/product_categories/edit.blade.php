@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Product Category')
+@section('title', __('Edit Product Category'))
 
 @section('content')
 <div class="container">
-    <h1>Edit Product Category: {{ $productCategory->name }}</h1>
+    <h1>{{ __('Edit Product Category') }}: {{ $productCategory->name }}</h1>
 
     <form action="{{ route('product-categories.update', $productCategory->category_id) }}" method="POST">
         @method('PUT')
