@@ -26,6 +26,11 @@ class Product extends Model
         'is_active',
         'created_by_user_id',
         'product_category_id',
+        'tax_rate_id',
+        'is_taxable',
+        'tax_rate_percentage',
+        'tax_category',
+        'tax_country_code',
     ];
 
     protected $casts = [
@@ -34,6 +39,8 @@ class Product extends Model
         'quantity_on_hand' => 'integer',
         'is_service' => 'boolean',
         'is_active' => 'boolean',
+        'is_taxable' => 'boolean',
+        'tax_rate_percentage' => 'decimal:2',
     ];
 
     /**
@@ -71,6 +78,102 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id', 'category_id');
+    }
+
+    /**
+     * Get the tax rate that applies to this product.
+     */
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class, 'tax_rate_id', 'tax_rate_id');
+    }
+
+    /**
+     * Calculate the price with tax included.
+     */
+    public function getPriceWithTaxAttribute(): float
+    {
+        if (!$this->is_taxable) {
+            return round($this->price, 2);
+        }
+        if ($this->tax_rate_percentage !== null) {
+            return round($this->price * (1 + ($this->tax_rate_percentage / 100)), 2);
+        }
+        if ($this->taxRate) {
+            return round($this->taxRate->calculateTotalWithTax($this->price), 2);
+        }
+        return round($this->price, 2);
+    }
+
+    /**
+     * Calculate the tax amount for this product.
+     */
+    public function getTaxAmountAttribute(): float
+    {
+        if (!$this->is_taxable) {
+            return 0.0;
+        }
+        // Prioridad: tasa específica > modelo > 0
+        if ($this->tax_rate_percentage !== null) {
+            return round($this->price * ($this->tax_rate_percentage / 100), 2);
+        }
+        if ($this->taxRate) {
+            return round($this->taxRate->calculateTaxAmount($this->price), 2);
+        }
+        return 0.0;
+    }
+
+    /**
+     * Get the effective tax rate for this product.
+     */
+    public function getEffectiveTaxRateAttribute(): float
+    {
+        if (!$this->is_taxable) {
+            return 0.0;
+        }
+        if ($this->tax_rate_percentage !== null) {
+            return round($this->tax_rate_percentage, 2);
+        }
+        if ($this->taxRate) {
+            return round($this->taxRate->rate, 2);
+        }
+        return 0.0;
+    }
+
+    /**
+     * Get tax rates available for this product's country.
+     */
+    public function getAvailableTaxRates(): array
+    {
+        $countryCode = $this->tax_country_code ?? 'EC';
+        $settingKey = "tax_rates_{$countryCode}";
+        
+        $setting = \App\Models\Setting::where('key', $settingKey)->first();
+        if ($setting) {
+            return json_decode($setting->value, true);
+        }
+        
+        // Fallback a tasas por defecto
+        return [
+            ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
+            ['name' => 'IVA 15%', 'rate' => 15.00, 'description' => 'Tasa general de IVA'],
+            ['name' => 'IVA 22%', 'rate' => 22.00, 'description' => 'Tasa especial de IVA'],
+        ];
+    }
+
+    /**
+     * Check if this product category is taxable.
+     */
+    public function isCategoryTaxable(): bool
+    {
+        $taxableCategories = ['goods', 'services'];
+        $nonTaxableCategories = ['transport_public'];
+        
+        if (in_array($this->tax_category, $nonTaxableCategories)) {
+            return false;
+        }
+        
+        return in_array($this->tax_category, $taxableCategories) || $this->tax_category === null;
     }
 
     /**

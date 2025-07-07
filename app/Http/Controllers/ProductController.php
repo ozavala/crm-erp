@@ -6,6 +6,7 @@ use App\Models\ProductFeature; // Add this
 use App\Models\ProductCategory; // Add this
 use App\Models\Warehouse; // Add this
 use App\Models\Product;
+use App\Models\TaxRate; // Add this
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
@@ -54,11 +55,13 @@ class ProductController extends Controller
         $productFeatures = ProductFeature::orderBy('name')->get();
         $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
         $categories = ProductCategory::orderBy('name')->get();
+        $taxRates = TaxRate::where('is_active', true)->orderBy('rate')->get();
         return view('products.create', [
             'product' => new Product(), 
             'productFeatures' => $productFeatures, 
             'warehouses' => $warehouses, 
-            'categories' => $categories]);
+            'categories' => $categories,
+            'taxRates' => $taxRates]);
     }
 
     /**
@@ -102,8 +105,9 @@ class ProductController extends Controller
         $productFeatures = ProductFeature::orderBy('name')->get();
         $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
         $categories = ProductCategory::orderBy('name')->get();
+        $taxRates = TaxRate::where('is_active', true)->orderBy('rate')->get();
         $product->load(['features', 'warehouses', 'category']); // Load existing features, inventory and category for the form
-        return view('products.edit', compact('product', 'productFeatures', 'warehouses', 'categories'));
+        return view('products.edit', compact('product', 'productFeatures', 'warehouses', 'categories', 'taxRates'));
     }
 
     /**

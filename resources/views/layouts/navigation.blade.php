@@ -23,6 +23,9 @@
                         <a class="dropdown-item" href="{{ route('settings.edit') }}">
                             {{ __('Settings') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('tax-settings.index') }}">
+                            {{ __('Tax Settings') }}
+                        </a>
                         <a class="dropdown-item" href="{{ route('crm-users.index') }}">
                             {{ __('CRM Users') }}
                         </a>

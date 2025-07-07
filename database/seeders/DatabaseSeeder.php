@@ -21,6 +21,7 @@ use Database\Seeders\UserRoleSeeder;
 use Database\Seeders\WarehouseSeeder;
 use Database\Seeders\SupplierSeeder;
 use App\Models\Supplier;
+use Database\Seeders\TaxRateSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
         // 1. Seed foundational data that is mostly static
         $this->call([
             PermissionSeeder::class,
+            TaxRateSeeder::class,
             SettingsTableSeeder::class,
             UserRoleSeeder::class,
             CrmUserSeeder::class, // Creates specific users like 'Admin', 'Sales'

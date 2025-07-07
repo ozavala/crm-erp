@@ -33,6 +33,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\FeedbackController; // Add FeedbackController
 use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
 use App\Http\Controllers\PurchaseOrderStatusController; // Add PurchaseOrderStatusController
+use App\Http\Controllers\Reports\TaxReportController;
 
 
 // In routes/web.php
@@ -136,6 +137,22 @@ Route::middleware('auth')->group(function () {
     Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
+});
+
+Route::prefix('reportes/iva')->group(function () {
+    Route::get('/mensual', [TaxReportController::class, 'monthly'])->name('iva.report.monthly');
+    Route::get('/anual', [TaxReportController::class, 'annual'])->name('iva.report.annual');
+    Route::get('/personalizado', [TaxReportController::class, 'custom'])->name('iva.report.custom');
+    Route::get('/dashboard', [TaxReportController::class, 'dashboard'])->name('iva.report.dashboard');
+});
+
+// Tax Settings Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tax-settings', [App\Http\Controllers\TaxSettingsController::class, 'index'])->name('tax-settings.index');
+    Route::post('/tax-settings/default-country', [App\Http\Controllers\TaxSettingsController::class, 'setDefaultCountry'])->name('tax-settings.default-country');
+    Route::post('/tax-settings/service-settings', [App\Http\Controllers\TaxSettingsController::class, 'updateServiceSettings'])->name('tax-settings.service-settings');
+    Route::post('/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'updateCountryRates'])->name('tax-settings.update-rates');
+    Route::get('/api/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'getCountryRates'])->name('tax-settings.get-rates');
 });
 
 require __DIR__.'/auth.php';

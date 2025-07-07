@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\CrmUser;
+use App\Models\TaxRate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -13,20 +14,27 @@ class ProductFactory extends Factory
 
     public function definition(): array
     {
-        $isService = $this->faker->boolean();
-
+        $isService = fake()->boolean(30);
+        $taxCategories = ['goods', 'services', 'transport', 'insurance', 'storage', 'transport_public'];
+        $taxRates = [0, 15, 22]; // Tasas de IVA para Ecuador
+        
         return [
-            'name' => $this->faker->unique()->words(2, true) . ' ' . $this->faker->word(),
-            'description' => $this->faker->sentence(),
-            'sku' => $this->faker->unique()->ean8(),
-            'price' => $this->faker->randomFloat(2, 10, 1000),
-            'cost' => $this->faker->randomFloat(2, 5, 500),
-            'quantity_on_hand' => $isService ? 0 : $this->faker->numberBetween(0, 500),
-            'reorder_point' => $this->faker->numberBetween(5, 50),
+            'name' => fake()->words(2, true),
+            'description' => fake()->paragraph(),
+            'sku' => fake()->unique()->regexify('[A-Z]{2}[0-9]{6}'),
+            'price' => fake()->randomFloat(2, 10, 1000),
+            'cost' => fake()->randomFloat(2, 5, 800),
+            'quantity_on_hand' => $isService ? 0 : fake()->numberBetween(0, 100),
+            'reorder_point' => $isService ? 0 : fake()->numberBetween(5, 20),
             'is_service' => $isService,
-            'is_active' => $this->faker->boolean(90), // 90% chance of being active
-            'product_category_id' => ProductCategory::factory(),
+            'is_active' => true,
             'created_by_user_id' => CrmUser::factory(),
+            'product_category_id' => ProductCategory::factory(),
+            'tax_rate_id' => TaxRate::factory(),
+            'is_taxable' => fake()->boolean(80), // 80% de productos pagan IVA
+            'tax_rate_percentage' => fake()->randomElement($taxRates),
+            'tax_category' => fake()->randomElement($taxCategories),
+            'tax_country_code' => 'EC', // Ecuador por defecto
         ];
     }
 }

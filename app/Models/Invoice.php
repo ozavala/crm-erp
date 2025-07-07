@@ -34,6 +34,7 @@ class Invoice extends Model
         'terms_and_conditions',
         'notes',
         'created_by_user_id',
+        'tax_rate_id',
     ];
 
     protected $casts = [
@@ -90,9 +91,37 @@ class Invoice extends Model
     {
         return $this->total_amount - $this->amount_paid;
     }
+
     public function quotation(): BelongsTo
     {
         return $this->belongsTo(Quotation::class, 'quotation_id', 'quotation_id');
+    }
+
+    /**
+     * Get the tax rate that applies to this invoice.
+     */
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class, 'tax_rate_id', 'tax_rate_id');
+    }
+
+    /**
+     * Calculate tax amount based on subtotal and tax rate.
+     */
+    public function calculateTaxAmount(): float
+    {
+        if ($this->taxRate) {
+            return $this->taxRate->calculateTaxAmount($this->subtotal);
+        }
+        return $this->tax_amount;
+    }
+
+    /**
+     * Calculate total with tax.
+     */
+    public function calculateTotalWithTax(): float
+    {
+        return $this->subtotal + $this->calculateTaxAmount();
     }
 
     public function updateStatusAfterPayment(): void

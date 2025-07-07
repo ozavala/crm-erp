@@ -110,6 +110,67 @@
 
 <hr class="my-4">
 
+<h4>Configuración de IVA</h4>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="is_taxable" class="form-label">¿Paga IVA?</label>
+        <select class="form-select @error('is_taxable') is-invalid @enderror" id="is_taxable" name="is_taxable">
+            <option value="1" {{ old('is_taxable', $product->is_taxable ?? '1') == '1' ? 'selected' : '' }}>Sí</option>
+            <option value="0" {{ old('is_taxable', $product->is_taxable ?? '1') == '0' ? 'selected' : '' }}>No</option>
+        </select>
+        @error('is_taxable') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-4 mb-3">
+        <label for="tax_rate_percentage" class="form-label">Tasa de IVA (%)</label>
+        <input type="number" step="0.01" min="0" max="100" class="form-control @error('tax_rate_percentage') is-invalid @enderror" 
+               id="tax_rate_percentage" name="tax_rate_percentage" 
+               value="{{ old('tax_rate_percentage', $product->tax_rate_percentage ?? '') }}" 
+               placeholder="Ej: 15.00">
+        @error('tax_rate_percentage') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-4 mb-3">
+        <label for="tax_category" class="form-label">Categoría Fiscal</label>
+        <select class="form-select @error('tax_category') is-invalid @enderror" id="tax_category" name="tax_category">
+            <option value="">Seleccionar Categoría</option>
+            <option value="goods" {{ old('tax_category', $product->tax_category ?? '') == 'goods' ? 'selected' : '' }}>Bienes</option>
+            <option value="services" {{ old('tax_category', $product->tax_category ?? '') == 'services' ? 'selected' : '' }}>Servicios</option>
+            <option value="transport" {{ old('tax_category', $product->tax_category ?? '') == 'transport' ? 'selected' : '' }}>Transporte</option>
+            <option value="insurance" {{ old('tax_category', $product->tax_category ?? '') == 'insurance' ? 'selected' : '' }}>Seguro</option>
+            <option value="storage" {{ old('tax_category', $product->tax_category ?? '') == 'storage' ? 'selected' : '' }}>Almacenamiento</option>
+            <option value="transport_public" {{ old('tax_category', $product->tax_category ?? '') == 'transport_public' ? 'selected' : '' }}>Transporte Público</option>
+        </select>
+        @error('tax_category') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="tax_country_code" class="form-label">País para IVA</label>
+        <select class="form-select @error('tax_country_code') is-invalid @enderror" id="tax_country_code" name="tax_country_code">
+            <option value="EC" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'EC' ? 'selected' : '' }}>Ecuador</option>
+            <option value="ES" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'ES' ? 'selected' : '' }}>España</option>
+            <option value="MX" {{ old('tax_country_code', $product->tax_country_code ?? 'EC') == 'MX' ? 'selected' : '' }}>México</option>
+        </select>
+        @error('tax_country_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+    <div class="col-md-8 mb-3">
+        <label for="tax_rate_id" class="form-label">Tasa de IVA (Modelo)</label>
+        <select class="form-select @error('tax_rate_id') is-invalid @enderror" id="tax_rate_id" name="tax_rate_id">
+            <option value="">Seleccionar Tasa</option>
+            @foreach($taxRates ?? [] as $taxRate)
+                <option value="{{ $taxRate->tax_rate_id }}" 
+                        {{ old('tax_rate_id', $product->tax_rate_id ?? '') == $taxRate->tax_rate_id ? 'selected' : '' }}>
+                    {{ $taxRate->name }} ({{ $taxRate->rate }}%)
+                </option>
+            @endforeach
+        </select>
+        <small class="form-text text-muted">Opcional: usar tasa del modelo en lugar de tasa específica</small>
+        @error('tax_rate_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+</div>
+
+<hr class="my-4">
+
 <div id="inventory-management-section" style="{{ old('is_service', $product->is_service ?? '0') == '1' ? 'display:none;' : '' }}">
     <h4>Inventory Levels per Warehouse</h4>
     @if(isset($warehouses) && $warehouses->count() > 0)

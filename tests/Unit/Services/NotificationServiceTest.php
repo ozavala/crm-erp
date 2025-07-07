@@ -13,6 +13,7 @@ use App\Models\CrmUser;
 use App\Models\UserRole;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationServiceTest extends TestCase
 {
@@ -46,7 +47,7 @@ class NotificationServiceTest extends TestCase
         $product->warehouses()->attach($warehouse->id, ['quantity' => 5]);
 
         // Mock del servicio de email para evitar envío real
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendLowStockAlert($product);
@@ -71,7 +72,7 @@ class NotificationServiceTest extends TestCase
         ]);
 
         // Mock del servicio de email
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendOverdueInvoiceAlert($invoice);
@@ -88,7 +89,7 @@ class NotificationServiceTest extends TestCase
         ]);
 
         // Mock del servicio de email
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendPurchaseOrderStatusUpdate($purchaseOrder, 'draft', 'confirmed');
@@ -108,7 +109,7 @@ class NotificationServiceTest extends TestCase
         ]);
 
         // Mock del servicio de email
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendPaymentReceivedAlert($payment);
@@ -125,7 +126,7 @@ class NotificationServiceTest extends TestCase
         ]);
 
         // Mock del servicio de email
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendOrderStatusUpdate($order, 'processing', 'shipped');
@@ -144,7 +145,7 @@ class NotificationServiceTest extends TestCase
         $admin->roles()->attach($adminRole);
 
         // Mock del servicio de email
-        $this->mock(\Illuminate\Support\Facades\Mail::class);
+        Mail::fake();
 
         // Ejecutar método
         $this->notificationService->sendDailyReport();
