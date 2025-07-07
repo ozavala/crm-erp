@@ -1,5 +1,9 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
+       
+            <a class="navbar-brand" href="{{ route('dashboard') }}">
+                {{ __('Dashboard') }}
+            </a>
         <a class="navbar-brand" href="{{ route('dashboard') }}">
             {{ __('Dashboard') }}
         </a>
@@ -20,9 +24,11 @@
                         {{ __('Admin') }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownAdmin">
+                        @can('view-settings')
                         <a class="dropdown-item" href="{{ route('settings.edit') }}">
                             {{ __('Settings') }}
                         </a>
+                        @endcan
                         <a class="dropdown-item" href="{{ route('tax-settings.index') }}">
                             {{ __('Tax Settings') }}
                         </a>

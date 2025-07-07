@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Models\TaxRate;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Helpers\TaxRateDefaults;
 
 class TaxSettingsController extends Controller
 {
@@ -130,5 +131,29 @@ class TaxSettingsController extends Controller
             'country_code' => $countryCode,
             'rates' => $rates,
         ]);
+    }
+    
+    /**
+     * Restaurar tasas por defecto para un país.
+     */
+    public function restoreDefaultRates(Request $request, string $countryCode)
+    {
+        // Obtener tasas por defecto del helper
+        $defaultRates = TaxRateDefaults::getTaxRatesForCountry($countryCode);
+        if (!$defaultRates) {
+            return response()->json(['success' => false, 'message' => 'No hay tasas por defecto para este país.'], 404);
+        }
+        // Sobrescribir en settings
+        $setting = Setting::where('key', "tax_rates_{$countryCode}")->first();
+        if (!$setting) {
+            Setting::create([
+                'key' => "tax_rates_{$countryCode}",
+                'value' => json_encode($defaultRates),
+                'type' => 'json',
+            ]);
+        } else {
+            $setting->update(['value' => json_encode($defaultRates)]);
+        }
+        return response()->json(['success' => true, 'message' => 'Tasas restauradas correctamente.', 'rates' => $defaultRates]);
     }
 }

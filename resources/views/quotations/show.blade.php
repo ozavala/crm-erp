@@ -83,6 +83,12 @@
         </div>
     </div>
 
+    <div class="mb-3">
+        <a href="{{ route('quotations.pdf', $quotation) }}" class="btn btn-outline-primary" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+        </a>
+    </div>
+
         
     {{-- Items and Totals --}}
     <div class="card">

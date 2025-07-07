@@ -3,111 +3,135 @@
 @section('title', 'Configuraciones de IVA')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Configuraciones de IVA</h1>
-        <p class="text-gray-600">Gestiona las tasas de IVA por país y configuraciones de servicios</p>
+<div class="container py-4">
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Configuraciones de IVA</h1>
+        <p class="text-muted">Gestiona las tasas de IVA por país y configuraciones de servicios</p>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
     <!-- Configuración de País por Defecto -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">País por Defecto</h2>
-        <form action="{{ route('tax-settings.default-country') }}" method="POST" class="flex items-center gap-4">
-            @csrf
-            <select name="country_code" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                @foreach($countries as $code => $name)
-                    <option value="{{ $code }}" {{ $code === $defaultCountry ? 'selected' : '' }}>
-                        {{ $name }}
-                    </option>
-                @endforeach
-            </select>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                Establecer País por Defecto
-            </button>
-        </form>
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+            <span class="fw-semibold">País por Defecto</span>
+            <span class="ms-2 text-muted" data-bs-toggle="tooltip" title="El país seleccionado será el predeterminado para facturación.">
+                <i class="bi bi-info-circle"></i>
+            </span>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('tax-settings.default-country') }}" method="POST" class="row g-2 align-items-center">
+                @csrf
+                <div class="col-auto flex-grow-1">
+                    <select name="country_code" class="form-select">
+                        @foreach($countries as $code => $name)
+                            <option value="{{ $code }}" {{ $code === $defaultCountry ? 'selected' : '' }}>
+                                {{ $name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        Establecer País por Defecto
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Configuraciones de Servicios -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Configuraciones de Servicios</h2>
-        <form action="{{ route('tax-settings.service-settings') }}" method="POST">
-            @csrf
-            <div class="space-y-4">
-                <div class="flex items-center">
-                    <input type="checkbox" name="tax_includes_services" id="tax_includes_services" 
-                           value="1" {{ $serviceSettings['tax_includes_services'] === 'true' ? 'checked' : '' }}
-                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <label for="tax_includes_services" class="ml-2 text-gray-700">
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+            <span class="fw-semibold">Configuraciones de Servicios</span>
+            <span class="ms-2 text-muted" data-bs-toggle="tooltip" title="Define si los servicios y el transporte público están sujetos a IVA.">
+                <i class="bi bi-info-circle"></i>
+            </span>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('tax-settings.service-settings') }}" method="POST">
+                @csrf
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="tax_includes_services" id="tax_includes_services" value="1" {{ $serviceSettings['tax_includes_services'] === 'true' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="tax_includes_services" data-bs-toggle="tooltip" title="Si está marcado, los servicios pagarán IVA.">
                         Los servicios pagan IVA
                     </label>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" name="tax_includes_transport" id="tax_includes_transport" 
-                           value="1" {{ $serviceSettings['tax_includes_transport'] === 'true' ? 'checked' : '' }}
-                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <label for="tax_includes_transport" class="ml-2 text-gray-700">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="tax_includes_transport" id="tax_includes_transport" value="1" {{ $serviceSettings['tax_includes_transport'] === 'true' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="tax_includes_transport" data-bs-toggle="tooltip" title="Si está marcado, el transporte público pagará IVA.">
                         El transporte público paga IVA
                     </label>
                 </div>
-            </div>
-            <button type="submit" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-                Guardar Configuraciones
-            </button>
-        </form>
+                <button type="submit" class="btn btn-success">
+                    Guardar Configuraciones
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Tasas de IVA por País -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="row g-4">
         @foreach($taxSettings as $countryCode => $settings)
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">{{ $settings['name'] }}</h3>
-                    @if($settings['is_default'])
-                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                            Por Defecto
-                        </span>
-                    @endif
-                </div>
-
-                <form action="{{ route('tax-settings.update-rates', $countryCode) }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div id="rates-{{ $countryCode }}" class="space-y-3">
-                        @foreach($settings['rates'] as $index => $rate)
-                            <div class="flex gap-2 items-center">
-                                <input type="text" name="rates[{{ $index }}][name]" 
-                                       value="{{ $rate['name'] }}" placeholder="Nombre"
-                                       class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm">
-                                <input type="number" name="rates[{{ $index }}][rate]" 
-                                       value="{{ $rate['rate'] }}" placeholder="%" step="0.01" min="0" max="100"
-                                       class="w-20 border border-gray-300 rounded-md px-3 py-2 text-sm">
-                                <input type="text" name="rates[{{ $index }}][description]" 
-                                       value="{{ $rate['description'] ?? '' }}" placeholder="Descripción"
-                                       class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm">
-                                <button type="button" onclick="removeRate(this)" 
-                                        class="text-red-600 hover:text-red-800">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 position-relative">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <span class="fw-semibold">{{ $settings['name'] }} <span class="badge bg-light text-secondary ms-1" data-bs-toggle="tooltip" title="Código de país">{{ $countryCode }}</span></span>
+                        @if($settings['is_default'])
+                            <span class="badge bg-primary">Por Defecto</span>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('tax-settings.update-rates', $countryCode) }}" method="POST" onsubmit="return validateRates('{{ $countryCode }}')">
+                            @csrf
+                            <div id="rates-{{ $countryCode }}">
+                                @foreach($settings['rates'] as $index => $rate)
+                                    <div class="row g-2 align-items-center mb-2 rate-row">
+                                        <div class="col-5">
+                                            <input type="text" name="rates[{{ $index }}][name]" value="{{ $rate['name'] }}" placeholder="Nombre" required class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" name="rates[{{ $index }}][rate]" value="{{ $rate['rate'] }}" placeholder="%" step="0.01" min="0" max="100" required class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" name="rates[{{ $index }}][description]" value="{{ $rate['description'] ?? '' }}" placeholder="Descripción" class="form-control form-control-sm">
+                                        </div>
+                                        <div class="col-1 text-end">
+                                            <button type="button" class="btn btn-outline-danger btn-sm p-0" onclick="removeRate(this)" title="Eliminar tasa">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRate('{{ $countryCode }}')" title="Agregar nueva tasa">
+                                    <i class="bi bi-plus-circle"></i> Agregar Tasa
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Guardar Tasas
                                 </button>
                             </div>
-                        @endforeach
+                        </form>
+                        <button type="button" onclick="restoreDefaultRates('{{ $countryCode }}')" class="btn btn-warning btn-sm mt-2 w-100" title="Restaurar tasas por defecto (no guarda automáticamente)">
+                            <i class="bi bi-arrow-clockwise"></i> Restaurar por defecto
+                        </button>
                     </div>
-                    
-                    <button type="button" onclick="addRate('{{ $countryCode }}')" 
-                            class="text-blue-600 hover:text-blue-800 text-sm">
-                        + Agregar Tasa
-                    </button>
-                    
-                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        Guardar Tasas
-                    </button>
-                </form>
+                </div>
             </div>
         @endforeach
     </div>
@@ -116,29 +140,83 @@
 <script>
 function addRate(countryCode) {
     const container = document.getElementById(`rates-${countryCode}`);
-    const index = container.children.length;
-    
-    const rateDiv = document.createElement('div');
-    rateDiv.className = 'flex gap-2 items-center';
-    rateDiv.innerHTML = `
-        <input type="text" name="rates[${index}][name]" placeholder="Nombre"
-               class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm">
-        <input type="number" name="rates[${index}][rate]" placeholder="%" step="0.01" min="0" max="100"
-               class="w-20 border border-gray-300 rounded-md px-3 py-2 text-sm">
-        <input type="text" name="rates[${index}][description]" placeholder="Descripción"
-               class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm">
-        <button type="button" onclick="removeRate(this)" class="text-red-600 hover:text-red-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
+    const index = container.querySelectorAll('.rate-row').length;
+    const row = document.createElement('div');
+    row.className = 'row g-2 align-items-center mb-2 rate-row';
+    row.innerHTML = `
+        <div class="col-5">
+            <input type="text" name="rates[${index}][name]" placeholder="Nombre" required class="form-control form-control-sm">
+        </div>
+        <div class="col-3">
+            <input type="number" name="rates[${index}][rate]" placeholder="%" step="0.01" min="0" max="100" required class="form-control form-control-sm">
+        </div>
+        <div class="col-3">
+            <input type="text" name="rates[${index}][description]" placeholder="Descripción" class="form-control form-control-sm">
+        </div>
+        <div class="col-1 text-end">
+            <button type="button" class="btn btn-outline-danger btn-sm p-0" onclick="removeRate(this)" title="Eliminar tasa">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
     `;
-    
-    container.appendChild(rateDiv);
+    container.appendChild(row);
 }
 
 function removeRate(button) {
-    button.closest('div').remove();
+    button.closest('.rate-row').remove();
 }
+
+function validateRates(countryCode) {
+    const container = document.getElementById(`rates-${countryCode}`);
+    let valid = true;
+    container.querySelectorAll('input[required]').forEach(input => {
+        if (!input.value.trim()) {
+            input.classList.add('is-invalid');
+            valid = false;
+        } else {
+            input.classList.remove('is-invalid');
+        }
+        if (input.type === 'number' && input.value) {
+            const val = parseFloat(input.value);
+            if (val < 0 || val > 100) {
+                input.classList.add('is-invalid');
+                valid = false;
+            }
+        }
+    });
+    if (!valid) {
+        alert('Por favor, completa correctamente todos los campos requeridos.');
+    }
+    return valid;
+}
+
+function restoreDefaultRates(countryCode) {
+    if (!confirm('¿Estás seguro de que deseas restaurar las tasas por defecto para este país? Se perderán los cambios no guardados.')) return;
+    fetch(`/tax-settings/${countryCode}/restore-defaults`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Tasas restauradas correctamente.');
+            location.reload();
+        } else {
+            alert(data.message || 'No se pudieron restaurar las tasas.');
+        }
+    })
+    .catch(() => alert('Error al restaurar las tasas por defecto.'));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 </script>
 @endsection 

@@ -153,6 +153,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tax-settings/service-settings', [App\Http\Controllers\TaxSettingsController::class, 'updateServiceSettings'])->name('tax-settings.service-settings');
     Route::post('/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'updateCountryRates'])->name('tax-settings.update-rates');
     Route::get('/api/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'getCountryRates'])->name('tax-settings.get-rates');
+    Route::post('/tax-settings/{countryCode}/restore-defaults', [\App\Http\Controllers\TaxSettingsController::class, 'restoreDefaultRates'])->name('tax-settings.restore-defaults');
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('quotations/{quotation}/pdf', [App\Http\Controllers\QuotationController::class, 'printPdf'])->name('quotations.pdf');

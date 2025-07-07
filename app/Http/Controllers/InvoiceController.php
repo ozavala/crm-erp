@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoiceReminder;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Setting;
 
 class InvoiceController extends Controller
 {
@@ -139,11 +140,31 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request)
     {
         $validatedData = $request->validated();
- 
-        return DB::transaction(function () use ($validatedData) {
+
+        // Obtener parámetros de settings
+        $invoicePrefix = Setting::where('key', 'invoice_prefix')->value('value') ?? 'F-';
+        $invoiceStart = Setting::where('key', 'invoice_start_number')->value('value') ?? 1;
+        $defaultTerms = Setting::where('key', 'default_payment_terms')->value('value') ?? 'Contado';
+        $defaultDueDays = Setting::where('key', 'default_due_days')->value('value') ?? 30;
+
+        return DB::transaction(function () use ($validatedData, $invoicePrefix, $invoiceStart, $defaultTerms, $defaultDueDays) {
             $invoiceData = collect($validatedData)->except(['items'])->all();
             $invoiceData['created_by_user_id'] = Auth::id();
             $invoiceData['amount_paid'] = 0; // Initially no amount paid
+
+            // Generar número de factura correlativo
+            $lastInvoice = Invoice::orderByDesc('id')->first();
+            $nextNumber = $lastInvoice ? ($lastInvoice->number ?? $lastInvoice->id) + 1 : $invoiceStart;
+            $invoiceData['number'] = $nextNumber;
+            $invoiceData['invoice_number'] = $invoicePrefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+
+            // Condiciones de pago por defecto
+            if (empty($invoiceData['payment_terms'])) {
+                $invoiceData['payment_terms'] = $defaultTerms;
+            }
+            if (empty($invoiceData['due_date'])) {
+                $invoiceData['due_date'] = now()->addDays($defaultDueDays);
+            }
 
             $totals = $this->calculateTotals(
                 $validatedData['items'] ?? [],

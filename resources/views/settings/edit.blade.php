@@ -50,6 +50,10 @@
                         </div>
                     @endif
                 </div>
+                <div class="mb-3">
+                    <label for="company_website" class="form-label">Página Web</label>
+                    <input type="url" class="form-control" id="company_website" name="company_website" value="{{ old('company_website', $settings['company_website'] ?? '') }}" placeholder="https://www.tuempresa.com">
+                </div>
             </div>
         </div>
  
@@ -98,6 +102,40 @@
                         <label for="mail_from_name" class="form-label">From Name</label>
                         <input type="text" class="form-control" id="mail_from_name" name="mail_from_name" value="{{ old('mail_from_name', $settings['mail_from_name'] ?? '') }}">
                     </div>
+                </div>
+            </div>
+        </div>
+ 
+        <div class="card mb-4">
+            <div class="card-header">Parámetros de Facturación</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="invoice_prefix" class="form-label">Prefijo de Factura</label>
+                        <input type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" value="{{ old('invoice_prefix', $settings['invoice_prefix'] ?? 'F-') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="invoice_start_number" class="form-label">Número inicial de Factura</label>
+                        <input type="number" class="form-control" id="invoice_start_number" name="invoice_start_number" value="{{ old('invoice_start_number', $settings['invoice_start_number'] ?? 1) }}" min="1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="quotation_prefix" class="form-label">Prefijo de Cotización</label>
+                        <input type="text" class="form-control" id="quotation_prefix" name="quotation_prefix" value="{{ old('quotation_prefix', $settings['quotation_prefix'] ?? 'C-') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="quotation_start_number" class="form-label">Número inicial de Cotización</label>
+                        <input type="number" class="form-control" id="quotation_start_number" name="quotation_start_number" value="{{ old('quotation_start_number', $settings['quotation_start_number'] ?? 1) }}" min="1">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="default_payment_terms" class="form-label">Condiciones de Pago por Defecto</label>
+                    <input type="text" class="form-control" id="default_payment_terms" name="default_payment_terms" value="{{ old('default_payment_terms', $settings['default_payment_terms'] ?? 'Contado') }}" placeholder="Ej: Contado, 30 días, etc.">
+                </div>
+                <div class="mb-3">
+                    <label for="default_due_days" class="form-label">Días de Vencimiento por Defecto</label>
+                    <input type="number" class="form-control" id="default_due_days" name="default_due_days" value="{{ old('default_due_days', $settings['default_due_days'] ?? 30) }}" min="0">
                 </div>
             </div>
         </div>

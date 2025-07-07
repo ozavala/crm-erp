@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\QuotationEmail;
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuotationController extends Controller
 {
@@ -66,11 +68,31 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request)
     {
         $validatedData = $request->validated();
-        
-        return DB::transaction(function () use ($validatedData) {
+
+        // Obtener parámetros de settings
+        $quotationPrefix = Setting::where('key', 'quotation_prefix')->value('value') ?? 'C-';
+        $quotationStart = Setting::where('key', 'quotation_start_number')->value('value') ?? 1;
+        $defaultTerms = Setting::where('key', 'default_payment_terms')->value('value') ?? 'Contado';
+        $defaultDueDays = Setting::where('key', 'default_due_days')->value('value') ?? 30;
+
+        return DB::transaction(function () use ($validatedData, $quotationPrefix, $quotationStart, $defaultTerms, $defaultDueDays) {
             $quotationData = collect($validatedData)->except(['items'])->all();
             $quotationData['created_by_user_id'] = Auth::id();
-            
+
+            // Generar número de cotización correlativo
+            $lastQuotation = Quotation::orderByDesc('id')->first();
+            $nextNumber = $lastQuotation ? ($lastQuotation->number ?? $lastQuotation->id) + 1 : $quotationStart;
+            $quotationData['number'] = $nextNumber;
+            $quotationData['quotation_number'] = $quotationPrefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+
+            // Condiciones de pago por defecto
+            if (empty($quotationData['payment_terms'])) {
+                $quotationData['payment_terms'] = $defaultTerms;
+            }
+            if (empty($quotationData['due_date'])) {
+                $quotationData['due_date'] = now()->addDays($defaultDueDays);
+            }
+
             // Calculate totals before creating quotation
             $totals = $this->calculateTotals(
                 $validatedData['items'] ?? [],
@@ -248,5 +270,21 @@ class QuotationController extends Controller
             'discount_value' => $quotation->discount_value,
             'tax_percentage' => $quotation->tax_percentage,
         ]);
+    }
+
+    /**
+     * Generar y descargar PDF de la cotización.
+     */
+    public function printPdf(Quotation $quotation)
+    {
+        // Obtener logo si existe
+        $logoPath = config('settings.company_logo');
+        $logoData = null;
+        if ($logoPath && \Storage::disk('public')->exists($logoPath)) {
+            $logoData = 'data:image/png;base64,' . base64_encode(\Storage::disk('public')->get($logoPath));
+        }
+        $quotation->load(['opportunity.customer', 'items']);
+        $pdf = Pdf::loadView('quotations.pdf', compact('quotation', 'logoData'));
+        return $pdf->download('Cotizacion_' . $quotation->quotation_number . '.pdf');
     }
 }

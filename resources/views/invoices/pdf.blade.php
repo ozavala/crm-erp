@@ -35,7 +35,10 @@
                         {{ config('settings.company_address_line_1', '123 Street') }}<br>
                         {{ config('settings.company_address_line_2', 'City, State, Zip') }}<br>
                         Email: {{ config('settings.company_email', 'contact@yourcompany.com') }}<br>
-                        Phone: {{ config('settings.company_phone', '123-456-7890') }}
+                        Phone: {{ config('settings.company_phone', '123-456-7890') }}<br>
+                        @if(config('settings.company_website'))
+                            Web: {{ config('settings.company_website') }}<br>
+                        @endif
                     </p>
                 </td>
                 <td class="invoice-details" style="text-align: right;">
@@ -43,7 +46,9 @@
                     <p>
                         <strong>Invoice #:</strong> {{ $invoice->invoice_number }}<br>
                         <strong>Date:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}<br>
-                        <strong>Due Date:</strong> {{ $invoice->due_date->format('Y-m-d') }}
+                        <strong>Due Date:</strong> {{ $invoice->due_date->format('Y-m-d') }}<br>
+                        <strong>Condiciones de Pago:</strong> {{ $invoice->payment_terms ?? config('settings.default_payment_terms', 'Contado') }}<br>
+                        <strong>Días de Vencimiento:</strong> {{ $invoice->due_date ? $invoice->invoice_date->diffInDays($invoice->due_date) : config('settings.default_due_days', 30) }}
                     </p>
                 </td>
             </tr>

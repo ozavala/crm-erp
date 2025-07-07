@@ -35,7 +35,14 @@ class SettingsController extends Controller
             'company_email' => 'nullable|email|max:255',
             'company_phone' => 'nullable|string|max:255',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+            'company_website' => 'nullable|url|max:255',
+            // Billing Parameters
+            'invoice_prefix' => 'nullable|string|max:10',
+            'invoice_start_number' => 'nullable|integer|min:1',
+            'quotation_prefix' => 'nullable|string|max:10',
+            'quotation_start_number' => 'nullable|integer|min:1',
+            'default_payment_terms' => 'nullable|string|max:100',
+            'default_due_days' => 'nullable|integer|min:0',
             // Mail Settings
             'mail_mailer' => 'required|string',
             'mail_host' => 'required|string',
