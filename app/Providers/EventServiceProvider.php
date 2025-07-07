@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Models\Payment;
 use App\Observers\PaymentObserver;
+use App\Models\Invoice;
+use App\Observers\InvoiceObserver;
+use App\Models\Bill;
+use App\Observers\BillObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -29,6 +33,8 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $observers = [
         Payment::class => [PaymentObserver::class],
+        Invoice::class => [InvoiceObserver::class],
+        Bill::class => [BillObserver::class],
     ];
 
     /**

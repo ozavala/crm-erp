@@ -52,6 +52,7 @@ class SettingsController extends Controller
             'mail_encryption' => 'nullable|string|in:tls,ssl,starttls',
             'mail_from_address' => 'required|email',
             'mail_from_name' => 'required|string',
+            'default_locale' => 'nullable|in:es,en',
         ]);
 
         if ($request->hasFile('company_logo')) {

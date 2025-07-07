@@ -137,6 +137,13 @@
                     <label for="default_due_days" class="form-label">Días de Vencimiento por Defecto</label>
                     <input type="number" class="form-control" id="default_due_days" name="default_due_days" value="{{ old('default_due_days', $settings['default_due_days'] ?? 30) }}" min="0">
                 </div>
+                <div class="mb-3">
+                    <label for="default_locale" class="form-label">{{ __('Language') }}</label>
+                    <select id="default_locale" name="default_locale" class="form-select">
+                        <option value="es" {{ (old('default_locale', $settings['default_locale'] ?? '') == 'es') ? 'selected' : '' }}>Español</option>
+                        <option value="en" {{ (old('default_locale', $settings['default_locale'] ?? '') == 'en') ? 'selected' : '' }}>English</option>
+                    </select>
+                </div>
             </div>
         </div>
  

@@ -34,6 +34,7 @@ use App\Http\Controllers\FeedbackController; // Add FeedbackController
 use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
 use App\Http\Controllers\PurchaseOrderStatusController; // Add PurchaseOrderStatusController
 use App\Http\Controllers\Reports\TaxReportController;
+use App\Http\Controllers\ProfitAndLossController;
 
 
 // In routes/web.php
@@ -132,6 +133,7 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/sales-by-customer', [ReportController::class, 'salesByCustomer'])->name('reports.sales-by-customer');
     Route::get('reports/sales-by-category', [ReportController::class, 'salesByCategory'])->name('reports.sales-by-category');
     Route::get('reports/sales-by-employee', [ReportController::class, 'salesByEmployee'])->name('reports.sales-by-employee');
+    Route::get('reports/profit-and-loss', [ProfitAndLossController::class, 'index'])->name('reports.profit_and_loss');
     Route::resource('feedback', FeedBackController::class)->except(['edit', 'destroy']);
 });
     Route::middleware('auth')->group(function () {

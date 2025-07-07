@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Observers;
+
+use App\Models\Bill;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
+use Illuminate\Support\Facades\Auth;
+
+class BillObserver
+{
+    /**
+     * Handle the Bill "created" event.
+     */
+    public function created(Bill $bill)
+    {
+        // Crear asiento principal
+        $entry = JournalEntry::create([
+            'entry_date' => $bill->bill_date ?? now(),
+            'transaction_type' => 'bill',
+            'description' => 'Registro de compra ' . $bill->bill_number,
+            'referenceable_id' => $bill->bill_id,
+            'referenceable_type' => Bill::class,
+            'created_by_user_id' => Auth::id() ?? 1,
+        ]);
+
+        // Línea debe: Inventario/Costos
+        JournalEntryLine::create([
+            'journal_entry_id' => $entry->journal_entry_id,
+            'account_name' => 'Inventario',
+            'debit_amount' => $bill->total_amount,
+            'credit_amount' => 0,
+        ]);
+
+        // Línea haber: Proveedores/Cuentas por pagar
+        JournalEntryLine::create([
+            'journal_entry_id' => $entry->journal_entry_id,
+            'account_name' => 'Cuentas por pagar',
+            'debit_amount' => 0,
+            'credit_amount' => $bill->total_amount,
+        ]);
+    }
+} 

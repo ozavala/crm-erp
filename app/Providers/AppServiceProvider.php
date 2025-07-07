@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Payment;
 use App\Observers\PaymentObserver;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Setting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,5 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Payment::observe(PaymentObserver::class);
+        $defaultLocale = Setting::where('key', 'default_locale')->value('value') ?? config('app.locale');
+        app()->setLocale($defaultLocale);
     }
 }
