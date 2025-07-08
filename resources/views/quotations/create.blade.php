@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Create New Quotation</h1>
+    <h1>{{ __('quotations.create_new_quotation') }}</h1>
 
     <form action="{{ route('quotations.store') }}" method="POST">
         @include('quotations._form', [

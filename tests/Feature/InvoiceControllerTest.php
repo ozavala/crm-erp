@@ -15,8 +15,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 class InvoiceControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CrmUser $user;
 
     protected function setUp(): void
@@ -225,7 +223,8 @@ class InvoiceControllerTest extends TestCase
     {
         $response = $this->post(route('invoices.store'), []);
 
-        $response->assertSessionHasErrors(['customer_id', 'invoice_number', 'invoice_date', 'status']);
+        // Solo los campos realmente requeridos
+        $response->assertSessionHasErrors(['customer_id', 'invoice_date', 'due_date', 'status', 'items']);
     }
 
     #[Test]

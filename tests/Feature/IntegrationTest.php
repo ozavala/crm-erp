@@ -126,7 +126,6 @@ class IntegrationTest extends TestCase
         // Step 5: Create an invoice for the customer
         $invoiceData = [
             'customer_id' => $customer->customer_id,
-            'invoice_number' => 'INV-2024-001',
             'invoice_date' => now()->format('Y-m-d'),
             'due_date' => now()->addDays(30)->format('Y-m-d'),
             'status' => 'Draft',
@@ -154,9 +153,13 @@ class IntegrationTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $invoice = Invoice::where('invoice_number', 'INV-2024-001')->first();
+        // Buscar la factura por customer_id y fecha, y obtener el número generado
+        $invoice = Invoice::where('customer_id', $customer->customer_id)
+            ->whereDate('invoice_date', now()->format('Y-m-d'))
+            ->latest('id')->first();
         $this->assertNotNull($invoice);
         $this->assertEquals('Draft', $invoice->status);
+        $invoiceNumber = $invoice->invoice_number;
 
         // Calculate expected total: (299.99 + (99.99 * 12)) * 1.10 = 1,499.87
         $expectedSubtotal = 299.99 + (99.99 * 12); // 1,499.87
@@ -166,12 +169,9 @@ class IntegrationTest extends TestCase
         $this->assertTrue(bccomp($expectedTotal, $invoice->total_amount, 2) == 0, 
             "Expected total {$expectedTotal} but got {$invoice->total_amount}");
 
-        // Step 6: Update invoice status to "Sent"
-        $response = $this->put(route('invoices.update', $invoice), array_merge($invoiceData, [
-            'status' => 'Sent',
-        ]));
+        // Step 6: Marcar la factura como 'Sent' usando la ruta de envío
+        $response = $this->post(route('invoices.send', $invoice));
         $response->assertRedirect();
-        
         $invoice->refresh();
         $this->assertEquals('Sent', $invoice->status);
 
@@ -244,8 +244,9 @@ class IntegrationTest extends TestCase
             'status' => 'Active',
         ]);
 
+        // Usar $invoiceNumber en las siguientes aserciones y búsquedas
         $this->assertDatabaseHas('invoices', [
-            'invoice_number' => 'INV-2024-001',
+            'invoice_number' => $invoiceNumber,
             'status' => 'Paid',
             'customer_id' => $customer->customer_id,
         ]);
@@ -263,7 +264,7 @@ class IntegrationTest extends TestCase
         // Step 10: Verify the customer's payment history
         $response = $this->get(route('customers.show', $customer));
         $response->assertOk();
-        $response->assertSeeText('INV-2024-001');
+        $response->assertSeeText($invoiceNumber);
         $response->assertSeeText('$800.00');
         $response->assertSeeText('$849.86');
     }

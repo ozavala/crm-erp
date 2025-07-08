@@ -17,14 +17,14 @@ class ProductTaxTest extends TestCase
         parent::setUp();
         
         // Configurar settings básicos
-        Setting::create([
-            'key' => 'tax_rates_ecuador',
+        Setting::updateOrCreate([
+            'key' => 'tax_rates_ecuador'
+        ], [
             'value' => json_encode([
                 ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
                 ['name' => 'IVA 15%', 'rate' => 15.00, 'description' => 'Tasa general de IVA'],
                 ['name' => 'IVA 22%', 'rate' => 22.00, 'description' => 'Tasa especial de IVA'],
-            ]),
-            'type' => 'json',
+            ])
         ]);
     }
 

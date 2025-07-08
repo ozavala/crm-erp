@@ -27,7 +27,7 @@ class StoreInvoiceRequest extends FormRequest
             'order_id' => 'nullable|exists:orders,order_id',
             'quotation_id' => 'nullable|exists:quotations,quotation_id',
             'customer_id' => 'required|exists:customers,customer_id',
-            'invoice_number' => ['required', 'string', 'max:255', Rule::unique('invoices', 'invoice_number')],
+            'invoice_number' => ['nullable', 'string', 'max:255', Rule::unique('invoices', 'invoice_number')],
             'invoice_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:invoice_date',
             'status' => ['required', 'string', Rule::in(array_keys(Invoice::$statuses))],

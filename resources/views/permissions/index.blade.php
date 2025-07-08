@@ -5,18 +5,18 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Permissions</h1>
-        <a href="{{ route('permissions.create') }}" class="btn btn-primary">Add New Permission</a>
+        <h1>{{ __('permissions.title') }}</h1>
+        <a href="{{ route('permissions.create') }}" class="btn btn-primary">{{ __('permissions.add_new_permission') }}</a>
     </div>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Roles Count</th>
-                <th>Actions</th>
+                <th>{{ __('permissions.id') }}</th>
+                <th>{{ __('permissions.name') }}</th>
+                <th>{{ __('permissions.description') }}</th>
+                <th>{{ __('permissions.roles_count') }}</th>
+                <th>{{ __('permissions.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,18 +27,18 @@
                     <td>{{ Str::limit($permission->description, 70) }}</td>
                     <td>{{ $permission->roles_count }}</td>
                     <td>
-                        <a href="{{ route('permissions.show', $permission->permission_id) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('permissions.edit', $permission->permission_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ route('permissions.show', $permission->permission_id) }}" class="btn btn-info btn-sm">{{ __('permissions.view') }}</a>
+                        <a href="{{ route('permissions.edit', $permission->permission_id) }}" class="btn btn-warning btn-sm">{{ __('permissions.edit') }}</a>
                         <form action="{{ route('permissions.destroy', $permission->permission_id) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure? This will not detach roles automatically unless handled in controller.')">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('permissions.confirm_delete') }}')">{{ __('permissions.delete') }}</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center">No permissions found.</td>
+                    <td colspan="5" class="text-center">{{ __('permissions.no_permissions_found') }}</td>
                 </tr>
             @endforelse
         </tbody>

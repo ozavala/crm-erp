@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Journal Entries')
+@section('title', __('journal_entries.Journal Entries'))
 
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Journal Entries</h1>
-        <a href="{{ route('journal-entries.create') }}" class="btn btn-primary">Create Manual Entry</a>
+        <h1>{{ __('journal_entries.Journal Entries') }}</h1>
+        <a href="{{ route('journal-entries.create') }}" class="btn btn-primary">{{ __('journal_entries.Create Manual Entry') }}</a>
     </div>
 
     {{-- Add Filter Form Later if needed --}}
@@ -35,15 +35,15 @@
     <table class="table table-sm table-striped">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Reference</th>
-                <th>Created By</th>
-                <th class="text-end">Debits</th>
-                <th class="text-end">Credits</th>
-                <th>Actions</th>
+                <th>{{ __('journal_entries.ID') }}</th>
+                <th>{{ __('journal_entries.Date') }}</th>
+                <th>{{ __('journal_entries.Type') }}</th>
+                <th>{{ __('journal_entries.Description') }}</th>
+                <th>{{ __('journal_entries.Reference') }}</th>
+                <th>{{ __('journal_entries.Created By') }}</th>
+                <th class="text-end">{{ __('journal_entries.Debits') }}</th>
+                <th class="text-end">{{ __('journal_entries.Credits') }}</th>
+                <th>{{ __('journal_entries.Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -65,18 +65,18 @@
                     <td class="text-end">${{ number_format($entry->lines->sum('credit_amount'), 2) }}</td>
                     <td>
                         @if(!$entry->referenceable_id) {{-- Only allow edit/delete for manual entries --}}
-                            <a href="{{ route('journal-entries.edit', $entry->journal_entry_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{{ route('journal-entries.edit', $entry->journal_entry_id) }}" class="btn btn-warning btn-sm">{{ __('journal_entries.Edit') }}</a>
                             <form action="{{ route('journal-entries.destroy', $entry->journal_entry_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm">{{ __('journal_entries.Delete') }}</button>
                             </form>
                         @endif
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="text-center">No journal entries found.</td>
+                    <td colspan="9" class="text-center">{{ __('journal_entries.No journal entries found.') }}</td>
                 </tr>
             @endforelse
         </tbody>

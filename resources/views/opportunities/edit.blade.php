@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Opportunity')
+@section('title', __('opportunities.Edit Opportunity'))
 
 @section('content')
 <div class="container">
-    <h1>Edit Opportunity: {{ $opportunity->name }}</h1>
+    <h1>{{ __('opportunities.Edit Opportunity') }}: {{ $opportunity->name }}</h1>
 
     <div class="card">
         <div class="card-body">

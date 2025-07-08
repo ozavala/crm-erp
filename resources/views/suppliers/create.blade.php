@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Create New Supplier</h1>
+    <h1>{{ __('suppliers.create_new_supplier') }}</h1>
 
     <form action="{{ route('suppliers.store') }}" method="POST">
         @include('suppliers._form', ['supplier' => new \App\Models\Supplier()])

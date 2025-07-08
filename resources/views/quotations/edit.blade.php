@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Edit Quotation: {{ $quotation->subject }}</h1>
+    <h1>{{ __('quotations.edit_quotation') }}: {{ $quotation->subject }}</h1>
 
     <form action="{{ route('quotations.update', $quotation->quotation_id) }}" method="POST">
         @method('PUT')

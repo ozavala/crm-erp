@@ -4,7 +4,7 @@
 @endphp
 <div class="card mt-4">
     <div class="card-header">
-        <h2 class="h5 mb-0">Tasks</h2>
+        <h2 class="h5 mb-0">{{ __('partials.Tasks') }}</h2>
     </div>
     <div class="card-body">
         {{-- Form to add a new task --}}
@@ -14,26 +14,26 @@
             <input type="hidden" name="taskable_type" value="{{ class_basename($model) }}">
 
             <div class="mb-3">
-                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" placeholder="New task title..." required>
+                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" placeholder="{{ __('partials.New task title...') }}" required>
                 @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="assigned_to_user_id" class="form-label small">Assign To</label>
+                    <label for="assigned_to_user_id" class="form-label small">{{ __('partials.Assign To') }}</label>
                     <select name="assigned_to_user_id" class="form-select form-select-sm">
-                        <option value="">Unassigned</option>
+                        <option value="">{{ __('partials.Unassigned') }}</option>
                         @foreach($crmUsers as $user)
                             <option value="{{ $user->user_id }}">{{ $user->full_name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="due_date" class="form-label small">Due Date</label>
+                    <label for="due_date" class="form-label small">{{ __('partials.Due Date') }}</label>
                     <input type="date" name="due_date" class="form-control form-control-sm">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="priority" class="form-label small">Priority</label>
+                    <label for="priority" class="form-label small">{{ __('partials.Priority') }}</label>
                     <select name="priority" class="form-select form-select-sm" required>
                         @foreach(\App\Models\Task::$priorities as $priority)
                             <option value="{{ $priority }}" {{ $priority === 'Normal' ? 'selected' : '' }}>{{ $priority }}</option>
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
+            <button type="submit" class="btn btn-primary btn-sm">{{ __('partials.Add Task') }}</button>
         </form>
 
         {{-- List of existing tasks --}}
@@ -60,23 +60,23 @@
                     </span>
                     <div class="small text-muted">
                         @if($task->assignedTo)
-                            Assigned to: {{ $task->assignedTo->full_name }}
+                            {{ __('partials.Assigned to:') }} {{ $task->assignedTo->full_name }}
                         @else
-                            Unassigned
+                            {{ __('partials.Unassigned') }}
                         @endif
                         @if($task->due_date)
-                        - Due: <span class="{{ $task->due_date->isPast() && $task->status !== 'Completed' ? 'text-danger' : '' }}">{{ $task->due_date->format('M d, Y') }}</span>
+                        - {{ __('partials.Due:') }} <span class="{{ $task->due_date->isPast() && $task->status !== 'Completed' ? 'text-danger' : '' }}">{{ $task->due_date->format('M d, Y') }}</span>
                         @endif
                     </div>
                 </div>
-                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Are you sure?');" class="d-inline">
+                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm(__('partials.Are you sure?'));" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-link btn-sm text-danger p-0">Delete</button>
+                    <button type="submit" class="btn btn-link btn-sm text-danger p-0">{{ __('partials.Delete') }}</button>
                 </form>
             </div>
         @empty
-            <p>No tasks yet.</p>
+            <p>{{ __('partials.No tasks yet.') }}</p>
         @endforelse
     </div>
 </div>

@@ -10,13 +10,10 @@ use App\Models\Order;
 use App\Models\CrmUser;
 use App\Models\Permission;
 use App\Models\UserRole;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 
 class PaymentControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CrmUser $user;
 
     protected function setUp(): void

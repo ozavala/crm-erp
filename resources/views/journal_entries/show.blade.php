@@ -1,44 +1,44 @@
 @extends('layouts.app')
 
-@section('title', 'Journal Entry Details')
+@section('title', __('journal_entries.Journal Entry Details'))
 
 @section('content')
 <div class="container">
-    <h1>Journal Entry #{{ $journalEntry->journal_entry_id }}</h1>
+    <h1>{{ __('journal_entries.Journal Entry') }} #{{ $journalEntry->journal_entry_id }}</h1>
 
     <div class="card">
         <div class="card-header">
-            Details
+            {{ __('journal_entries.Details') }}
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Entry ID:</strong> {{ $journalEntry->journal_entry_id }}</p>
-                    <p><strong>Entry Date:</strong> {{ $journalEntry->entry_date->format('Y-m-d') }}</p>
-                    <p><strong>Transaction Type:</strong> {{ $journalEntry->transaction_type ?: 'N/A' }}</p>
+                    <p><strong>{{ __('journal_entries.Entry ID') }}:</strong> {{ $journalEntry->journal_entry_id }}</p>
+                    <p><strong>{{ __('journal_entries.Entry Date') }}:</strong> {{ $journalEntry->entry_date->format('Y-m-d') }}</p>
+                    <p><strong>{{ __('journal_entries.Transaction Type') }}:</strong> {{ $journalEntry->transaction_type ?: __('journal_entries.N/A') }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Description:</strong> {{ $journalEntry->description ?: 'N/A' }}</p>
-                    <p><strong>Reference:</strong>
+                    <p><strong>{{ __('journal_entries.Description') }}:</strong> {{ $journalEntry->description ?: __('journal_entries.N/A') }}</p>
+                    <p><strong>{{ __('journal_entries.Reference') }}:</strong>
                         @if($journalEntry->referenceable)
                             {{ class_basename($journalEntry->referenceable_type) }} #{{ $journalEntry->referenceable_id }}
                             {{-- You could add a link here if you have consistent show routes for referenceable models --}}
                         @else
-                            N/A
+                            {{ __('journal_entries.N/A') }}
                         @endif
                     </p>
-                    <p><strong>Created By:</strong> {{ $journalEntry->createdBy->full_name ?? ($journalEntry->createdBy->username ?? 'N/A') }} on {{ $journalEntry->created_at->format('Y-m-d H:i') }}</p>
+                    <p><strong>{{ __('journal_entries.Created By') }}:</strong> {{ $journalEntry->createdBy->full_name ?? ($journalEntry->createdBy->username ?? __('journal_entries.N/A')) }} {{ __('journal_entries.on') }} {{ $journalEntry->created_at->format('Y-m-d H:i') }}</p>
                 </div>
             </div>
 
-            <h5 class="mt-4">Entry Lines</h5>
+            <h5 class="mt-4">{{ __('journal_entries.Entry Lines') }}</h5>
             <table class="table table-sm table-bordered">
                 <thead>
                     <tr>
-                        <th>Account Name</th>
-                        <th class="text-end">Debit</th>
-                        <th class="text-end">Credit</th>
-                        <th>Entity</th>
+                        <th>{{ __('journal_entries.Account Name') }}</th>
+                        <th class="text-end">{{ __('journal_entries.Debit') }}</th>
+                        <th class="text-end">{{ __('journal_entries.Credit') }}</th>
+                        <th>{{ __('journal_entries.Entity') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +52,7 @@
                                 {{ class_basename($line->entity_type) }} #{{ $line->entity_id }}
                                 {{-- Add link to entity if possible --}}
                             @else
-                                N/A
+                                {{ __('journal_entries.N/A') }}
                             @endif
                         </td>
                     </tr>
@@ -61,7 +61,7 @@
             </table>
         </div>
         <div class="card-footer">
-            <a href="{{ route('journal-entries.index') }}" class="btn btn-secondary">Back to Journal Entries</a>
+            <a href="{{ route('journal-entries.index') }}" class="btn btn-secondary">{{ __('journal_entries.Back to Journal Entries') }}</a>
             {{-- Add Edit/Delete for manual journal entries later if needed --}}
         </div>
     </div>

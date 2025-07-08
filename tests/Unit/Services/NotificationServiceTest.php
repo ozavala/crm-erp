@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Mail;
 
 class NotificationServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
     private NotificationService $notificationService;
 
     protected function setUp(): void

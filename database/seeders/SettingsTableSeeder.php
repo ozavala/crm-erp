@@ -45,5 +45,8 @@ class SettingsTableSeeder extends Seeder
         Setting::create(['key' => 'default_country_tax', 'value' => 'ecuador']);
         Setting::create(['key' => 'tax_includes_services', 'value' => 'true']);
         Setting::create(['key' => 'tax_includes_transport', 'value' => 'false']);
+        // Configuración de idioma y moneda por defecto
+        Setting::create(['key' => 'default_locale', 'value' => 'es']);
+        Setting::create(['key' => 'default_currency', 'value' => 'USD']);
     }
 }

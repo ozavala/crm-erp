@@ -14,8 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 class ProductControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CrmUser $user;
 
     protected function setUp(): void

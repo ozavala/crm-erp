@@ -11,8 +11,6 @@ use Tests\TestCase;
 
 class CustomerControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CrmUser $user;
 
     protected function setUp(): void

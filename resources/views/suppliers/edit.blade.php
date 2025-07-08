@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Edit Supplier: {{ $supplier->name }}</h1>
+    <h1>{{ __('suppliers.edit_supplier') }}: {{ $supplier->name }}</h1>
 
     <form action="{{ route('suppliers.update', $supplier->supplier_id) }}" method="POST">
         @method('PUT')

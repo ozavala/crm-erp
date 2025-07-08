@@ -5,8 +5,8 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Suppliers</h1>
-        <a href="{{ route('suppliers.create') }}" class="btn btn-primary">Add New Supplier</a>
+        <h1>{{ __('suppliers.title') }}</h1>
+        <a href="{{ route('suppliers.create') }}" class="btn btn-primary">{{ __('suppliers.add_new_supplier') }}</a>
     </div>
 
     @if (session('success'))
@@ -18,10 +18,10 @@
 
     <div class="mb-3">
         <form action="{{ route('suppliers.index') }}" method="GET" class="d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="Search by name, contact, email..." value="{{ request('search') }}">
-            <button type="submit" class="btn btn-outline-primary">Search</button>
+            <input type="text" name="search" class="form-control me-2" placeholder="{{ __('suppliers.search_placeholder') }}" value="{{ request('search') }}">
+            <button type="submit" class="btn btn-outline-primary">{{ __('suppliers.search') }}</button>
             @if(request('search'))
-                <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary ms-2">Clear</a>
+                <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary ms-2">{{ __('suppliers.clear') }}</a>
             @endif
         </form>
     </div>
@@ -29,12 +29,12 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Contact Person</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Actions</th>
+                <th>{{ __('suppliers.id') }}</th>
+                <th>{{ __('suppliers.name') }}</th>
+                <th>{{ __('suppliers.contact_person') }}</th>
+                <th>{{ __('suppliers.email') }}</th>
+                <th>{{ __('suppliers.phone') }}</th>
+                <th>{{ __('suppliers.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -46,17 +46,17 @@
                     <td>{{ $supplier->email ?: 'N/A' }}</td>
                     <td>{{ $supplier->phone_number ?: 'N/A' }}</td>
                     <td>
-                        <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}" class="btn btn-warning btn-sm">{{ __('suppliers.edit') }}</a>
                         <form action="{{ route('suppliers.destroy', $supplier->supplier_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm">{{ __('suppliers.delete') }}</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">No suppliers found.</td>
+                    <td colspan="6" class="text-center">{{ __('suppliers.no_suppliers_found') }}</td>
                 </tr>
             @endforelse
         </tbody>

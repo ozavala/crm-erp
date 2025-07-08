@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Receive Goods for PO: ' . $purchaseOrder->purchase_order_number)
+@section('title', __('goods_receipts.Receive Goods for PO') . ': ' . $purchaseOrder->purchase_order_number)
 
 @section('content')
 <div class="container">
-    <h1>Receive Goods for PO: <a href="{{ route('purchase-orders.show', $purchaseOrder) }}">{{ $purchaseOrder->purchase_order_number }}</a></h1>
+    <h1>{{ __('goods_receipts.Receive Goods for PO') }}: <a href="{{ route('purchase-orders.show', $purchaseOrder) }}">{{ $purchaseOrder->purchase_order_number }}</a></h1>
 
     <form action="{{ route('goods-receipts.store', $purchaseOrder) }}" method="POST">
         @csrf
         <div class="card">
-            <div class="card-header">Receipt Details</div>
+            <div class="card-header">{{ __('goods_receipts.Receipt Details') }}</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="receipt_date" class="form-label">Receipt Date <span class="text-danger">*</span></label>
+                        <label for="receipt_date" class="form-label">{{ __('goods_receipts.Receipt Date') }} <span class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('receipt_date') is-invalid @enderror" id="receipt_date" name="receipt_date" value="{{ old('receipt_date', now()->format('Y-m-d')) }}" required>
                         @error('receipt_date')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="notes" class="form-label">Notes</label>
+                    <label for="notes" class="form-label">{{ __('goods_receipts.Notes') }}</label>
                     <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
                     @error('notes')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="card mt-4">
-            <div class="card-header">Items to Receive</div>
+            <div class="card-header">{{ __('goods_receipts.Items to Receive') }}</div>
             <div class="card-body">
                 @if($errors->has('items'))
                     <div class="alert alert-danger">
@@ -41,10 +41,10 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th class="text-end">Ordered</th>
-                            <th class="text-end">Remaining</th>
-                            <th style="width: 150px;" class="text-end">Quantity to Receive</th>
+                            <th>{{ __('goods_receipts.Product') }}</th>
+                            <th class="text-end">{{ __('goods_receipts.Ordered') }}</th>
+                            <th class="text-end">{{ __('goods_receipts.Remaining') }}</th>
+                            <th style="width: 150px;" class="text-end">{{ __('goods_receipts.Quantity to Receive') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -70,8 +70,8 @@
         </div>
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-success">Receive Items</button>
-            <a href="{{ route('purchase-orders.show', $purchaseOrder) }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-success">{{ __('goods_receipts.Receive Items') }}</button>
+            <a href="{{ route('purchase-orders.show', $purchaseOrder) }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
         </div>
     </form>
 </div>

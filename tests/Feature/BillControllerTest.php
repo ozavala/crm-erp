@@ -12,8 +12,6 @@ use App\Models\PurchaseOrder;
 
 class BillControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected CrmUser $user;
 
     protected function setUp(): void

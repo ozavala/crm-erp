@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Edit Purchase Order: {{ $purchaseOrder->purchase_order_number }}</h1>
+    <h1>{{ __('purchase_orders.edit_purchase_order') }}: {{ $purchaseOrder->purchase_order_number }}</h1>
 
     <form action="{{ route('purchase-orders.update', $purchaseOrder->purchase_order_id) }}" method="POST">
         @method('PUT')

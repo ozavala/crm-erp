@@ -7,43 +7,40 @@ use App\Models\Product;
 use App\Models\TaxRate;
 use App\Models\Setting;
 use App\Services\TaxCalculationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TaxCalculationTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
         
         // Crear configuraciones de IVA para Ecuador
-        Setting::create([
-            'key' => 'tax_rates_ecuador',
+        Setting::updateOrCreate([
+            'key' => 'tax_rates_ecuador'
+        ], [
             'value' => json_encode([
                 ['name' => 'IVA 0%', 'rate' => 0.00, 'description' => 'Productos exentos de IVA'],
                 ['name' => 'IVA 15%', 'rate' => 15.00, 'description' => 'Tasa general de IVA'],
                 ['name' => 'IVA 22%', 'rate' => 22.00, 'description' => 'Tasa especial de IVA'],
-            ]),
-            'type' => 'json',
+            ])
         ]);
         
-        Setting::create([
-            'key' => 'default_country_tax',
-            'value' => 'ecuador',
-            'type' => 'string',
+        Setting::updateOrCreate([
+            'key' => 'default_country_tax'
+        ], [
+            'value' => 'ecuador'
         ]);
         
-        Setting::create([
-            'key' => 'tax_includes_services',
-            'value' => 'true',
-            'type' => 'boolean',
+        Setting::updateOrCreate([
+            'key' => 'tax_includes_services'
+        ], [
+            'value' => 'true'
         ]);
         
-        Setting::create([
-            'key' => 'tax_includes_transport',
-            'value' => 'false',
-            'type' => 'boolean',
+        Setting::updateOrCreate([
+            'key' => 'tax_includes_transport'
+        ], [
+            'value' => 'false'
         ]);
     }
 

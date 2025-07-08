@@ -1,29 +1,29 @@
 @extends('layouts.app')
 
-@section('title', 'supplier Details - ' . $supplier->name)
+@section('title', __('suppliers.details') . ' - ' . $supplier->name)
 
 @section('content')
 <div class="container">
-    <h1>supplier: {{ $supplier->full_name }}</h1>
+    <h1>{{ __('suppliers.supplier') }}: {{ $supplier->full_name }}</h1>
 
     <div class="card">
         <div class="card-header">
-            supplier ID: {{ $supplier->supplier_id }}
+            {{ __('suppliers.supplier_id') }}: {{ $supplier->supplier_id }}
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Name:</strong> {{ $supplier->name }}</p>
-                    <p><strong>Contact:</strong> {{ $supplier->contact_person}}</p>
-                    <p><strong>Email:</strong> {{ $supplier->email ?: 'N/A' }}</p>
-                    <p><strong>Phone Number:</strong> {{ $supplier->phone_number ?: 'N/A' }}</p>
+                    <p><strong>{{ __('suppliers.name') }}:</strong> {{ $supplier->name }}</p>
+                    <p><strong>{{ __('suppliers.contact') }}:</strong> {{ $supplier->contact_person}}</p>
+                    <p><strong>{{ __('suppliers.email') }}:</strong> {{ $supplier->email ?: __('suppliers.na') }}</p>
+                    <p><strong>{{ __('suppliers.phone_number') }}:</strong> {{ $supplier->phone_number ?: __('suppliers.na') }}</p>
                     
                 </div>
                 <div class="col-md-6">
-                    <h5>Addresses</h5>
+                    <h5>{{ __('suppliers.addresses') }}</h5>
                     @forelse ($supplier->addresses as $address)
                         <div class="mb-2 p-2 border rounded {{ $address->is_primary ? 'border-primary' : '' }}">
-                            <strong>{{ $address->address_type ?: 'Address' }} {{ $address->is_primary ? '(Primary)' : '' }}</strong><br>
+                            <strong>{{ $address->address_type ?: __('suppliers.address') }} {{ $address->is_primary ? '(' . __('suppliers.primary') . ')' : '' }}</strong><br>
                             {{ $address->street_address_line_1 }}<br>
                             @if($address->street_address_line_2)
                                 {{ $address->street_address_line_2 }}<br>
@@ -32,11 +32,11 @@
                             {{ $address->country_code }}
                         </div>
                     @empty
-                        <p>No addresses on file.</p>
+                        <p>{{ __('suppliers.no_addresses_on_file') }}</p>
                     @endforelse
                     {{-- Old address fields (can be removed after migration) --}}
                     @if(empty($supplier->addresses->first()) && ($supplier->address_street || $supplier->address_city))
-                        <p class="text-muted small"><em>Legacy Address: {{ $supplier->address_street }}, {{ $supplier->address_city }}, {{ $supplier->address_state }} {{ $supplier->address_postal_code }} {{ $supplier->address_country }}</em></p>
+                        <p class="text-muted small"><em>{{ __('suppliers.legacy_address') }}: {{ $supplier->address_street }}, {{ $supplier->address_city }}, {{ $supplier->address_state }} {{ $supplier->address_postal_code }} {{ $supplier->address_country }}</em></p>
                     @endif
                 </div>
             </div>
@@ -44,38 +44,38 @@
            
             <hr>
 
-            <p><strong>Created By:</strong> {{ $supplier->createdBy ? $supplier->createdBy->full_name : 'N/A' }} ({{ $supplier->createdBy ? $supplier->createdBy->username : 'N/A' }})</p>
-            <p><strong>Created At:</strong> {{ $supplier->created_at->format('Y-m-d H:i:s') }}</p>
-            <p><strong>Updated At:</strong> {{ $supplier->updated_at->format('Y-m-d H:i:s') }}</p>
+            <p><strong>{{ __('suppliers.created_by') }}:</strong> {{ $supplier->createdBy ? $supplier->createdBy->full_name : __('suppliers.na') }} ({{ $supplier->createdBy ? $supplier->createdBy->username : __('suppliers.na') }})</p>
+            <p><strong>{{ __('suppliers.created_at') }}:</strong> {{ $supplier->created_at->format('Y-m-d H:i:s') }}</p>
+            <p><strong>{{ __('suppliers.updated_at') }}:</strong> {{ $supplier->updated_at->format('Y-m-d H:i:s') }}</p>
         </div>
         <div class="card-footer d-flex justify-content-between">
             <div>
-                <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}" class="btn btn-warning">Edit</a>
+                <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}" class="btn btn-warning">{{ __('suppliers.edit') }}</a>
                 <form action="{{ route('suppliers.destroy', $supplier->supplier_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this supplier?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">{{ __('suppliers.delete') }}</button>
                 </form>
             </div>
-            <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">Back to List</a>
+            <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">{{ __('suppliers.back_to_list') }}</a>
         </div>
     </div>
 
     <div class="card mt-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Contacts</h2>
-            <a href="{{ route('contacts.create', ['supplier_id' => $supplier->supplier_id]) }}" class="btn btn-primary btn-sm">Add New Contact</a>
+            <h2 class="h5 mb-0">{{ __('suppliers.contacts') }}</h2>
+            <a href="{{ route('contacts.create', ['supplier_id' => $supplier->supplier_id]) }}" class="btn btn-primary btn-sm">{{ __('suppliers.add_new_contact') }}</a>
         </div>
         <div class="card-body">
             @if($supplier->contacts->isNotEmpty())
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Title</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Actions</th>
+                            <th>{{ __('suppliers.name') }}</th>
+                            <th>{{ __('suppliers.title') }}</th>
+                            <th>{{ __('suppliers.email') }}</th>
+                            <th>{{ __('suppliers.phone') }}</th>
+                            <th>{{ __('suppliers.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Opportunities')
+@section('title', __('opportunities.Opportunities'))
 
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Opportunities</h1>
+        <h1>{{ __('opportunities.Opportunities') }}</h1>
         <div>
-            <a href="{{ route('opportunities.kanban') }}" class="btn btn-outline-primary">Kanban View</a>
-            <a href="{{ route('opportunities.create') }}" class="btn btn-primary">Create New Opportunity</a>
+            <a href="{{ route('opportunities.kanban') }}" class="btn btn-outline-primary">{{ __('opportunities.Kanban View') }}</a>
+            <a href="{{ route('opportunities.create') }}" class="btn btn-primary">{{ __('opportunities.Create New Opportunity') }}</a>
         </div>
     </div>
 
@@ -17,13 +17,13 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Customer</th>
-                        <th>Stage</th>
-                        <th>Amount</th>
-                        <th>Close Date</th>
-                        <th>Assigned To</th>
-                        <th>Actions</th>
+                        <th>{{ __('opportunities.Name') }}</th>
+                        <th>{{ __('opportunities.Customer') }}</th>
+                        <th>{{ __('opportunities.Stage') }}</th>
+                        <th>{{ __('opportunities.Amount') }}</th>
+                        <th>{{ __('opportunities.Close Date') }}</th>
+                        <th>{{ __('opportunities.Assigned To') }}</th>
+                        <th>{{ __('opportunities.Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,12 +36,12 @@
                             <td>{{ $opportunity->expected_close_date?->format('Y-m-d') }}</td>
                             <td>{{ $opportunity->assignedTo?->full_name }}</td>
                             <td>
-                                <a href="{{ route('opportunities.edit', $opportunity) }}" class="btn btn-secondary btn-sm">Edit</a>
+                                <a href="{{ route('opportunities.edit', $opportunity) }}" class="btn btn-secondary btn-sm">{{ __('opportunities.Edit') }}</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">No opportunities found.</td>
+                            <td colspan="7" class="text-center">{{ __('opportunities.No opportunities found.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

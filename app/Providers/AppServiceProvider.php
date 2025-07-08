@@ -23,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Payment::observe(PaymentObserver::class);
-        $defaultLocale = Setting::where('key', 'default_locale')->value('value') ?? config('app.locale');
-        app()->setLocale($defaultLocale);
+        // Solo intentar leer settings si la tabla existe
+        if (\Schema::hasTable('settings')) {
+            $defaultLocale = Setting::where('key', 'default_locale')->value('value') ?? config('app.locale');
+            app()->setLocale($defaultLocale);
+        }
     }
 }
