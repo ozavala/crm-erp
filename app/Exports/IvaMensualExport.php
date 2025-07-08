@@ -22,12 +22,12 @@ class IvaMensualExport implements FromArray, WithHeadings, WithTitle
     public function array(): array
     {
         $rows = [];
-        $rows[] = ['IVA Pagado', $this->report['tax_paid']['total'] ?? 0];
-        $rows[] = ['IVA Cobrado', $this->report['tax_collected']['total'] ?? 0];
-        $rows[] = ['IVA Neto', $this->report['net_tax']['amount'] ?? 0];
+        $rows[] = [__('iva_reports.VAT Paid'), $this->report['tax_paid']['total'] ?? 0];
+        $rows[] = [__('iva_reports.VAT Collected'), $this->report['tax_collected']['total'] ?? 0];
+        $rows[] = [__('iva_reports.Net VAT'), $this->report['net_tax']['amount'] ?? 0];
         $rows[] = [];
-        $rows[] = ['Desglose IVA Pagado'];
-        $rows[] = ['Tasa', 'Monto', 'Operaciones'];
+        $rows[] = [__('iva_reports.Breakdown VAT Paid')];
+        $rows[] = [__('iva_reports.Rate'), __('iva_reports.Amount'), __('iva_reports.Operations')];
         foreach ($this->report['tax_paid']['breakdown'] ?? [] as $item) {
             $rows[] = [
                 $item['tax_rate_name'] . ' (' . $item['tax_rate_percentage'] . '%)',
@@ -36,8 +36,8 @@ class IvaMensualExport implements FromArray, WithHeadings, WithTitle
             ];
         }
         $rows[] = [];
-        $rows[] = ['Desglose IVA Cobrado'];
-        $rows[] = ['Tasa', 'Monto', 'Operaciones'];
+        $rows[] = [__('iva_reports.Breakdown VAT Collected')];
+        $rows[] = [__('iva_reports.Rate'), __('iva_reports.Amount'), __('iva_reports.Operations')];
         foreach ($this->report['tax_collected']['breakdown'] ?? [] as $item) {
             $rows[] = [
                 $item['tax_rate_name'] . ' (' . $item['tax_rate_percentage'] . '%)',
@@ -50,11 +50,11 @@ class IvaMensualExport implements FromArray, WithHeadings, WithTitle
 
     public function headings(): array
     {
-        return ['Concepto', 'Valor', 'Extra'];
+        return [__('iva_reports.Concept'), __('iva_reports.Value'), __('iva_reports.Extra')];
     }
 
     public function title(): string
     {
-        return 'IVA ' . $this->year . '-' . str_pad($this->month, 2, '0', STR_PAD_LEFT);
+        return __('iva_reports.Monthly VAT Report') . ' ' . $this->year . '-' . str_pad($this->month, 2, '0', STR_PAD_LEFT);
     }
 } 

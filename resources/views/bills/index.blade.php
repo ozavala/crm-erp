@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Bills')
+@section('title', __('bills.Bills'))
 
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Bills</h1>
-        <a href="{{ route('bills.create') }}" class="btn btn-primary">Create New Bill</a>
+        <h1>{{ __('bills.Bills') }}</h1>
+        <a href="{{ route('bills.create') }}" class="btn btn-primary">{{ __('bills.Create New Bill') }}</a>
     </div>
 
     <div class="card">
@@ -15,14 +15,14 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>Bill #</th>
-                            <th>Supplier</th>
-                            <th>Bill Date</th>
-                            <th>Due Date</th>
-                            <th class="text-end">Total</th>
-                            <th class="text-end">Amount Due</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('bills.Bill #') }}</th>
+                            <th>{{ __('bills.Supplier') }}</th>
+                            <th>{{ __('bills.Bill Date') }}</th>
+                            <th>{{ __('bills.Due Date') }}</th>
+                            <th class="text-end">{{ __('bills.Total') }}</th>
+                            <th class="text-end">{{ __('bills.Amount Due') }}</th>
+                            <th>{{ __('bills.Status') }}</th>
+                            <th>{{ __('bills.Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,13 +47,13 @@
                                     <span class="badge {{ $statusClass }}">{{ $bill->status }}</span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-info">View</a>
-                                    <a href="{{ route('bills.edit', $bill) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-info">{{ __('bills.View') }}</a>
+                                    <a href="{{ route('bills.edit', $bill) }}" class="btn btn-sm btn-warning">{{ __('bills.Edit') }}</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">No bills found.</td>
+                                <td colspan="8" class="text-center">{{ __('bills.No bills found.') }}</td>
                             </tr>
                         @endforelse
                     </tbody>
