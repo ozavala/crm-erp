@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('leads.Edit Lead'))
+@section('title', 'Edit Lead')
 
 @section('content')
 <div class="container">
-    <h1>{{ __('leads.Edit Lead') }}: {{ $lead->title }}</h1>
+    <h1>Edit Lead: {{ $lead->title }}</h1>
 
     <form action="{{ route('leads.update', $lead->lead_id) }}" method="POST">
         @method('PUT')

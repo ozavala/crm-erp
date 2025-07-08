@@ -47,8 +47,8 @@
                         <strong>Invoice #:</strong> {{ $invoice->invoice_number }}<br>
                         <strong>Date:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}<br>
                         <strong>Due Date:</strong> {{ $invoice->due_date->format('Y-m-d') }}<br>
-                        <strong>Condiciones de Pago:</strong> {{ $invoice->payment_terms ?? config('settings.default_payment_terms', 'Contado') }}<br>
-                        <strong>Días de Vencimiento:</strong> {{ $invoice->due_date ? $invoice->invoice_date->diffInDays($invoice->due_date) : config('settings.default_due_days', 30) }}
+                        <strong>Payment Terms:</strong> {{ $invoice->payment_terms ?? config('settings.default_payment_terms', 'Cash') }}<br>
+                        <strong>Due Days:</strong> {{ $invoice->due_date ? $invoice->invoice_date->diffInDays($invoice->due_date) : config('settings.default_due_days', 30) }}
                     </p>
                 </td>
             </tr>

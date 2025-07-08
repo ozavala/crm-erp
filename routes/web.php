@@ -139,6 +139,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings/custom', [SettingsController::class, 'storeCustom'])->name('settings.custom.store');
+    Route::delete('settings/custom/{setting}', [SettingsController::class, 'destroyCustom'])->name('settings.custom.destroy');
 });
 
 Route::prefix('reportes/iva')->group(function () {

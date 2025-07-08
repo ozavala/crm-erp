@@ -14,32 +14,32 @@
     </style>
 </head>
 <body>
-    <h1>{{ __('iva_reports.Monthly VAT Report') }}</h1>
-    <p><strong>{{ __('iva_reports.Period') }}:</strong> {{ $report['period']['start'] }} {{ __('iva_reports.to') }} {{ $report['period']['end'] }}</p>
+    <h1>Monthly VAT Report</h1>
+    <p><strong>Period:</strong> {{ $report['period']['start'] }} to {{ $report['period']['end'] }}</p>
     <div class="resumen">
         <table>
             <tr>
-                <th>{{ __('iva_reports.VAT Paid') }}</th>
-                <th>{{ __('iva_reports.VAT Collected') }}</th>
-                <th>{{ __('iva_reports.Net VAT') }}</th>
-                <th>{{ __('iva_reports.Status') }}</th>
+                <th>VAT Paid</th>
+                <th>VAT Collected</th>
+                <th>Net VAT</th>
+                <th>Status</th>
             </tr>
             <tr>
                 <td>${{ number_format($report['tax_paid']['total'], 2) }}</td>
                 <td>${{ number_format($report['tax_collected']['total'], 2) }}</td>
                 <td>${{ number_format($report['net_tax']['amount'], 2) }}</td>
-                <td>{{ $report['net_tax']['status'] == 'payable' ? __('iva_reports.Payable') : __('iva_reports.Receivable') }}</td>
+                <td>{{ $report['net_tax']['status'] == 'payable' ? 'Payable' : 'Receivable' }}</td>
             </tr>
         </table>
     </div>
 
-    <h2 class="section-title">{{ __('iva_reports.Breakdown VAT Paid') }}</h2>
+    <h2 class="section-title">Breakdown VAT Paid</h2>
     <table>
         <thead>
             <tr>
-                <th>{{ __('iva_reports.Rate') }}</th>
-                <th>{{ __('iva_reports.Amount') }}</th>
-                <th>{{ __('iva_reports.Operations') }}</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Operations</th>
             </tr>
         </thead>
         <tbody>
@@ -53,13 +53,13 @@
         </tbody>
     </table>
 
-    <h2 class="section-title">{{ __('iva_reports.Breakdown VAT Collected') }}</h2>
+    <h2 class="section-title">Breakdown VAT Collected</h2>
     <table>
         <thead>
             <tr>
-                <th>{{ __('iva_reports.Rate') }}</th>
-                <th>{{ __('iva_reports.Amount') }}</th>
-                <th>{{ __('iva_reports.Operations') }}</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Operations</th>
             </tr>
         </thead>
         <tbody>
@@ -73,6 +73,6 @@
         </tbody>
     </table>
 
-    <p style="font-size:11px; color:#888;">{{ __('iva_reports.Generated on') }} {{ now()->format('d/m/Y H:i') }}</p>
+    <p style="font-size:11px; color:#888;">Generated on {{ now()->format('d/m/Y H:i') }}</p>
 </body>
 </html> 

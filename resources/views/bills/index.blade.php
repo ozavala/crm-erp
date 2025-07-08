@@ -5,8 +5,8 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ __('bills.Bills') }}</h1>
-        <a href="{{ route('bills.create') }}" class="btn btn-primary">{{ __('bills.Create New Bill') }}</a>
+        <h1>Bills</h1>
+        <a href="{{ route('bills.create') }}" class="btn btn-primary">Add Bill</a>
     </div>
 
     <div class="card">
@@ -15,14 +15,14 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>{{ __('bills.Bill #') }}</th>
-                            <th>{{ __('bills.Supplier') }}</th>
-                            <th>{{ __('bills.Bill Date') }}</th>
-                            <th>{{ __('bills.Due Date') }}</th>
-                            <th class="text-end">{{ __('bills.Total') }}</th>
-                            <th class="text-end">{{ __('bills.Amount Due') }}</th>
-                            <th>{{ __('bills.Status') }}</th>
-                            <th>{{ __('bills.Actions') }}</th>
+                            <th>ID</th>
+                            <th>Supplier</th>
+                            <th>Bill Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Amount Due</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,8 +32,6 @@
                                 <td><a href="{{ route('suppliers.show', $bill->supplier) }}">{{ $bill->supplier->name }}</a></td>
                                 <td>{{ $bill->bill_date->format('Y-m-d') }}</td>
                                 <td>{{ $bill->due_date->format('Y-m-d') }}</td>
-                                <td class="text-end">${{ number_format($bill->total_amount, 2) }}</td>
-                                <td class="text-end">${{ number_format($bill->amount_due, 2) }}</td>
                                 <td>
                                     @php
                                         $statusClass = match($bill->status) {
@@ -46,14 +44,16 @@
                                     @endphp
                                     <span class="badge {{ $statusClass }}">{{ $bill->status }}</span>
                                 </td>
+                                <td class="text-end">${{ number_format($bill->total_amount, 2) }}</td>
+                                <td class="text-end">${{ number_format($bill->amount_due, 2) }}</td>
                                 <td>
-                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-info">{{ __('bills.View') }}</a>
-                                    <a href="{{ route('bills.edit', $bill) }}" class="btn btn-sm btn-warning">{{ __('bills.Edit') }}</a>
+                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ route('bills.edit', $bill->bill_id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">{{ __('bills.No bills found.') }}</td>
+                                <td colspan="8" class="text-center">No bills found.</td>
                             </tr>
                         @endforelse
                     </tbody>

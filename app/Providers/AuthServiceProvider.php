@@ -40,6 +40,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('edit-feedback', function ($Crmuser, $user) {
             return $user->hasPermissionTo('edit-feedback');
         });
+        Gate::define('edit-settings', function ($user) {
+            return $user->hasPermissionTo('edit-settings');
+        });
 
 
     }

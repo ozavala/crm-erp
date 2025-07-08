@@ -5,14 +5,14 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Purchase Order: {{ $purchaseOrder->purchase_order_number }}</h1>
+        <h1>{{ __('purchase_orders.Purchase Order') }}: #{{ $purchaseOrder->purchase_order_id }}</h1>
         <div>
             <a href="{{ route('purchase-orders.print', $purchaseOrder) }}" class="btn btn-info" target="_blank">Print to PDF</a>
             @if(!in_array($purchaseOrder->status, ['Draft', 'Sent', 'Completed', 'Cancelled']))
                 <a href="{{ route('goods-receipts.create', $purchaseOrder) }}" class="btn btn-primary">Receive Goods</a>
             @endif
-            <a href="{{ route('purchase-orders.edit', $purchaseOrder) }}" class="btn btn-warning">Edit</a>
-            <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">Back to List</a>
+            <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning">{{ __('messages.Edit') }}</a>
+            <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">{{ __('messages.Back to List') }}</a>
         </div>
     </div>
 
@@ -27,11 +27,10 @@
             <div class="card mb-3">
                 <div class="card-header">PO Details</div>
                 <div class="card-body">
-                    <p><strong>Supplier:</strong> <a href="{{ route('suppliers.show', $purchaseOrder->supplier) }}">{{ $purchaseOrder->supplier->name }}</a></p>
-                    <p><strong>Order Date:</strong> {{ $purchaseOrder->order_date->format('Y-m-d') }}</p>
-                    <p><strong>Expected Delivery:</strong> {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('Y-m-d') : 'N/A' }}</p>
-                    <p><strong>Status:</strong> <span class="badge bg-info">{{ $purchaseOrder->status }}</span></p>
-                    <p><strong>Type:</strong> {{ $purchaseOrder->type }}</p>
+                    <p><strong>{{ __('purchase_orders.Supplier') }}:</strong> {{ $purchaseOrder->supplier->name }}</p>
+                    <p><strong>{{ __('messages.Date') }}:</strong> {{ $purchaseOrder->order_date }}</p>
+                    <p><strong>{{ __('messages.Status') }}:</strong> {{ $purchaseOrder->status }}</p>
+                    <p><strong>{{ __('messages.Total') }}:</strong> {{ $purchaseOrder->total }}</p>
                 </div>
             </div>
         </div>
@@ -128,7 +127,7 @@
                                         <form action="{{ route('landed-costs.destroy', $cost) }}" method="POST" onsubmit="return confirm('Are you sure?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            <button type="submit" class="btn btn-danger btn-sm">{{ __('messages.Delete') }}</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -151,14 +150,14 @@
                     <form action="{{ route('landed-costs.store', $purchaseOrder) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description (e.g., Freight, Duties)</label>
+                            <label for="description" class="form-label">{{ __('messages.Description') }} (e.g., Freight, Duties)</label>
                             <input type="text" name="description" id="description" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="amount" class="form-label">Amount</label>
+                            <label for="amount" class="form-label">{{ __('messages.Amount') }}</label>
                             <input type="number" name="amount" id="amount" class="form-control" step="0.01" min="0" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Cost</button>
+                        <button type="submit" class="btn btn-primary">{{ __('messages.Add Cost') }}</button>
                     </form>
                 </div>
             </div>
@@ -166,7 +165,7 @@
         <div class="card-footer text-end">
             <form action="{{ route('landed-costs.apportion', $purchaseOrder) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-success">Calculate & Apportion Costs to Items</button>
+                <button type="submit" class="btn btn-success">{{ __('messages.Calculate & Apportion Costs to Items') }}</button>
             </form>
         </div>
     </div>
@@ -192,13 +191,13 @@
                             <td><a href="{{ route('goods-receipts.show', $receipt) }}">GR-{{ $receipt->goods_receipt_id }}</a></td>
                             <td>{{ $receipt->receipt_date->format('Y-m-d') }}</td>
                             <td>{{ $receipt->receivedBy->full_name ?? 'N/A' }}</td>
-                            <td class="text-end"><a href="{{ route('goods-receipts.show', $receipt) }}" class="btn btn-info btn-sm">View</a></td>
+                            <td class="text-end"><a href="{{ route('goods-receipts.show', $receipt) }}" class="btn btn-info btn-sm">{{ __('messages.View') }}</a></td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             @else
-                <p>No goods have been received for this order yet.</p>
+                <p>{{ __('messages.No goods have been received for this order yet.') }}</p>
             @endif
         </div>
     </div>

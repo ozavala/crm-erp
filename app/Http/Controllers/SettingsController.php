@@ -16,8 +16,9 @@ class SettingsController extends Controller
     public function edit()
     {
         Gate::authorize('edit-settings');
-        $settings = Setting::all()->pluck('value', 'key');
-        return view('settings.edit', compact('settings'));
+        $coreSettings = Setting::where('type', 'core')->get();
+        $customSettings = Setting::where('type', 'custom')->get();
+        return view('settings.edit', compact('coreSettings', 'customSettings'));
     }
 
     /**
@@ -26,59 +27,42 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         Gate::authorize('edit-settings');
-
-        $validated = $request->validate([
-            // Company Settings
-            'company_name' => 'nullable|string|max:255',
-            'company_address_line_1' => 'nullable|string|max:255',
-            'company_address_line_2' => 'nullable|string|max:255',
-            'company_email' => 'nullable|email|max:255',
-            'company_phone' => 'nullable|string|max:255',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'company_website' => 'nullable|url|max:255',
-            // Billing Parameters
-            'invoice_prefix' => 'nullable|string|max:10',
-            'invoice_start_number' => 'nullable|integer|min:1',
-            'quotation_prefix' => 'nullable|string|max:10',
-            'quotation_start_number' => 'nullable|integer|min:1',
-            'default_payment_terms' => 'nullable|string|max:100',
-            'default_due_days' => 'nullable|integer|min:0',
-            // Mail Settings
-            'mail_mailer' => 'required|string',
-            'mail_host' => 'required|string',
-            'mail_port' => 'required|integer',
-            'mail_username' => 'nullable|string',
-            'mail_password' => 'nullable|string',
-            'mail_encryption' => 'nullable|string|in:tls,ssl,starttls',
-            'mail_from_address' => 'required|email',
-            'mail_from_name' => 'required|string',
-            'default_locale' => 'nullable|in:es,en',
-        ]);
-
-        if ($request->hasFile('company_logo')) {
-            // Get current logo path to delete it later
-            $currentLogo = Setting::where('key', 'company_logo')->value('value');
-
-            // Store new logo in the public disk
-            $path = $request->file('company_logo')->store('logos', 'public');
-            $validated['company_logo'] = $path;
-
-            // Delete old logo if it exists
-            if ($currentLogo && Storage::disk('public')->exists($currentLogo)) {
-                Storage::disk('public')->delete($currentLogo);
-            }
+        // Validar solo los core settings
+        $coreKeys = Setting::where('type', 'core')->pluck('key');
+        $rules = [];
+        foreach ($coreKeys as $key) {
+            $rules[$key] = 'nullable|string|max:255';
         }
-
+        $validated = $request->validate($rules);
         foreach ($validated as $key => $value) {
-            Setting::updateOrCreate(
-                ['key' => $key],
-                ['value' => $value ?? '']
-            );
+            Setting::where('key', $key)->update(['value' => $value]);
         }
+        return redirect()->route('settings.edit')->with('success', __('settings.Updated successfully'));
+    }
 
-        // Clear the config cache to apply the new mail settings
-        Artisan::call('config:clear');
+    public function storeCustom(Request $request)
+    {
+        Gate::authorize('edit-settings');
+        $validated = $request->validate([
+            'key' => 'required|string|max:255|unique:settings,key',
+            'value' => 'nullable|string',
+        ]);
+        Setting::create([
+            'key' => $validated['key'],
+            'value' => $validated['value'],
+            'type' => 'custom',
+            'is_editable' => true,
+        ]);
+        return redirect()->route('settings.edit')->with('success', __('settings.Custom setting added'));
+    }
 
-        return redirect()->route('settings.edit')->with('success', 'Settings updated successfully.');
+    public function destroyCustom(Setting $setting)
+    {
+        Gate::authorize('edit-settings');
+        if ($setting->type === 'custom' && $setting->is_editable) {
+            $setting->delete();
+            return redirect()->route('settings.edit')->with('success', __('settings.Custom setting deleted'));
+        }
+        return redirect()->route('settings.edit')->with('error', __('settings.Cannot delete core setting'));
     }
 }

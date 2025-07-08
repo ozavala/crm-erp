@@ -19,28 +19,17 @@ class OrderControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\SettingsTableSeeder::class);
         $this->user = CrmUser::factory()->create();
-        
-        // Create permissions and roles for order management
-        $permissions = [
+        $this->actingAs($this->user);
+        // Asignar permisos necesarios para gestión de órdenes
+        // Esto es requerido por la lógica de autorización en el controlador de órdenes
+        $this->givePermission($this->user, [
             'view-orders',
-            'create-orders', 
+            'create-orders',
             'edit-orders',
             'delete-orders'
-        ];
-        
-        foreach ($permissions as $permissionName) {
-            Permission::create(['name' => $permissionName]);
-        }
-        
-        // Create a role with all order permissions
-        $role = UserRole::create(['name' => 'Order Manager']);
-        $role->permissions()->attach(Permission::whereIn('name', $permissions)->pluck('permission_id'));
-        
-        // Assign role to user
-        $this->user->roles()->attach($role->role_id);
-        
-        $this->actingAs($this->user);
+        ]);
     }
 
     #[Test]

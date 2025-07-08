@@ -14,5 +14,15 @@ class Setting extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'type', 'is_editable'];
+
+    public static function core()
+    {
+        return static::where('type', 'core');
+    }
+
+    public static function custom()
+    {
+        return static::where('type', 'custom');
+    }
 }

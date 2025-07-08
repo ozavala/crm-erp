@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>@yield('title')</h1>
+    <h1>Create Bill</h1>
 
     <form action="{{ route('bills.store') }}" method="POST">
         @csrf
@@ -13,11 +13,11 @@
         @endif
 
         <div class="card mb-4">
-            <div class="card-header">{{ __('bills.Bill Details') }}</div>
+            <div class="card-header">Bill Details</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="supplier_id" class="form-label">{{ __('bills.Supplier') }}</label>
+                        <label for="supplier_id" class="form-label">Supplier</label>
                         @if($purchaseOrder)
                             <input type="hidden" name="supplier_id" value="{{ $purchaseOrder->supplier_id }}">
                             <input type="text" class="form-control" value="{{ $purchaseOrder->supplier->name }}" readonly>
@@ -34,7 +34,7 @@
                         @endif
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="bill_number" class="form-label">{{ __('bills.Bill Number (from Supplier)') }}</label>
+                        <label for="bill_number" class="form-label">Bill Number</label>
                         <input type="text" name="bill_number" id="bill_number" class="form-control @error('bill_number') is-invalid @enderror" value="{{ old('bill_number') }}" required>
                         @error('bill_number')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -43,14 +43,14 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="bill_date" class="form-label">{{ __('bills.Bill Date') }}</label>
+                        <label for="bill_date" class="form-label">Bill Date</label>
                         <input type="date" name="bill_date" id="bill_date" class="form-control @error('bill_date') is-invalid @enderror" value="{{ old('bill_date', now()->toDateString()) }}" required>
                         @error('bill_date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="due_date" class="form-label">{{ __('bills.Due Date') }}</label>
+                        <label for="due_date" class="form-label">Due Date</label>
                         <input type="date" name="due_date" id="due_date" class="form-control @error('due_date') is-invalid @enderror" value="{{ old('due_date', now()->addDays(30)->toDateString()) }}" required>
                         @error('due_date')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -61,16 +61,16 @@
         </div>
 
         <div class="card mb-4">
-            <div class="card-header">{{ __('bills.Bill Items') }}</div>
+            <div class="card-header">Bill Items</div>
             <div class="card-body">
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th>{{ __('bills.Item Name') }}</th>
-                            <th>{{ __('bills.Description') }}</th>
-                            <th width="10%">{{ __('bills.Qty') }}</th>
-                            <th width="15%">{{ __('bills.Unit Price') }}</th>
-                            <th width="15%">{{ __('bills.Total') }}</th>
+                            <th>Item Name</th>
+                            <th>Description</th>
+                            <th width="10%">Qty</th>
+                            <th width="15%">Unit Price</th>
+                            <th width="15%">Total</th>
                         </tr>
                     </thead>
                     <tbody id="bill-items-body">
@@ -103,24 +103,24 @@
         </div>
 
         <div class="card mb-4">
-            <div class="card-header">{{ __('bills.Summary & Notes') }}</div>
+            <div class="card-header">Summary & Notes</div>
             <div class="card-body">
                  <div class="row">
                     <div class="col-md-6">
-                        <label for="notes" class="form-label">{{ __('bills.Notes') }}</label>
+                        <label for="notes" class="form-label">Notes</label>
                         <textarea name="notes" id="notes" rows="3" class="form-control">{{ old('notes') }}</textarea>
                     </div>
                     <div class="col-md-6">
                         {{-- Add summary fields like subtotal, tax, total --}}
                         <div class="mb-2">
-                            <p class="d-flex justify-content-between"><span>{{ __('bills.Subtotal:') }}</span> <span id="subtotal-display">$0.00</span></p>
+                            <p class="d-flex justify-content-between"><span>Subtotal:</span> <span id="subtotal-display">$0.00</span></p>
                         </div>
                         <div class="mb-2">
-                            <label for="tax_amount" class="form-label">{{ __('bills.Tax Amount') }}</label>
+                            <label for="tax_amount" class="form-label">Tax Amount</label>
                             <input type="number" name="tax_amount" id="tax_amount" class="form-control" step="0.01" value="{{ old('tax_amount', 0) }}" min="0">
                         </div>
                         <div class="mb-2">
-                            <p class="d-flex justify-content-between"><span>{{ __('bills.Total Amount:') }}</span> <span id="total-amount-display">$0.00</span></p>
+                            <p class="d-flex justify-content-between"><span>Total Amount:</span> <span id="total-amount-display">$0.00</span></p>
                         </div>
                     </div>
                 </div>
@@ -130,8 +130,8 @@
         @include('bills._item_calculation_script')
         
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary">{{ __('bills.Save Bill') }}</button>
-            <a href="{{ $purchaseOrder ? route('purchase-orders.show', $purchaseOrder) : route('purchase-orders.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ route('bills.index') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>

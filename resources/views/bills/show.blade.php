@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center">
-        <h1>{{ __('bills.Bill #') }}{{ $bill->bill_number }}
+        <h1>Bill #{{ $bill->bill_number }}
             @php
                 $statusClass = match($bill->status) {
                     'Paid' => 'bg-success',
@@ -31,33 +31,33 @@
         </div>
     @endif
     <div class="mb-3">
-        <a href="{{ route('bills.edit', $bill) }}" class="btn btn-warning">{{ __('bills.Edit Bill') }}</a>
+        <a href="{{ route('bills.edit', $bill) }}" class="btn btn-warning">Edit Bill</a>
         {{-- Add delete button here later --}}
     </div>
 
     <div class="card mb-4">
         <div class="card-header">
-            {{ __('bills.Bill ID:') }} {{ $bill->bill_id }} | {{ __('bills.Bill Date:') }} {{ $bill->bill_date->format('M d, Y') }} | {{ __('bills.Due Date:') }} {{ $bill->due_date->format('M d, Y') }}
+            Bill ID: {{ $bill->bill_id }} | Bill Date: {{ $bill->bill_date->format('M d, Y') }} | Due Date: {{ $bill->due_date->format('M d, Y') }}
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <h5>{{ __('bills.Supplier Details') }}</h5>
-                    <p><strong>{{ __('bills.Supplier:') }}</strong> <a href="{{ route('suppliers.show', $bill->supplier_id) }}">{{ $bill->supplier->name }}</a></p>
+                    <h5>Supplier Details</h5>
+                    <p><strong>Supplier:</strong> <a href="{{ route('suppliers.show', $bill->supplier_id) }}">{{ $bill->supplier->name }}</a></p>
                     @if($bill->purchaseOrder)
-                        <p><strong>{{ __('bills.From Purchase Order:') }}</strong> <a href="{{ route('purchase-orders.show', $bill->purchase_order_id) }}">{{ $bill->purchaseOrder->purchase_order_number }}</a></p>
+                        <p><strong>From Purchase Order:</strong> <a href="{{ route('purchase-orders.show', $bill->purchase_order_id) }}">{{ $bill->purchaseOrder->purchase_order_number }}</a></p>
                     @endif
                 </div>
             </div>
 
-            <h5>{{ __('bills.Line Items') }}</h5>
+            <h5>Line Items</h5>
             <table class="table table-sm table-bordered">
                 <thead>
                     <tr>
-                        <th>{{ __('bills.Item Name') }}</th>
-                        <th class="text-end">{{ __('bills.Qty') }}</th>
-                        <th class="text-end">{{ __('bills.Unit Price') }}</th>
-                        <th class="text-end">{{ __('bills.Total') }}</th>
+                        <th>Item Name</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,12 +74,12 @@
 
             <div class="row justify-content-end mt-3">
                 <div class="col-md-4">
-                    <p class="d-flex justify-content-between"><span>{{ __('bills.Subtotal:') }}</span> <span>${{ number_format($bill->subtotal, 2) }}</span></p>
-                    <p class="d-flex justify-content-between"><span>{{ __('bills.Tax:') }}</span> <span>${{ number_format($bill->tax_amount, 2) }}</span></p>
+                    <p class="d-flex justify-content-between"><span>Subtotal:</span> <span>${{ number_format($bill->subtotal, 2) }}</span></p>
+                    <p class="d-flex justify-content-between"><span>Tax:</span> <span>${{ number_format($bill->tax_amount, 2) }}</span></p>
                     <hr class="my-1">
-                    <p class="d-flex justify-content-between"><span>{{ __('bills.Total Amount:') }}</span> <span>${{ number_format($bill->total_amount, 2) }}</span></p>
-                    <p class="d-flex justify-content-between"><span>{{ __('bills.Amount Paid:') }}</span> <span>${{ number_format($bill->amount_paid, 2) }}</span></p>
-                    <h5 class="d-flex justify-content-between"><span>{{ __('bills.Amount Due:') }}</span> <span>${{ number_format($bill->amount_due, 2) }}</span></h5>
+                    <p class="d-flex justify-content-between"><span>Total Amount:</span> <span>${{ number_format($bill->total_amount, 2) }}</span></p>
+                    <p class="d-flex justify-content-between"><span>Amount Paid:</span> <span>${{ number_format($bill->amount_paid, 2) }}</span></p>
+                    <h5 class="d-flex justify-content-between"><span>Amount Due:</span> <span>${{ number_format($bill->amount_due, 2) }}</span></h5>
                 </div>
             </div>
         </div>
@@ -87,21 +87,21 @@
 
     {{-- Payments Section --}}
     <div class="card mt-4">
-        <div class="card-header"><h4>{{ __('bills.Payments') }}</h4></div>
+        <div class="card-header"><h4>Payments</h4></div>
         <div class="card-body">
             @if ($bill->amount_due > 0 && $bill->status !== 'Cancelled')
             <div class="mb-4 p-3 border rounded">
-                <h5>{{ __('bills.Record New Payment') }}</h5>
+                <h5>Record New Payment</h5>
                 <form action="{{ route('payments.store') }}" method="POST">
                     @include('payments._form', ['payable' => $bill])
                 </form>
             </div>
             @endif
 
-            <h5>{{ __('bills.Payment History') }}</h5>
+            <h5>Payment History</h5>
             @if($bill->payments->isNotEmpty())
                 <table class="table table-sm">
-                    <thead><tr><th>{{ __('bills.Date') }}</th><th>{{ __('bills.Amount') }}</th><th>{{ __('bills.Method') }}</th><th>{{ __('bills.Reference') }}</th><th>{{ __('bills.Action') }}</th></tr></thead>
+                    <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Action</th></tr></thead>
                     <tbody>
                         @foreach($bill->payments as $payment)
                         <tr>
@@ -112,7 +112,7 @@
                             <td>
                                 <form action="{{ route('payments.destroy', $payment->payment_id) }}" method="POST" onsubmit="return confirm('{{ __('bills.Delete this payment?') }}');">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">{{ __('bills.Delete') }}</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -120,7 +120,7 @@
                     </tbody>
                 </table>
             @else
-                <p>{{ __('bills.No payments recorded for this bill yet.') }}</p>
+                <p>No payments recorded for this bill yet.</p>
             @endif
         </div>
     </div>

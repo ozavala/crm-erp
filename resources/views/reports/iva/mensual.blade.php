@@ -2,19 +2,19 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('iva_reports.Monthly VAT Report') }}</h1>
+    <h1>Monthly VAT Report</h1>
     <form method="get" action="{{ route('iva.report.monthly') }}" class="mb-4">
         <div class="row g-2 align-items-end">
             <div class="col-auto">
-                <label for="year" class="form-label">{{ __('iva_reports.Year') }}</label>
+                <label for="year" class="form-label">Year</label>
                 <input type="number" name="year" id="year" class="form-control" value="{{ request('year', now()->year) }}" min="2000" max="2100">
             </div>
             <div class="col-auto">
-                <label for="month" class="form-label">{{ __('iva_reports.Month') }}</label>
+                <label for="month" class="form-label">Month</label>
                 <input type="number" name="month" id="month" class="form-control" value="{{ request('month', now()->month) }}" min="1" max="12">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary">{{ __('iva_reports.View Report') }}</button>
+                <button type="submit" class="btn btn-primary">View Report</button>
             </div>
         </div>
     </form>
@@ -22,24 +22,24 @@
     @isset($report)
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">{{ __('iva_reports.Period Summary') }}: {{ $report['period']['start'] }} {{ __('iva_reports.to') }} {{ $report['period']['end'] }}</h5>
+            <h5 class="card-title">Period Summary: {{ $report['period']['start'] }} to {{ $report['period']['end'] }}</h5>
             <ul>
-                <li><strong>{{ __('iva_reports.VAT Paid') }}:</strong> ${{ number_format($report['tax_paid']['total'], 2) }}</li>
-                <li><strong>{{ __('iva_reports.VAT Collected') }}:</strong> ${{ number_format($report['tax_collected']['total'], 2) }}</li>
-                <li><strong>{{ __('iva_reports.Net VAT') }}:</strong> ${{ number_format($report['net_tax']['amount'], 2) }} ({{ $report['net_tax']['status'] == 'payable' ? __('iva_reports.Payable') : __('iva_reports.Receivable') }})</li>
+                <li><strong>VAT Paid:</strong> ${{ number_format($report['tax_paid']['total'], 2) }}</li>
+                <li><strong>VAT Collected:</strong> ${{ number_format($report['tax_collected']['total'], 2) }}</li>
+                <li><strong>Net VAT:</strong> ${{ number_format($report['net_tax']['amount'], 2) }} ({{ $report['net_tax']['status'] == 'payable' ? 'Payable' : 'Receivable' }})</li>
             </ul>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <h4>{{ __('iva_reports.Breakdown VAT Paid') }}</h4>
+            <h4>Breakdown VAT Paid</h4>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>{{ __('iva_reports.Rate') }}</th>
-                        <th>{{ __('iva_reports.Amount') }}</th>
-                        <th>{{ __('iva_reports.Operations') }}</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Operations</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,13 +54,13 @@
             </table>
         </div>
         <div class="col-md-6">
-            <h4>{{ __('iva_reports.Breakdown VAT Collected') }}</h4>
+            <h4>Breakdown VAT Collected</h4>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>{{ __('iva_reports.Rate') }}</th>
-                        <th>{{ __('iva_reports.Amount') }}</th>
-                        <th>{{ __('iva_reports.Operations') }}</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Operations</th>
                     </tr>
                 </thead>
                 <tbody>

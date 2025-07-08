@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('settings', function (Blueprint $table) {
-            $table->string('key')->primary();
+            $table->id();
+            $table->string('key')->unique();
             $table->text('value')->nullable();
+            $table->enum('type', ['core', 'custom'])->default('custom');
+            $table->boolean('is_editable')->default(true);
+            $table->timestamps();
         });
     }
 

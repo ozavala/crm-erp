@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('invoices.edit_invoice') }}: {{ $invoice->invoice_number }}</h1>
+    <h1>Edit Invoice: {{ $invoice->invoice_number }}</h1>
 
     <form action="{{ route('invoices.update', $invoice->invoice_id) }}" method="POST">
         @method('PUT')

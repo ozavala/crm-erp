@@ -16,28 +16,17 @@ class CustomerControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\SettingsTableSeeder::class);
         $this->user = CrmUser::factory()->create();
-        
-        // Create permissions and roles for customer management
-        $permissions = [
+        $this->actingAs($this->user);
+        // Asignar permisos necesarios para gestión de clientes
+        // Esto es requerido por la lógica de autorización en el controlador de clientes
+        $this->givePermission($this->user, [
             'view-customers',
-            'create-customers', 
+            'create-customers',
             'edit-customers',
             'delete-customers'
-        ];
-        
-        foreach ($permissions as $permissionName) {
-            \App\Models\Permission::create(['name' => $permissionName]);
-        }
-        
-        // Create a role with all customer permissions
-        $role = \App\Models\UserRole::create(['name' => 'Customer Manager']);
-        $role->permissions()->attach(\App\Models\Permission::whereIn('name', $permissions)->pluck('permission_id'));
-        
-        // Assign role to user
-        $this->user->roles()->attach($role->role_id);
-        
-        $this->actingAs($this->user);
+        ]);
     }
 
     #[Test]

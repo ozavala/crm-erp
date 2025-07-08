@@ -1,68 +1,68 @@
 @extends('layouts.app')
 
-@section('title', __('leads.Lead Details'))
+@section('title', 'Lead Details')
 
 @section('content')
 <div class="container">
-    <h1>{{ __('leads.Lead') }}: {{ $lead->title }}</h1>
+    <h1>Lead: {{ $lead->title }}</h1>
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            {{ __('leads.Lead ID') }}: {{ $lead->lead_id }}
+            Lead ID: {{ $lead->lead_id }}
             <span class="badge bg-info fs-6">{{ $lead->status }}</span>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-7">
-                    <p><strong>{{ __('leads.Description') }}:</strong></p>
-                    <p>{{ $lead->description ?: __('leads.N/A') }}</p>
+                    <p><strong>Description:</strong></p>
+                    <p>{{ $lead->description ?: 'N/A' }}</p>
                     <hr>
-                    <p><strong>{{ __('leads.Potential Value') }}:</strong> ${{ $lead->value ? number_format($lead->value, 2) : __('leads.N/A') }}</p>
-                    <p><strong>{{ __('leads.Source') }}:</strong> {{ $lead->source ?: __('leads.N/A') }}</p>
-                    <p><strong>{{ __('leads.Expected Close Date') }}:</strong> {{ $lead->expected_close_date ? $lead->expected_close_date->format('M d, Y') : __('leads.N/A') }}</p>
+                    <p><strong>Potential Value:</strong> ${{ $lead->value ? number_format($lead->value, 2) : 'N/A' }}</p>
+                    <p><strong>Source:</strong> {{ $lead->source ?: 'N/A' }}</p>
+                    <p><strong>Expected Close Date:</strong> {{ $lead->expected_close_date ? $lead->expected_close_date->format('M d, Y') : 'N/A' }}</p>
                 </div>
                 <div class="col-md-5">
-                    <h5>{{ __('leads.Contact & Assignment') }}</h5>
+                    <h5>Contact & Assignment</h5>
                     @if($lead->customer)
-                        <p><strong>{{ __('leads.Associated Customer') }}:</strong> <a href="{{ route('customers.show', $lead->customer_id) }}">{{ $lead->customer->full_name }}</a> {{ $lead->customer->company_name ? '('.$lead->customer->company_name.')' : '' }}</p>
+                        <p><strong>Associated Customer:</strong> <a href="{{ route('customers.show', $lead->customer_id) }}">{{ $lead->customer->full_name }}</a> {{ $lead->customer->company_name ? '('.$lead->customer->company_name.')' : '' }}</p>
                     @else
-                        <p><strong>{{ __('leads.Contact Name') }}:</strong> {{ $lead->contact_name ?: __('leads.N/A') }}</p>
-                        <p><strong>{{ __('leads.Contact Email') }}:</strong> {{ $lead->contact_email ?: __('leads.N/A') }}</p>
-                        <p><strong>{{ __('leads.Contact Phone') }}:</strong> {{ $lead->contact_phone ?: __('leads.N/A') }}</p>
+                        <p><strong>Contact Name:</strong> {{ $lead->contact_name ?: 'N/A' }}</p>
+                        <p><strong>Contact Email:</strong> {{ $lead->contact_email ?: 'N/A' }}</p>
+                        <p><strong>Contact Phone:</strong> {{ $lead->contact_phone ?: 'N/A' }}</p>
                     @endif
                     <hr>
-                    <p><strong>{{ __('leads.Assigned To') }}:</strong> {{ $lead->assignedTo ? $lead->assignedTo->full_name : __('leads.Unassigned') }}</p>
-                    <p><strong>{{ __('leads.Created By') }}:</strong> {{ $lead->createdBy ? $lead->createdBy->full_name : __('leads.N/A') }}</p>
+                    <p><strong>Assigned To:</strong> {{ $lead->assignedTo ? $lead->assignedTo->full_name : 'Unassigned' }}</p>
+                    <p><strong>Created By:</strong> {{ $lead->createdBy ? $lead->createdBy->full_name : 'N/A' }}</p>
                 </div>
             </div>
             <hr>
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>{{ __('leads.Created At') }}:</strong> {{ $lead->created_at->format('Y-m-d H:i:s') }}</p>
+                    <p><strong>Created At:</strong> {{ $lead->created_at->format('Y-m-d H:i:s') }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>{{ __('leads.Updated At') }}:</strong> {{ $lead->updated_at->format('Y-m-d H:i:s') }}</p>
+                    <p><strong>Updated At:</strong> {{ $lead->updated_at->format('Y-m-d H:i:s') }}</p>
                 </div>
             </div>
         </div>
         <div class="card-footer d-flex justify-content-between">
             <div>
-                <a href="{{ route('leads.edit', $lead->lead_id) }}" class="btn btn-warning">{{ __('leads.Edit Lead') }}</a>
+                <a href="{{ route('leads.edit', $lead->lead_id) }}" class="btn btn-warning">Edit Lead</a>
                 @if(!in_array($lead->status, ['Won', 'Lost']))
                     <form action="{{ route('leads.convertToCustomer', $lead->lead_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('leads.Are you sure you want to convert this lead? This will create a new Opportunity and mark the lead as Won.') }}');">
                         @csrf
-                        <button type="submit" class="btn btn-success">{{ __('leads.Convert Lead') }}</button>
+                        <button type="submit" class="btn btn-success">Convert Lead</button>
                     </form>
                 @endif
                 @if($lead->status !== 'Lost') {{-- Allow deleting unless it's already "Lost" or "Won" (soft delete still works) --}}
                     <form action="{{ route('leads.destroy', $lead->lead_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('leads.Are you sure you want to delete this lead?') }}');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">{{ __('leads.Delete Lead') }}</button>
+                        <button type="submit" class="btn btn-danger">Delete Lead</button>
                     </form>
                 @endif
             </div>
-            <a href="{{ route('leads.index') }}" class="btn btn-secondary">{{ __('leads.Back to List') }}</a>
+            <a href="{{ route('leads.index') }}" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
 

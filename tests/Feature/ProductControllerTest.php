@@ -19,28 +19,17 @@ class ProductControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\SettingsTableSeeder::class);
         $this->user = CrmUser::factory()->create();
-        
-        // Create permissions and roles for product management
-        $permissions = [
+        $this->actingAs($this->user);
+        // Asignar permisos necesarios para gestión de productos
+        // Esto es requerido por la lógica de autorización en el controlador de productos
+        $this->givePermission($this->user, [
             'view-products',
-            'create-products', 
+            'create-products',
             'edit-products',
             'delete-products'
-        ];
-        
-        foreach ($permissions as $permissionName) {
-            Permission::create(['name' => $permissionName]);
-        }
-        
-        // Create a role with all product permissions
-        $role = UserRole::create(['name' => 'Product Manager']);
-        $role->permissions()->attach(Permission::whereIn('name', $permissions)->pluck('permission_id'));
-        
-        // Assign role to user
-        $this->user->roles()->attach($role->role_id);
-        
-        $this->actingAs($this->user);
+        ]);
     }
 
     #[Test]

@@ -4,10 +4,12 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('purchase_orders.create_new_purchase_order') }}</h1>
+    <h1>Create Purchase Order</h1>
 
     <form action="{{ route('purchase-orders.store') }}" method="POST">
         @include('purchase_orders._form')
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 @endsection

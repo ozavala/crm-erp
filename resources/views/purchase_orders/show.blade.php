@@ -7,8 +7,8 @@
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="mb-0">{{ __('purchase_orders.purchase_order') }}</h1>
-            <p class="text-muted mb-0">{{ $purchaseOrder->purchase_order_number }}</p>
+            <h1 class="mb-0">Purchase Order</h1>
+            <p class="text-muted mb-0">#{{ $purchaseOrder->purchase_order_number }}</p>
         </div>
         <div>
             {{-- Status Badge --}}
@@ -22,8 +22,8 @@
                 };
             @endphp
             <span class="badge {{ $statusClass }} fs-6 me-2">{{ $purchaseOrder->status }}</span>
-            <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning">{{ __('purchase_orders.edit') }}</a>
-            <a href="{{ route('purchase-orders.print', $purchaseOrder->purchase_order_id) }}" class="btn btn-secondary" target="_blank">{{ __('purchase_orders.print_pdf') }}</a>
+            <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ route('purchase-orders.print', $purchaseOrder->purchase_order_id) }}" class="btn btn-secondary" target="_blank">Print PDF</a>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h5>{{ __('purchase_orders.supplier') }}</h5>
+                            <h5>Supplier</h5>
                             <p>
                                 <a href="{{ route('suppliers.show', $purchaseOrder->supplier->supplier_id) }}">{{ $purchaseOrder->supplier->name }}</a><br>
                                 {{-- Supplier Address --}}
@@ -60,7 +60,7 @@
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <h5>{{ __('purchase_orders.ship_to') }}</h5>
+                            <h5>Ship To</h5>
                             <p>
                                 @if($purchaseOrder->shippingAddress)
                                     <strong>{{ $purchaseOrder->shippingAddress->address_name ?? __('purchase_orders.main_warehouse') }}</strong><br>
@@ -76,13 +76,13 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-4">
-                            <strong>{{ __('purchase_orders.order_date') }}</strong>: {{ $purchaseOrder->order_date->format('M d, Y') }}
+                            <strong>Order Date</strong>: {{ $purchaseOrder->order_date->format('M d, Y') }}
                         </div>
                         <div class="col-md-4">
-                            <strong>{{ __('purchase_orders.expected_delivery') }}</strong>: {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('M d, Y') : __('purchase_orders.na') }}
+                            <strong>Expected Delivery</strong>: {{ $purchaseOrder->expected_delivery_date ? $purchaseOrder->expected_delivery_date->format('M d, Y') : 'N/A' }}
                         </div>
                         <div class="col-md-4">
-                            <strong>{{ __('purchase_orders.created_by') }}</strong>: {{ $purchaseOrder->createdBy->full_name ?? __('purchase_orders.na') }}
+                            <strong>Created By</strong>: {{ $purchaseOrder->createdBy->full_name ?? 'N/A' }}
                         </div>
                     </div>
                 </div>
@@ -90,16 +90,16 @@
             {{-- Tabs for Items, Landed Costs, etc. --}}
             <ul class="nav nav-tabs" id="poDetailsTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">{{ __('purchase_orders.items') }}</button>
+                    <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">Items</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="landed-costs-tab" data-bs-toggle="tab" data-bs-target="#landed-costs" type="button" role="tab" aria-controls="landed-costs" aria-selected="false">{{ __('purchase_orders.landed_costs') }}</button>
+                    <button class="nav-link" id="landed-costs-tab" data-bs-toggle="tab" data-bs-target="#landed-costs" type="button" role="tab" aria-controls="landed-costs" aria-selected="false">Landed Costs</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="receipts-tab" data-bs-toggle="tab" data-bs-target="#receipts" type="button" role="tab" aria-controls="receipts" aria-selected="false">{{ __('purchase_orders.goods_receipts') }}</button>
+                    <button class="nav-link" id="receipts-tab" data-bs-toggle="tab" data-bs-target="#receipts" type="button" role="tab" aria-controls="receipts" aria-selected="false">Goods Receipts</button>
                 </li>
                  <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">{{ __('purchase_orders.payments') }}</button>
+                    <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">Payments</button>
                 </li>
             </ul>
             <div class="tab-content" id="poDetailsTabContent">
@@ -109,12 +109,12 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>{{ __('purchase_orders.item') }}</th>
-                                    <th class="text-end">{{ __('purchase_orders.qty') }}</th>
-                                    <th class="text-end">{{ __('purchase_orders.unit_price') }}</th>
-                                    <th class="text-end">{{ __('purchase_orders.landed_cost_per_unit') }}</th>
-                                    <th class="text-end">{{ __('purchase_orders.final_cost_per_unit') }}</th>
-                                    <th class="text-end">{{ __('purchase_orders.line_total') }}</th>
+                                    <th>Item</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Landed Cost/Unit</th>
+                                    <th class="text-end">Final Cost/Unit</th>
+                                    <th class="text-end">Line Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,11 +141,11 @@
                         <div class="row">
                             <div class="col-md-7">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5>{{ __('purchase_orders.existing_costs') }}</h5>
+                                    <h5>Existing Costs</h5>
                                     @if($purchaseOrder->landedCosts->isNotEmpty())
                                         <form action="{{ route('landed-costs.apportion', $purchaseOrder->purchase_order_id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success">{{ __('purchase_orders.apportion_costs') }}</button>
+                                            <button type="submit" class="btn btn-sm btn-success">Apportion Costs</button>
                                         </form>
                                     @endif
                                 </div>
@@ -153,8 +153,8 @@
                                     <table class="table table-sm">
                                         <thead>
                                             <tr>
-                                                <th>{{ __('purchase_orders.description') }}</th>
-                                                <th class="text-end">{{ __('purchase_orders.amount') }}</th>
+                                                <th>Description</th>
+                                                <th class="text-end">Amount</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -167,7 +167,7 @@
                                                     <form action="{{ route('landed-costs.destroy', $cost->landed_cost_id) }}" method="POST" onsubmit="return confirm('{{ __('purchase_orders.confirm_delete') }}');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm">{{ __('purchase_orders.delete') }}</button>
+                                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -175,32 +175,32 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td class="text-end"><strong>{{ __('purchase_orders.total') }}:</strong></td>
+                                                <td class="text-end"><strong>Total:</strong></td>
                                                 <td class="text-end"><strong>${{ number_format($purchaseOrder->landedCosts->sum('amount'), 2) }}</strong></td>
                                                 <td></td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                 @else
-                                    <p>{{ __('purchase_orders.no_landed_costs_added') }}</p>
+                                    <p>No landed costs added.</p>
                                 @endif
                             </div>
                             <div class="col-md-5">
-                                <h5>{{ __('purchase_orders.add_new_cost') }}</h5>
+                                <h5>Add New Cost</h5>
                                 <form action="{{ route('landed-costs.store', $purchaseOrder->purchase_order_id) }}" method="POST">
                                     @csrf
                                     <div class="mb-3">
-                                        <label for="description" class="form-label">{{ __('purchase_orders.description') }}</label>
-                                        <input type="text" name="description" id="description" class="form-control" required placeholder="{{ __('purchase_orders.e_g_freight_duties') }}">
+                                        <label for="description" class="form-label">Description</label>
+                                        <input type="text" name="description" id="description" class="form-control" required placeholder="e.g. Freight, Duties">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="amount" class="form-label">{{ __('purchase_orders.amount') }}</label>
+                                        <label for="amount" class="form-label">Amount</label>
                                         <div class="input-group">
                                             <span class="input-group-text">$</span>
                                             <input type="number" name="amount" id="amount" class="form-control" step="0.01" min="0" required>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">{{ __('purchase_orders.add_cost') }}</button>
+                                    <button type="submit" class="btn btn-primary">Add Cost</button>
                                 </form>
                             </div>
                         </div>
@@ -210,18 +210,18 @@
                 <div class="tab-pane fade" id="receipts" role="tabpanel" aria-labelledby="receipts-tab">
                     <div class="card card-body border-top-0">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>{{ __('purchase_orders.goods_receipt_history') }}</h5>
+                            <h5>Goods Receipt History</h5>
                             @if(!in_array($purchaseOrder->status, ['Received', 'Completed', 'Cancelled', 'Paid']))
-                                <a href="{{ route('goods-receipts.create', $purchaseOrder->purchase_order_id) }}" class="btn btn-sm btn-primary">{{ __('purchase_orders.create_goods_receipt') }}</a>
+                                <a href="{{ route('goods-receipts.create', $purchaseOrder->purchase_order_id) }}" class="btn btn-sm btn-primary">Create Goods Receipt</a>
                             @endif
                         </div>
                         @if($purchaseOrder->goodsReceipts->isNotEmpty())
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>{{ __('purchase_orders.receipt_number') }}</th>
-                                        <th>{{ __('purchase_orders.receipt_date') }}</th>
-                                        <th>{{ __('purchase_orders.received_by') }}</th>
+                                        <th>Receipt Number</th>
+                                        <th>Receipt Date</th>
+                                        <th>Received By</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -231,7 +231,7 @@
                                         <td><a href="{{ route('goods-receipts.show', $receipt->goods_receipt_id) }}">GR-{{ str_pad($receipt->goods_receipt_id, 6, '0', STR_PAD_LEFT) }}</a></td>
                                         <td>{{ $receipt->receipt_date->format('M d, Y') }}</td>
                                         <td>{{ $receipt->receivedBy->full_name ?? __('purchase_orders.na') }}</td>
-                                        <td class="text-end"><a href="{{ route('goods-receipts.show', $receipt->goods_receipt_id) }}" class="btn btn-info btn-sm">{{ __('purchase_orders.view') }}</a></td>
+                                        <td class="text-end"><a href="{{ route('goods-receipts.show', $receipt->goods_receipt_id) }}" class="btn btn-info btn-sm">View</a></td>
                                     </tr>
                                     @endforeach
                                 </tbody>

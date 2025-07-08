@@ -14,17 +14,17 @@
     </style>
 </head>
 <body>
-    <h1>{{ __('iva_reports.Annual VAT Report') }}</h1>
-    <p><strong>{{ __('iva_reports.Year') }}:</strong> {{ $year }}</p>
+    <h1>Annual VAT Report</h1>
+    <p><strong>Year:</strong> {{ $year }}</p>
     <div class="resumen">
         <table>
             <thead>
                 <tr>
-                    <th>{{ __('iva_reports.Month') }}</th>
-                    <th>{{ __('iva_reports.VAT Paid') }}</th>
-                    <th>{{ __('iva_reports.VAT Collected') }}</th>
-                    <th>{{ __('iva_reports.Net VAT') }}</th>
-                    <th>{{ __('iva_reports.Status') }}</th>
+                    <th>Month</th>
+                    <th>VAT Paid</th>
+                    <th>VAT Collected</th>
+                    <th>Net VAT</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,12 +34,12 @@
                     <td>${{ number_format($report['tax_paid']['total'], 2) }}</td>
                     <td>${{ number_format($report['tax_collected']['total'], 2) }}</td>
                     <td>${{ number_format($report['net_tax']['amount'], 2) }}</td>
-                    <td>{{ $report['net_tax']['status'] == 'payable' ? __('iva_reports.Payable') : __('iva_reports.Receivable') }}</td>
+                    <td>{{ $report['net_tax']['status'] == 'payable' ? 'Payable' : 'Receivable' }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
-    <p style="font-size:11px; color:#888;">{{ __('iva_reports.Generated on') }} {{ now()->format('d/m/Y H:i') }}</p>
+    <p style="font-size:11px; color:#888;">Generated on {{ now()->format('d/m/Y H:i') }}</p>
 </body>
 </html> 

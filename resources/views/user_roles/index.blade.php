@@ -5,19 +5,19 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>{{ __('user_roles.title') }}</h1>
-        <a href="{{ route('user-roles.create') }}" class="btn btn-primary">{{ __('user_roles.add_new_role') }}</a>
+        <h1>{{ __('messages.User Roles') }}</h1>
+        <a href="{{ route('user-roles.create') }}" class="btn btn-primary">{{ __('messages.Add New') }}</a>
     </div>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>{{ __('user_roles.id') }}</th>
-                <th>{{ __('user_roles.name') }}</th>
-                <th>{{ __('user_roles.description') }}</th>
-                <th>{{ __('user_roles.users') }}</th>
-                <th>{{ __('user_roles.permissions') }}</th>
-                <th>{{ __('user_roles.actions') }}</th>
+                <th>{{ __('messages.ID') }}</th>
+                <th>{{ __('messages.Name') }}</th>
+                <th>{{ __('messages.Description') }}</th>
+                <th>{{ __('messages.Users') }}</th>
+                <th>{{ __('messages.Permissions') }}</th>
+                <th>{{ __('messages.Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -29,18 +29,18 @@
                     <td>{{ $role->users_count }}</td>
                     <td>{{ $role->permissions_count }}</td>
                     <td>
-                        <a href="{{ route('user-roles.show', $role->role_id) }}" class="btn btn-info btn-sm">{{ __('user_roles.view') }}</a>
-                        <a href="{{ route('user-roles.edit', $role->role_id) }}" class="btn btn-warning btn-sm">{{ __('user_roles.edit') }}</a>
+                        <a href="{{ route('user-roles.show', $role->role_id) }}" class="btn btn-info btn-sm">{{ __('messages.View') }}</a>
+                        <a href="{{ route('user-roles.edit', $role->role_id) }}" class="btn btn-warning btn-sm">{{ __('messages.Edit') }}</a>
                         <form action="{{ route('user-roles.destroy', $role->role_id) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('user_roles.confirm_delete') }}')">{{ __('user_roles.delete') }}</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.Are you sure?') }}')">{{ __('messages.Delete') }}</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">{{ __('user_roles.no_user_roles_found') }}</td>
+                    <td colspan="6" class="text-center">{{ __('messages.No results found') }}</td>
                 </tr>
             @endforelse
         </tbody>

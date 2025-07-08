@@ -52,7 +52,7 @@
         @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-3 mb-3">
-        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+        <label for="status" class="form-label">Status</label>
         <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
             @foreach($statuses as $key => $value)
                 <option value="{{ $key }}" {{ old('status', $purchaseOrder->status ?? 'Draft') == $key ? 'selected' : '' }}>{{ $value }}</option>
@@ -155,7 +155,7 @@
 </div>
 
 <div class="mt-4">
-    <button type="submit" class="btn btn-primary">{{ isset($purchaseOrder->purchase_order_id) ? 'Update Purchase Order' : 'Create Purchase Order' }}</button>
+    <button type="submit" class="btn btn-primary">Save</button>
     <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">Cancel</a>
 </div>
 

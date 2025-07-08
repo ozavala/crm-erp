@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('journal_entries.Edit Journal Entry') }} #{{ $journalEntry->journal_entry_id }}</h1>
+    <h1>Edit Journal Entry #{{ $journalEntry->journal_entry_id }}</h1>
 
     @if($journalEntry->referenceable_id)
         <div class="alert alert-warning">{{ __('journal_entries.Automatically generated warning') }}</div>

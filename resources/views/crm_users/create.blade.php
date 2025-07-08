@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Create New CRM User</h1>
+    <h1>{{ __('messages.Create') }} {{ __('messages.CRM User') }}</h1>
 
     <form action="{{ route('crm-users.store') }}" method="POST">
         @csrf
@@ -60,8 +60,8 @@
             @error('roles.*') <div class="text-danger small">{{ $message }}</div> @enderror
         </div>
 
-        <button type="submit" class="btn btn-primary">Create User</button>
-        <a href="{{ route('crm-users.index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">{{ __('messages.Save') }}</button>
+        <a href="{{ route('crm-users.index') }}" class="btn btn-secondary">{{ __('messages.Cancel') }}</a>
     </form>
 </div>
 @endsection

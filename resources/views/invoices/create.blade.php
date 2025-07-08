@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('invoices.create_new_invoice') }}</h1>
+    <h1>Create Invoice</h1>
 
     <form action="{{ route('invoices.store') }}" method="POST">
         @include('invoices._form')

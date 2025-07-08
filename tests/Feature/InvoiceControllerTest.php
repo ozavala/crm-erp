@@ -20,28 +20,17 @@ class InvoiceControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\SettingsTableSeeder::class);
         $this->user = CrmUser::factory()->create();
-        
-        // Create permissions and roles for invoice management
-        $permissions = [
+        $this->actingAs($this->user);
+        // Asignar permisos necesarios para gestión de facturas
+        // Esto es requerido por la lógica de autorización en el controlador de facturas
+        $this->givePermission($this->user, [
             'view-invoices',
-            'create-invoices', 
+            'create-invoices',
             'edit-invoices',
             'delete-invoices'
-        ];
-        
-        foreach ($permissions as $permissionName) {
-            Permission::create(['name' => $permissionName]);
-        }
-        
-        // Create a role with all invoice permissions
-        $role = UserRole::create(['name' => 'Invoice Manager']);
-        $role->permissions()->attach(Permission::whereIn('name', $permissions)->pluck('permission_id'));
-        
-        // Assign role to user
-        $this->user->roles()->attach($role->role_id);
-        
-        $this->actingAs($this->user);
+        ]);
     }
 
     #[Test]

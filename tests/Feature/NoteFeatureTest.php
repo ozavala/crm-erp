@@ -21,28 +21,10 @@ class NoteFeatureTest extends TestCase
     {
         parent::setUp();
         $this->user = CrmUser::factory()->create();
-        
-        // Create the permission directly
-        $permission = \App\Models\Permission::create([
-            'name' => 'view-customers',
-            'description' => 'View customer records',
-        ]);
-        
-        // Create a role with view-customers permission
-        $role = \App\Models\UserRole::create([
-            'name' => 'Test Role',
-            'description' => 'Test role for testing',
-        ]);
-        
-        // Attach the permission to the role
-        $role->permissions()->attach($permission->permission_id);
-        \Log::info("Permission attached to role. Role permissions count: " . $role->permissions()->count());
-        
-        // Assign the role to the user
-        $this->user->roles()->attach($role->role_id);
-        \Log::info("Role attached to user. User roles count: " . $this->user->roles()->count());
-        
         $this->actingAs($this->user, 'web');
+        // Asignar permiso necesario para ver clientes y asociar notas
+        // Esto es requerido por la lógica de autorización en notas y clientes
+        $this->givePermission($this->user, 'view-customers');
     }
 
     #[Test]

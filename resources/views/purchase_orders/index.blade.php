@@ -5,8 +5,8 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>{{ __('purchase_orders.title') }}</h1>
-        <a href="{{ route('purchase-orders.create') }}" class="btn btn-primary">{{ __('purchase_orders.add_new_purchase_order') }}</a>
+        <h1>Purchase Orders</h1>
+        <a href="{{ route('purchase-orders.create') }}" class="btn btn-primary">Add Purchase Order</a>
     </div>
 
     @if (session('success'))
@@ -20,11 +20,11 @@
         <form action="{{ route('purchase-orders.index') }}" method="GET">
             <div class="row g-2">
                 <div class="col-md-5">
-                    <input type="text" name="search" class="form-control" placeholder="{{ __('purchase_orders.search_placeholder') }}" value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Search purchase orders..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <select name="type_filter" class="form-select">
-                        <option value="">{{ __('purchase_orders.all_types') }}</option>
+                        <option value="">All Types</option>
                         @foreach($types as $key => $value)
                             <option value="{{ $key }}" {{ request('type_filter') == $key ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
@@ -32,15 +32,15 @@
                 </div>
                 <div class="col-md-2">
                     <select name="status_filter" class="form-select">
-                        <option value="">{{ __('purchase_orders.all_statuses') }}</option>
+                        <option value="">All Statuses</option>
                         @foreach($statuses as $key => $value)
                             <option value="{{ $key }}" {{ request('status_filter') == $key ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary flex-grow-1">{{ __('purchase_orders.filter') }}</button>
-                    <a href="{{ route('purchase-orders.index') }}" class="btn btn-outline-secondary ms-2" title="{{ __('purchase_orders.clear_filters') }}"><i class="bi bi-x-lg"></i> {{ __('purchase_orders.clear') }}</a>
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                    <a href="{{ route('purchase-orders.index') }}" class="btn btn-outline-secondary ms-2">Clear</a>
                 </div>
             </div>
         </form>
@@ -49,16 +49,16 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>{{ __('purchase_orders.id') }}</th>
-                <th>{{ __('purchase_orders.po_number') }}</th>
-                <th>{{ __('purchase_orders.supplier') }}</th>
-                <th>{{ __('purchase_orders.type') }}</th>
-                <th>{{ __('purchase_orders.status') }}</th>
-                <th class="text-end">{{ __('purchase_orders.total') }}</th>
-                <th class="text-end">{{ __('purchase_orders.amount_paid') }}</th>
-                <th class="text-end">{{ __('purchase_orders.amount_due') }}</th>
-                <th>{{ __('purchase_orders.order_date') }}</th>
-                <th>{{ __('purchase_orders.actions') }}</th>
+                <th>ID</th>
+                <th>Order #</th>
+                <th>Supplier</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Due</th>
+                <th>Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -85,17 +85,17 @@
                     <td class="text-end">${{ number_format($purchaseOrder->amount_due, 2) }}</td>
                     <td>{{ $purchaseOrder->order_date->format('Y-m-d') }}</td>
                     <td>
-                        <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning btn-sm">{{ __('purchase_orders.edit') }}</a>
+                        <a href="{{ route('purchase-orders.edit', $purchaseOrder->purchase_order_id) }}" class="btn btn-warning btn-sm">Edit</a>
                         <form action="{{ route('purchase-orders.destroy', $purchaseOrder->purchase_order_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure? This action cannot be undone.');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">{{ __('purchase_orders.delete') }}</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="text-center">{{ __('purchase_orders.no_purchase_orders_found') }}</td>
+                    <td colspan="10" class="text-center">No purchase orders found.</td>
                 </tr>
             @endforelse
         </tbody>
