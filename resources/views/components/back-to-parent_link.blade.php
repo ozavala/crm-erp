@@ -36,7 +36,7 @@ class BackToParentLink extends Component
     public function render()
     {
         return <<<'blade'
-            <a {{ $attributes->merge(['href' => $href]) }}>Back to {{ $text }}</a>
+            <a {{ $attributes->merge(['href' => $href]) }}>{{ __('components.Back to') }} {{ $text }}</a>
         blade;
     }
 }

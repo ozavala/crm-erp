@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'All Contacts')
+@section('title', __('contacts.All Contacts'))
 
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>All Contacts</h1>
-        <a href="{{ route('contacts.create') }}" class="btn btn-primary">Add New Contact</a>
+        <h1>{{ __('contacts.All Contacts') }}</h1>
+        <a href="{{ route('contacts.create') }}" class="btn btn-primary">{{ __('contacts.Add New Contact') }}</a>
     </div>
 
     <div class="card">
@@ -14,12 +14,12 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Company</th>
-                        <th>Title</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
+                        <th>{{ __('contacts.Name') }}</th>
+                        <th>{{ __('contacts.Company') }}</th>
+                        <th>{{ __('contacts.Title') }}</th>
+                        <th>{{ __('contacts.Email') }}</th>
+                        <th>{{ __('contacts.Phone') }}</th>
+                        <th>{{ __('contacts.Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,12 +31,12 @@
                             <td>{{ $contact->email }}</td>
                             <td>{{ $contact->phone }}</td>
                             <td>
-                                <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">Edit</a>
+                                <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">{{ __('contacts.Edit') }}</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">No contacts found.</td>
+                            <td colspan="6" class="text-center">{{ __('contacts.No contacts found.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

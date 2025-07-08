@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('feedback.Submit Feedback'))
+@section('title', __('feedback.Leave Feedback'))
 
 @section('content')
 <div class="container">
-    <h1>{{ __('feedback.Submit Feedback or Suggestion') }}</h1>
+    <h1>{{ __('feedback.Leave Feedback') }}</h1>
     <p class="text-muted">{{ __('feedback.We appreciate you taking the time to help us improve the application.') }}</p>
 
     <div class="card">
@@ -13,11 +13,12 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label for="type" class="form-label">{{ __('feedback.Feedback Type') }} <span class="text-danger">*</span></label>
+                    <label for="type" class="form-label">{{ __('feedback.Type') }}</label>
                     <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
-                        <option value="Suggestion" {{ old('type') == 'Suggestion' ? 'selected' : '' }}>{{ __('feedback.Suggestion') }}</option>
-                        <option value="Feature Request" {{ old('type') == 'Feature Request' ? 'selected' : '' }}>{{ __('feedback.Feature Request') }}</option>
-                        <option value="Bug Report" {{ old('type') == 'Bug Report' ? 'selected' : '' }}>{{ __('feedback.Bug Report') }}</option>
+                        <option value="">{{ __('feedback.Select Type') }}</option>
+                        <option value="bug" {{ old('type') == 'bug' ? 'selected' : '' }}>{{ __('feedback.Bug') }}</option>
+                        <option value="suggestion" {{ old('type') == 'suggestion' ? 'selected' : '' }}>{{ __('feedback.Suggestion') }}</option>
+                        <option value="other" {{ old('type') == 'other' ? 'selected' : '' }}>{{ __('feedback.Other') }}</option>
                     </select>
                     @error('type')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -33,16 +34,16 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">{{ __('feedback.Description') }} <span class="text-danger">*</span></label>
-                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" required>{{ old('description') }}</textarea>
-                    @error('description')
+                    <label for="message" class="form-label">{{ __('feedback.Message') }}</label>
+                    <textarea class="form-control @error('message') is-invalid @enderror" id="message" name="message" rows="4" required>{{ old('message') }}</textarea>
+                    @error('message')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">{{ __('feedback.Submit Feedback') }}</button>
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary">{{ __('feedback.Cancel') }}</a>
+                    <a href="{{ route('feedback.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
                 </div>
             </form>
         </div>

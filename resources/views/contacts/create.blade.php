@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Create New Contact')
+@section('title', __('contacts.Create New Contact'))
 
 @section('content')
 <div class="container">
-    <h1>Create New Contact</h1>
+    <h1>{{ __('contacts.Create New Contact') }}</h1>
 
     <div class="card">
         <div class="card-body">

@@ -1,6 +1,6 @@
 <div class="card mt-4">
     <div class="card-header">
-        <h2 class="h5 mb-0">{{ __('partials.Notes & Activity') }}</h2>
+        <h2 class="h5 mb-0">{{ __('notes.Notes & Activity') }}</h2>
     </div>
     <div class="card-body">
         {{-- Form to add a new note --}}
@@ -9,10 +9,10 @@
             <input type="hidden" name="noteable_id" value="{{ $model->getKey() }}">
             <input type="hidden" name="noteable_type" value="{{ class_basename($model) }}">
             <div class="mb-3">
-                <textarea name="body" class="form-control @error('body') is-invalid @enderror" rows="3" placeholder="{{ __('partials.Add a note...') }}" required></textarea>
+                <textarea name="body" class="form-control @error('body') is-invalid @enderror" rows="3" placeholder="{{ __('notes.Add a note...') }}" required></textarea>
                 @error('body')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">{{ __('partials.Add Note') }}</button>
+            <button type="submit" class="btn btn-primary btn-sm">{{ __('notes.Add Note') }}</button>
         </form>
 
         {{-- List of existing notes --}}
@@ -35,10 +35,11 @@
                         @method('DELETE')
                         <button type="submit" class="btn btn-link btn-sm text-danger p-0">{{ __('partials.Delete') }}</button>
                     </form>
+                    <a href="{{ route('notes.show', $note) }}" class="btn btn-info btn-sm">{{ __('notes.View') }}</a>
                 </div>
             </div>
         @empty
-            <p>{{ __('partials.No notes yet.') }}</p>
+            <p>{{ __('notes.No notes yet.') }}</p>
         @endforelse
     </div>
 </div>

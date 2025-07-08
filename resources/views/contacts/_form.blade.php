@@ -1,18 +1,18 @@
 <div class="row">
     <div class="col-md-6">
         <div class="mb-3">
-            <label for="contactable_type_selector" class="form-label">Associated With</label>
+            <label for="contactable_type_selector" class="form-label">{{ __('contacts.Associated With') }}</label>
             <select class="form-select" id="contactable_type_selector">
-                <option value="">Select Type</option>
-                <option value="customer" {{ old('contactable_type', $contact->contactable_type) == \App\Models\Customer::class ? 'selected' : '' }}>Customer</option>
-                <option value="supplier" {{ old('contactable_type', $contact->contactable_type) == \App\Models\Supplier::class ? 'selected' : '' }}>Supplier</option>
+                <option value="">{{ __('contacts.Select Type') }}</option>
+                <option value="customer" {{ old('contactable_type', $contact->contactable_type) == \App\Models\Customer::class ? 'selected' : '' }}>{{ __('contacts.Customer') }}</option>
+                <option value="supplier" {{ old('contactable_type', $contact->contactable_type) == \App\Models\Supplier::class ? 'selected' : '' }}>{{ __('contacts.Supplier') }}</option>
             </select>
         </div>
 
         <div class="mb-3" id="customer_select_group" style="display: none;">
-            <label for="customer_id" class="form-label">Customer/Company <span class="text-danger">*</span></label>
+            <label for="customer_id" class="form-label">{{ __('contacts.Customer/Company') }} <span class="text-danger">*</span></label>
             <select class="form-select @error('contactable_id') is-invalid @enderror" id="customer_id">
-                  <option value="">Select a Customer</option>
+                  <option value="">{{ __('contacts.Select a Customer') }}</option>
                 @foreach($customers as $customer)
                     <option value="{{ $customer->customer_id }}" {{ (old('contactable_type', $contact->contactable_type) == \App\Models\Customer::class && old('contactable_id', $contact->contactable_id) == $customer->customer_id) ? 'selected' : '' }}>
                         {{ $customer->company_name ?: $customer->full_name }}
@@ -23,9 +23,9 @@
         </div>
 
         <div class="mb-3" id="supplier_select_group" style="display: none;">
-            <label for="supplier_id" class="form-label">Supplier <span class="text-danger">*</span></label>
+            <label for="supplier_id" class="form-label">{{ __('contacts.Supplier') }} <span class="text-danger">*</span></label>
             <select class="form-select @error('contactable_id') is-invalid @enderror" id="supplier_id">
-                <option value="">Select a Supplier</option>
+                <option value="">{{ __('contacts.Select a Supplier') }}</option>
                 @foreach($suppliers as $supplier)
                     <option value="{{ $supplier->supplier_id }}" {{ (old('contactable_type', $contact->contactable_type) == \App\Models\Supplier::class && old('contactable_id', $contact->contactable_id) == $supplier->supplier_id) ? 'selected' : '' }}>
                         {{ $supplier->name }}
@@ -40,12 +40,12 @@
         <input type="hidden" name="contactable_type" id="hidden_contactable_type" value="{{ old('contactable_type', $contact->contactable_type) }}">
 
         <div class="mb-3">
-            <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+            <label for="first_name" class="form-label">{{ __('contacts.First Name') }} <span class="text-danger">*</span></label>
             <input type="text" class="form-control @error('first_name') is-invalid @enderror" id="first_name" name="first_name" value="{{ old('first_name', $contact->first_name) }}" required>
             @error('first_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
         <div class="mb-3">
-            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+            <label for="last_name" class="form-label">{{ __('contacts.Last Name') }} <span class="text-danger">*</span></label>
             <input type="text" class="form-control @error('last_name') is-invalid @enderror" id="last_name" name="last_name" value="{{ old('last_name', $contact->last_name) }}" required>
             @error('last_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
@@ -53,17 +53,17 @@
     </div>
     <div class="col-md-6">
         <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
+            <label for="title" class="form-label">{{ __('contacts.Title') }}</label>
             <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $contact->title) }}">
             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">{{ __('contacts.Email') }}</label>
             <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $contact->email) }}">
             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
         <div class="mb-3">
-            <label for="phone" class="form-label">Phone</label>
+            <label for="phone" class="form-label">{{ __('contacts.Phone') }}</label>
             <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $contact->phone) }}">
             @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
@@ -71,7 +71,7 @@
 </div>
 
 <div class="mt-3">
-    <button type="submit" class="btn btn-primary">{{ $contact->exists ? 'Update Contact' : 'Create Contact' }}</button>
+    <button type="submit" class="btn btn-primary">{{ $contact->exists ? __('contacts.Update Contact') : __('contacts.Create Contact') }}</button>
     @php
         $cancelUrl = route('contacts.index'); // Default fallback
         if ($contact->exists) {
@@ -88,7 +88,7 @@
             }
         }
     @endphp
-    <a href="{{ $cancelUrl }}" class="btn btn-secondary">Cancel</a>
+    <a href="{{ $cancelUrl }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
 </div>
 @push('scripts')
 <script>

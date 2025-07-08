@@ -36,7 +36,7 @@
                     <label for="priority" class="form-label small">{{ __('partials.Priority') }}</label>
                     <select name="priority" class="form-select form-select-sm" required>
                         @foreach(\App\Models\Task::$priorities as $priority)
-                            <option value="{{ $priority }}" {{ $priority === 'Normal' ? 'selected' : '' }}>{{ $priority }}</option>
+                            <option value="{{ $priority }}" {{ $priority === 'Normal' ? 'selected' : '' }}>{{ __('partials.priority.' . $priority) }}</option>
                         @endforeach
                     </select>
                 </div>

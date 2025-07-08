@@ -86,14 +86,14 @@
                                 <td>{{ $contact->email }}</td>
                                 <td>{{ $contact->phone }}</td>
                                 <td>
-                                    <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">Edit</a>
+                                    <a href="{{ route('contacts.edit', $contact) }}" class="btn btn-secondary btn-sm">{{ __('suppliers.edit_contact') }}</a>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             @else
-                <p>No contacts found for this supplier.</p>
+                <p>{{ __('suppliers.no_contacts_found') }}</p>
             @endif
         </div>
     </div>

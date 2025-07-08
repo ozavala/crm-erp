@@ -1,20 +1,20 @@
 <x-mail::message>
-# Your Quotation is Ready
+# {{ __('emails.quotations.Your Quotation is Ready') }}
 
-Hello {{ $quotation->customer?->name ?? 'Valued Customer' }},
+{{ __('emails.quotations.Hello') }} {{ $quotation->customer?->name ?? __('emails.quotations.Valued Customer') }},
 
-Thank you for your interest in our products. Please find your quotation details below:
+{{ __('emails.quotations.Thank you for your interest') }}
 
-**Quotation ID:** {{ $quotation->id }}
-**Total Amount:** ${{ number_format($quotation->total_amount, 2) }}
-**Status:** {{ ucfirst($quotation->status) }}
+**{{ __('emails.quotations.Quotation ID') }}** {{ $quotation->id }}
+**{{ __('emails.quotations.Total Amount') }}** ${{ number_format($quotation->total_amount, 2) }}
+**{{ __('emails.quotations.Status') }}** {{ ucfirst($quotation->status) }}
 
 <x-mail::button :url="route('quotations.show', $quotation)">
-View Quotation
+{{ __('emails.quotations.View Quotation') }}
 </x-mail::button>
 
-If you have any questions, please feel free to contact us.
+{{ __('emails.quotations.Questions contact us') }}
 
-Thanks,<br>
+{{ __('emails.quotations.Thanks') }},<br>
 {{ config('app.name') }}
 </x-mail::message>
