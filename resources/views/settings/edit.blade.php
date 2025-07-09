@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Configuración</h1>
+    <h1>Settings</h1>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -96,10 +96,10 @@
             <table class="table table-bordered mb-0">
                 <thead>
                     <tr>
-                        <th>Clave</th>
-                        <th>Valor</th>
-                        <th>Tipo</th>
-                        <th>Acciones</th>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Type</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,7 +111,7 @@
                                 <form action="{{ route('settings.custom.destroy', $setting) }}" method="POST" onsubmit="return confirm('{{ __('messages.Are you sure?') }}');" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete
                                 </form>
                             </td>
                         </tr>
@@ -128,7 +128,7 @@
                 @csrf
                 <input type="text" name="key" class="form-control form-control-sm" placeholder="{{ __('messages.New Setting Key') }}" required>
                 <input type="text" name="value" class="form-control form-control-sm" placeholder="{{ __('messages.New Setting Value') }}">
-                <button type="submit" class="btn btn-success btn-sm">Agregar Configuración Personalizada</button>
+                <button type="submit" class="btn btn-success btn-sm">{{ __('messages.Add Personal Configuration') }}</button>
             </form>
         </div>
     </div>

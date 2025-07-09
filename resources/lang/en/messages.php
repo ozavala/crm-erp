@@ -21,6 +21,7 @@ return [
     'Add' => 'Add',
     'New Setting Key' => 'New Setting Key',
     'New Setting Value' => 'New Setting Value',
+    'Add Personal Configuration' =>  'Add Personal Configuration',
     'Delete' => 'Delete',
     'Are you sure?' => 'Are you sure?',
     'No results found' => 'No results found',

@@ -44,7 +44,7 @@ Route::get('/phpinfo', function () {
 
 
 Route::get('/', function () {
-    return view('home');
+    return view('landing');
 });
 
 Route::get('/dashboard', function () {
