@@ -73,6 +73,12 @@
                         <a class="dropdown-item" href="{{ route('invoices.index') }}">
                             Invoices
                         </a>
+                        <a class="dropdown-item" href="{{ route('marketing-campaigns.index') }}">
+                            Marketing Campaigns
+                        </a>
+                        <a class="dropdown-item" href="{{ route('email-templates.index') }}">
+                            Email Templates
+                        </a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -145,6 +151,9 @@
                         </a>
                         <a class="dropdown-item" href="{{ route('reports.profit_and_loss') }}">
                             Profit and Loss
+                        </a>
+                        <a class="dropdown-item" href="{{ route('reports.tax-balance') }}">
+                            Tax Balance Report
                         </a>
                     </div>
                 </li>

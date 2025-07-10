@@ -27,7 +27,7 @@ class BillObserver
         // Línea debe: Inventario/Costos
         JournalEntryLine::create([
             'journal_entry_id' => $entry->journal_entry_id,
-            'account_name' => 'Inventario',
+            'account_code' => '4101',
             'debit_amount' => $bill->total_amount,
             'credit_amount' => 0,
         ]);
@@ -35,7 +35,7 @@ class BillObserver
         // Línea haber: Proveedores/Cuentas por pagar
         JournalEntryLine::create([
             'journal_entry_id' => $entry->journal_entry_id,
-            'account_name' => 'Cuentas por pagar',
+            'account_code' => '2101',
             'debit_amount' => 0,
             'credit_amount' => $bill->total_amount,
         ]);

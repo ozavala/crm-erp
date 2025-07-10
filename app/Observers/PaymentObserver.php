@@ -36,13 +36,13 @@ class PaymentObserver
             // Debe: Bancos/Caja, Haber: Cuentas por cobrar
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->journal_entry_id,
-                'account_name' => 'Bancos',
+                'account_code' => '1101',
                 'debit_amount' => $payment->amount,
                 'credit_amount' => 0,
             ]);
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->journal_entry_id,
-                'account_name' => 'Cuentas por cobrar',
+                'account_code' => '2102',
                 'debit_amount' => 0,
                 'credit_amount' => $payment->amount,
             ]);
@@ -51,13 +51,13 @@ class PaymentObserver
             // Debe: Cuentas por pagar, Haber: Bancos/Caja
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->journal_entry_id,
-                'account_name' => 'Cuentas por pagar',
+                'account_code' => '2101',
                 'debit_amount' => $payment->amount,
                 'credit_amount' => 0,
             ]);
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->journal_entry_id,
-                'account_name' => 'Bancos',
+                'account_code' => '1101',
                 'debit_amount' => 0,
                 'credit_amount' => $payment->amount,
             ]);

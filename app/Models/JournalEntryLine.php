@@ -15,7 +15,7 @@ class JournalEntryLine extends Model
 
     protected $fillable = [
         'journal_entry_id',
-        'account_name', // Will be 'account_id' later
+        'account_code',
         'debit_amount',
         'credit_amount',
         'entity_id',
@@ -35,5 +35,10 @@ class JournalEntryLine extends Model
     public function entity(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_code', 'code');
     }
 }

@@ -40,9 +40,19 @@
         @php $lineIndex = $index; @endphp
         <div class="row align-items-center mb-2 journal-line-row border p-2 rounded">
             <div class="col-md-5 mb-2">
-                <label class="form-label">Account Name <span class="text-danger">*</span></label>
-                <input type="text" name="lines[{{ $index }}][account_name]" class="form-control @error('lines.'.$index.'.account_name') is-invalid @enderror" value="{{ $line['account_name'] ?? '' }}" placeholder="e.g., Cash, Office Expense" required>
-                @error('lines.'.$index.'.account_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <label class="form-label">Account <span class="text-danger">*</span></label>
+                <select name="lines[{{ $index }}][account_code]" class="form-select @error('lines.'.$index.'.account_code') is-invalid @enderror" required>
+                    <option value="">Select account</option>
+                    @php
+                        $accounts = \App\Models\Account::orderBy('code')->get();
+                    @endphp
+                    @foreach($accounts as $account)
+                        <option value="{{ $account->code }}" {{ (isset($line['account_code']) && $line['account_code'] == $account->code) ? 'selected' : '' }}>
+                            {{ $account->code }} - {{ $account->description }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('lines.'.$index.'.account_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-3 mb-2">
                 <label class="form-label">Debit</label>

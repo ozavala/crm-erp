@@ -16,6 +16,78 @@
             <button type="submit" class="btn btn-primary">Filter</button>
         </div>
     </form>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Income (Sales) Detail</h5>
+            <table class="table table-sm table-bordered mb-2">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($ingresosDetalle as $line)
+                        @php $account = \App\Models\Account::where('code', $line->account_code)->first(); @endphp
+                        <tr>
+                            <td>{{ $account ? $account->code : $line->account_code }}</td>
+                            <td>{{ $account ? $account->description : '' }}</td>
+                            <td class="text-end">${{ number_format($line->total, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Costs Detail</h5>
+            <table class="table table-sm table-bordered mb-2">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($costosDetalle as $line)
+                        @php $account = \App\Models\Account::where('code', $line->account_code)->first(); @endphp
+                        <tr>
+                            <td>{{ $account ? $account->code : $line->account_code }}</td>
+                            <td>{{ $account ? $account->description : '' }}</td>
+                            <td class="text-end">${{ number_format($line->total, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Expenses Detail</h5>
+            <table class="table table-sm table-bordered mb-2">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($gastosDetalle as $line)
+                        @php $account = \App\Models\Account::where('code', $line->account_code)->first(); @endphp
+                        <tr>
+                            <td>{{ $account ? $account->code : $line->account_code }}</td>
+                            <td>{{ $account ? $account->description : '' }}</td>
+                            <td class="text-end">${{ number_format($line->total, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <table class="table table-bordered mb-0">

@@ -22,6 +22,7 @@ use Database\Seeders\WarehouseSeeder;
 use Database\Seeders\SupplierSeeder;
 use App\Models\Supplier;
 use Database\Seeders\TaxRateSeeder;
+use Database\Seeders\AccountSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -50,6 +51,7 @@ class DatabaseSeeder extends Seeder
             QuotationSeeder::class,
             OrderSeeder::class,
             PaymentSeeder::class,
+            AccountSeeder::class,
         ]);
 
         // 2. Use factories to create a rich, dynamic dataset for testing

@@ -61,7 +61,7 @@ class JournalEntryController extends Controller
             'transaction_type' => 'required|string|max:255',
             'description' => 'nullable|string',
             'lines' => 'required|array|min:2', // Must have at least two lines for a balanced entry
-            'lines.*.account_name' => 'required|string|max:255',
+            'lines.*.account_code' => 'required|string|max:255',
             'lines.*.debit_amount' => 'nullable|numeric|min:0|required_without:lines.*.credit_amount',
             'lines.*.credit_amount' => 'nullable|numeric|min:0|required_without:lines.*.debit_amount',
             // Add validation for entity_id and entity_type if you implement them in the form
@@ -90,7 +90,7 @@ class JournalEntryController extends Controller
 
             foreach ($validatedData['lines'] as $lineData) {
                 $journalEntry->lines()->create([
-                    'account_name' => $lineData['account_name'],
+                    'account_code' => $lineData['account_code'],
                     'debit_amount' => $lineData['debit_amount'] ?? 0,
                     'credit_amount' => $lineData['credit_amount'] ?? 0,
                     // 'entity_id' => $lineData['entity_id'] ?? null,

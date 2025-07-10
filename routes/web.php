@@ -34,7 +34,11 @@ use App\Http\Controllers\FeedbackController; // Add FeedbackController
 use App\Http\Controllers\QuotationStatusController; // Add QuotationStatusController
 use App\Http\Controllers\PurchaseOrderStatusController; // Add PurchaseOrderStatusController
 use App\Http\Controllers\Reports\TaxReportController;
+use App\Http\Controllers\Reports\TaxBalanceController;
 use App\Http\Controllers\ProfitAndLossController;
+use App\Http\Controllers\MarketingCampaignController; // Add MarketingCampaignController
+use App\Http\Controllers\EmailTemplateController; // Add EmailTemplateController
+use App\Http\Controllers\EmailServiceController; // Add EmailServiceController
 
 
 // In routes/web.php
@@ -143,11 +147,44 @@ Route::middleware('auth')->group(function () {
     Route::delete('settings/custom/{setting}', [SettingsController::class, 'destroyCustom'])->name('settings.custom.destroy');
 });
 
+// Marketing Campaigns
+Route::middleware('auth')->group(function () {
+    Route::resource('marketing-campaigns', MarketingCampaignController::class);
+    Route::post('marketing-campaigns/{marketingCampaign}/recipients', [MarketingCampaignController::class, 'addRecipients'])->name('marketing-campaigns.add-recipients');
+    Route::post('marketing-campaigns/{marketingCampaign}/send', [MarketingCampaignController::class, 'send'])->name('marketing-campaigns.send');
+    Route::post('marketing-campaigns/{marketingCampaign}/schedule', [MarketingCampaignController::class, 'schedule'])->name('marketing-campaigns.schedule');
+    Route::post('marketing-campaigns/{marketingCampaign}/pause', [MarketingCampaignController::class, 'pause'])->name('marketing-campaigns.pause');
+    Route::post('marketing-campaigns/{marketingCampaign}/resume', [MarketingCampaignController::class, 'resume'])->name('marketing-campaigns.resume');
+    Route::post('marketing-campaigns/{marketingCampaign}/cancel', [MarketingCampaignController::class, 'cancel'])->name('marketing-campaigns.cancel');
+});
+
+// Email Templates
+Route::middleware('auth')->group(function () {
+    Route::resource('email-templates', EmailTemplateController::class);
+    Route::get('email-templates/{emailTemplate}/preview', [EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::post('email-templates/{emailTemplate}/toggle-active', [EmailTemplateController::class, 'toggleActive'])->name('email-templates.toggle-active');
+    Route::post('email-templates/{emailTemplate}/duplicate', [EmailTemplateController::class, 'duplicate'])->name('email-templates.duplicate');
+});
+
+// Email Services (public routes for tracking)
+Route::get('email/track/{campaign}/{recipient}', [EmailServiceController::class, 'track'])->name('email.track');
+Route::get('email/click/{campaign}/{recipient}', [EmailServiceController::class, 'trackClick'])->name('email.click');
+Route::get('email/unsubscribe/{campaign}/{recipient}', [EmailServiceController::class, 'unsubscribe'])->name('email.unsubscribe');
+Route::post('email/bounce', [EmailServiceController::class, 'bounce'])->name('email.bounce');
+Route::post('email/webhook', [EmailServiceController::class, 'webhook'])->name('email.webhook');
+
 Route::prefix('reportes/iva')->group(function () {
     Route::get('/mensual', [TaxReportController::class, 'monthly'])->name('iva.report.monthly');
     Route::get('/anual', [TaxReportController::class, 'annual'])->name('iva.report.annual');
     Route::get('/personalizado', [TaxReportController::class, 'custom'])->name('iva.report.custom');
     Route::get('/dashboard', [TaxReportController::class, 'dashboard'])->name('iva.report.dashboard');
+});
+
+// Tax Balance Report Routes
+Route::prefix('reports')->group(function () {
+    Route::get('/tax-balance', [TaxBalanceController::class, 'index'])->name('reports.tax-balance');
+    Route::get('/tax-balance/pdf', [TaxBalanceController::class, 'exportPdf'])->name('reports.tax-balance.pdf');
+    Route::get('/tax-balance/excel', [TaxBalanceController::class, 'exportExcel'])->name('reports.tax-balance.excel');
 });
 
 // Tax Settings Routes
@@ -156,7 +193,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tax-settings/default-country', [App\Http\Controllers\TaxSettingsController::class, 'setDefaultCountry'])->name('tax-settings.default-country');
     Route::post('/tax-settings/service-settings', [App\Http\Controllers\TaxSettingsController::class, 'updateServiceSettings'])->name('tax-settings.service-settings');
     Route::post('/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'updateCountryRates'])->name('tax-settings.update-rates');
-    Route::get('/api/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'getCountryRates'])->name('tax-settings.get-rates');
     Route::post('/tax-settings/{countryCode}/restore-defaults', [\App\Http\Controllers\TaxSettingsController::class, 'restoreDefaultRates'])->name('tax-settings.restore-defaults');
 });
 

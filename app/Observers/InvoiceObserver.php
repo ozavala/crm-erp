@@ -27,7 +27,7 @@ class InvoiceObserver
         // Línea debe: Clientes (Cuentas por cobrar)
         JournalEntryLine::create([
             'journal_entry_id' => $entry->journal_entry_id,
-            'account_name' => 'Cuentas por cobrar',
+            'account_code' => '2102',
             'debit_amount' => $invoice->total_amount,
             'credit_amount' => 0,
         ]);
@@ -35,7 +35,7 @@ class InvoiceObserver
         // Línea haber: Ventas/Ingresos
         JournalEntryLine::create([
             'journal_entry_id' => $entry->journal_entry_id,
-            'account_name' => 'Ventas',
+            'account_code' => '3101',
             'debit_amount' => 0,
             'credit_amount' => $invoice->subtotal,
         ]);
@@ -44,7 +44,7 @@ class InvoiceObserver
         if ($invoice->tax_amount > 0) {
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->journal_entry_id,
-                'account_name' => 'Impuestos por pagar',
+                'account_code' => '5101',
                 'debit_amount' => 0,
                 'credit_amount' => $invoice->tax_amount,
             ]);

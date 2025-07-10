@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\OrderApiController;
 use App\Http\Controllers\Api\InvoiceApiController;
 use App\Http\Controllers\Api\PurchaseOrderApiController;
 use App\Http\Controllers\Api\ReportingApiController;
+use App\Http\Controllers\Api\AuthApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// Auth routes (no authentication required)
+Route::post('/auth/login', [AuthApiController::class, 'login']);
+Route::post('/auth/register', [AuthApiController::class, 'register']);
+
+// Protected auth routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/user', [AuthApiController::class, 'user']);
+    Route::post('/auth/logout', [AuthApiController::class, 'logout']);
+    Route::post('/auth/refresh', [AuthApiController::class, 'refresh']);
+    Route::post('/auth/change-password', [AuthApiController::class, 'changePassword']);
+});
+
 // Public endpoints (no authentication required)
 Route::get('/health', function () {
     return response()->json(['status' => 'healthy', 'timestamp' => now()]);
@@ -102,4 +115,6 @@ Route::get('/version', function () {
         'laravel_version' => app()->version(),
         'php_version' => PHP_VERSION
     ]);
-}); 
+});
+
+Route::get('/tax-settings/{countryCode}/rates', [\App\Http\Controllers\TaxSettingsController::class, 'getCountryRates'])->name('tax-settings.get-rates'); 

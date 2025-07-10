@@ -198,12 +198,12 @@ class PaymentController extends Controller
             // Debit Cash (or Bank), Credit Accounts Receivable
             $journalEntry->lines()->createMany([
                 [
-                    'account_name' => 'Cash', // Or specific bank account
+                    'account_code' => '1101', // Or specific bank account
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                 ],
                 [
-                    'account_name' => 'Accounts Receivable',
+                    'account_code' => '2102',
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                     'entity_id' => $payableModel->customer_id,
@@ -215,14 +215,14 @@ class PaymentController extends Controller
             // Debit Accounts Payable, Credit Cash (or Bank)
             $journalEntry->lines()->createMany([
                 [
-                    'account_name' => 'Accounts Payable',
+                    'account_code' => '2101',
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                     'entity_id' => $payableModel->supplier_id,
                     'entity_type' => \App\Models\Supplier::class,
                 ],
                 [
-                    'account_name' => 'Cash', // Or specific bank account
+                    'account_code' => '1101', // Or specific bank account
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                 ]
@@ -232,14 +232,14 @@ class PaymentController extends Controller
             // Debit Accounts Payable, Credit Cash (or Bank)
             $journalEntry->lines()->createMany([
                 [
-                    'account_name' => 'Accounts Payable',
+                    'account_code' => '2101',
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                     'entity_id' => $payableModel->supplier_id,
                     'entity_type' => \App\Models\Supplier::class,
                 ],
                 [
-                    'account_name' => 'Cash', // Or specific bank account
+                    'account_code' => '1101', // Or specific bank account
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                 ]
