@@ -64,6 +64,23 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <label for="locale" class="col-md-4 col-form-label text-md-end">
+                    {{ __('Language') }}
+                </label>
+                <div class="col-md-6">
+                    <select id="locale" name="locale" class="form-control @error('locale') is-invalid @enderror">
+                        <option value="es" {{ old('locale', $user->locale ?? 'es') == 'es' ? 'selected' : '' }}>Español</option>
+                        <option value="en" {{ old('locale', $user->locale ?? 'es') == 'en' ? 'selected' : '' }}>English</option>
+                    </select>
+                    @error('locale')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+
             <div class="row mb-0">
                 <div class="col-md-6 offset-md-4">
                     <button type="submit" class="btn btn-primary">

@@ -126,4 +126,43 @@ return [
         'id' => 'ID',
     ],
     // Agrega aquí más etiquetas según se requiera
+    'purchase_order' => [
+        // Headers
+        'header' => [
+            'index' => 'Purchase Orders',
+            'create' => 'Create Purchase Order',
+            'edit' => 'Edit Purchase Order',
+            'show' => 'Purchase Order Details',
+        ],
+        // Labels
+        'label' => [
+            'supplier' => 'Supplier',
+            'date' => 'Order Date',
+            'total' => 'Total Amount',
+            'status' => 'Status',
+            'items' => 'Order Items',
+        ],
+        // Buttons
+        'button' => [
+            'add_item' => 'Add Item',
+            'submit' => 'Submit Order',
+            'back_to_list' => 'Back to Purchase Orders',
+            'edit' => 'Edit',
+            'delete' => 'Delete',
+        ],
+        // Messages
+        'message' => [
+            'not_found' => 'No purchase order found.',
+            'created' => 'Purchase order created successfully.',
+            'updated' => 'Purchase order updated successfully.',
+            'deleted' => 'Purchase order deleted.',
+        ],
+        // Routes / Breadcrumbs
+        'route' => [
+            'index' => 'Purchase Orders',
+            'create' => 'New',
+            'edit' => 'Edit',
+            'show' => 'Details',
+        ],
+    ],
 ]; 

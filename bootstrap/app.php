@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // The 'can' alias is now registered to your CheckPermission middleware.
         $middleware->alias([
             'can' => \App\Http\Middleware\CheckPermission::class,
+            'setlocale' => \App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -1089,4 +1089,43 @@ return [
         'inventory_in_this_warehouse' => 'Inventario en este almacén',
         'inventory_placeholder' => 'Aquí se mostrará el inventario una vez que se establezca el vínculo producto-almacén.',
     ],
+    'purchase_order' => [
+        // Encabezados
+        'header' => [
+            'index' => 'Órdenes de Compra',
+            'create' => 'Crear Orden de Compra',
+            'edit' => 'Editar Orden de Compra',
+            'show' => 'Detalles de la Orden de Compra',
+        ],
+        // Etiquetas
+        'label' => [
+            'supplier' => 'Proveedor',
+            'date' => 'Fecha de Orden',
+            'total' => 'Importe Total',
+            'status' => 'Estado',
+            'items' => 'Ítems de la Orden',
+        ],
+        // Botones
+        'button' => [
+            'add_item' => 'Agregar Ítem',
+            'submit' => 'Enviar Orden',
+            'back_to_list' => 'Volver a Órdenes de Compra',
+            'edit' => 'Editar',
+            'delete' => 'Eliminar',
+        ],
+        // Mensajes
+        'message' => [
+            'not_found' => 'No se encontró ninguna orden de compra.',
+            'created' => 'Orden de compra creada exitosamente.',
+            'updated' => 'Orden de compra actualizada exitosamente.',
+            'deleted' => 'Orden de compra eliminada.',
+        ],
+        // Rutas / Breadcrumbs
+        'route' => [
+            'index' => 'Órdenes de Compra',
+            'create' => 'Nueva',
+            'edit' => 'Editar',
+            'show' => 'Detalles',
+        ],
+    ],
 ]; 

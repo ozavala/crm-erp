@@ -77,8 +77,8 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{{ route('settings.edit') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ route('settings.edit') }}" class="btn btn-secondary">Delete</a>
     </form>
 
     {{-- Custom Settings --}}
