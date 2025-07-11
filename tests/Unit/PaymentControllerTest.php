@@ -270,7 +270,7 @@ class PaymentControllerTest extends TestCase
         ]);
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Cash',
+            'account_name' => 'Bank',
             'credit_amount' => number_format($paymentAmount, 2, '.', ''),
         ]);
     }
@@ -306,7 +306,7 @@ class PaymentControllerTest extends TestCase
         ]);
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Cash',
+            'account_name' => 'Bank',
             'credit_amount' => number_format($paymentAmount, 2, '.', ''),
         ]);
     }

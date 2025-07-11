@@ -25,6 +25,7 @@ class CrmUser extends Authenticatable
         'full_name',
         'email',
         'password',
+        'locale',
     ];
 
     /**

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer; // If you need to link payments to customers
+use App\Models\Account;
 
 class PaymentController extends Controller
 {
@@ -193,53 +194,62 @@ class PaymentController extends Controller
             'created_by_user_id' => $payment->created_by_user_id,
         ]);
 
+        // Helper para obtener el nombre de la cuenta
+        $getAccountName = function($code) {
+            $map = [
+                '2101' => 'Accounts Payable',
+                '1101' => 'Bank',
+                '2102' => 'Accounts Receivable',
+            ];
+            return optional(\App\Models\Account::where('code', $code)->first())->name ?? ($map[$code] ?? $code);
+        };
+
         if ($payableModel instanceof Invoice || $payableModel instanceof Order) {
-            // Payment Received for an Invoice or Sales Order
-            // Debit Cash (or Bank), Credit Accounts Receivable
             $journalEntry->lines()->createMany([
                 [
-                    'account_code' => '1101', // Or specific bank account
+                    'account_code' => '1101',
+                    'account_name' => $getAccountName('1101'),
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                 ],
                 [
                     'account_code' => '2102',
+                    'account_name' => $getAccountName('2102'),
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                     'entity_id' => $payableModel->customer_id,
                     'entity_type' => Customer::class,
                 ]
             ]);
-        } elseif ($payableModel instanceof PurchaseOrder) {
-            // Payment Made for a Purchase Order (or Bill)
-            // Debit Accounts Payable, Credit Cash (or Bank)
             $journalEntry->lines()->createMany([
                 [
                     'account_code' => '2101',
+                    'account_name' => $getAccountName('2101'),
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
-                    'entity_id' => $payableModel->supplier_id,
-                    'entity_type' => \App\Models\Supplier::class,
+                    'entity_id' => $payableModel->supplier_id ?? null,
+                    'entity_type' => $payableModel->supplier_id ? \App\Models\Supplier::class : null,
                 ],
                 [
-                    'account_code' => '1101', // Or specific bank account
+                    'account_code' => '1101',
+                    'account_name' => $getAccountName('1101'),
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                 ]
             ]);
-        } elseif ($payableModel instanceof Bill) {
-            // Payment Made for a Bill
-            // Debit Accounts Payable, Credit Cash (or Bank)
+        } elseif ($payableModel instanceof Bill || $payableModel instanceof PurchaseOrder) {
             $journalEntry->lines()->createMany([
                 [
                     'account_code' => '2101',
+                    'account_name' => $getAccountName('2101'),
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                     'entity_id' => $payableModel->supplier_id,
                     'entity_type' => \App\Models\Supplier::class,
                 ],
                 [
-                    'account_code' => '1101', // Or specific bank account
+                    'account_code' => '1101',
+                    'account_name' => $getAccountName('1101'),
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                 ]

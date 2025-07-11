@@ -27,6 +27,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'locale' => 'es',
             ]);
 
         $response
@@ -49,6 +50,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
+                'locale' => 'es',
             ]);
 
         $response
