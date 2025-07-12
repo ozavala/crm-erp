@@ -28,6 +28,12 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <label for="legal_id" class="form-label">{{ __('Legal ID') }} / {{ __('Tax ID') }}</label>
+    <input type="text" class="form-control @error('legal_id') is-invalid @enderror" id="legal_id" name="legal_id" value="{{ old('legal_id', $supplier->legal_id ?? '') }}" required>
+    @error('legal_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+</div>
+
 <hr>
 <h5>Dirección</h5>
 @php

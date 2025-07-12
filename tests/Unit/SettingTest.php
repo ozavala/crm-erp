@@ -42,9 +42,16 @@ class SettingTest extends TestCase
 
     public function test_core_and_custom_scopes()
     {
+        // Contar los settings existentes del seeder
+        $existingCoreCount = Setting::core()->count();
+        $existingCustomCount = Setting::custom()->count();
+        
+        // Crear nuevos settings para el test
         Setting::create(['key' => 'core1', 'value' => 'A', 'type' => 'core', 'is_editable' => false]);
         Setting::create(['key' => 'custom1', 'value' => 'B', 'type' => 'custom', 'is_editable' => true]);
-        $this->assertEquals(1, Setting::core()->count());
-        $this->assertEquals(1, Setting::custom()->count());
+        
+        // Verificar que se agregaron los nuevos settings
+        $this->assertEquals($existingCoreCount + 1, Setting::core()->count());
+        $this->assertEquals($existingCustomCount + 1, Setting::custom()->count());
     }
 } 

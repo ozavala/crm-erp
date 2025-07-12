@@ -35,6 +35,7 @@
                 <thead>
                     <tr>
                         <th>Account Name</th>
+                        <th>Description</th>
                         <th class="text-end">Debit</th>
                         <th class="text-end">Credit</th>
                         <th>Entity</th>
@@ -42,16 +43,12 @@
                 </thead>
                 <tbody>
                     @foreach($journalEntry->lines as $line)
-                    @php
-                        $account = \App\Models\Account::where('name', $line->account_name)->first();
-                    @endphp
                     <tr>
                         <td>
-                            @if($line->account)
-                                {{ $line->account->code }} - {{ $line->account->description }}
-                            @else
-                                {{ $line->account_code }}
-                            @endif
+                            {{ $line->account_name }}
+                        </td>
+                        <td>
+                            {{ $line->description ?? '-' }}
                         </td>
                         <td class="text-end">${{ $line->debit_amount > 0 ? number_format($line->debit_amount, 2) : '-' }}</td>
                         <td class="text-end">${{ $line->credit_amount > 0 ? number_format($line->credit_amount, 2) : '-' }}</td>

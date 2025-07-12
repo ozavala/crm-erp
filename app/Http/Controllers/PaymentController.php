@@ -185,6 +185,9 @@ class PaymentController extends Controller
      */
     protected function createJournalEntriesForPayment(Payment $payment, Model $payableModel)
     {
+        // Get company settings for legal_id
+        $companyLegalId = \App\Models\Setting::where('key', 'company_legal_id')->first()?->value ?? 'N/A';
+        
         $journalEntry = JournalEntry::create([
             'entry_date' => $payment->payment_date,
             'transaction_type' => 'Payment',
@@ -205,53 +208,51 @@ class PaymentController extends Controller
         };
 
         if ($payableModel instanceof Invoice || $payableModel instanceof Order) {
+            // Pago de factura/orden (cliente paga a la empresa)
+            // Debe: Bancos/Caja (empresa principal), Haber: Cuentas por cobrar (cliente)
+            $customer = $payableModel->customer;
+            $customerLegalId = $customer->legal_id ?? 'N/A';
+            
             $journalEntry->lines()->createMany([
                 [
                     'account_code' => '1101',
-                    'account_name' => $getAccountName('1101'),
+                    'account_name' => $getAccountName('1101') . ' (' . $companyLegalId . ')',
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
+                    'description' => 'Bank account of main company',
                 ],
                 [
                     'account_code' => '2102',
-                    'account_name' => $getAccountName('2102'),
+                    'account_name' => $getAccountName('2102') . ' (' . $customerLegalId . ')',
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
                     'entity_id' => $payableModel->customer_id,
                     'entity_type' => Customer::class,
-                ]
-            ]);
-            $journalEntry->lines()->createMany([
-                [
-                    'account_code' => '2101',
-                    'account_name' => $getAccountName('2101'),
-                    'debit_amount' => $payment->amount,
-                    'credit_amount' => 0,
-                    'entity_id' => $payableModel->supplier_id ?? null,
-                    'entity_type' => $payableModel->supplier_id ? \App\Models\Supplier::class : null,
-                ],
-                [
-                    'account_code' => '1101',
-                    'account_name' => $getAccountName('1101'),
-                    'debit_amount' => 0,
-                    'credit_amount' => $payment->amount,
+                    'description' => 'Customer accounts receivable',
                 ]
             ]);
         } elseif ($payableModel instanceof Bill || $payableModel instanceof PurchaseOrder) {
+            // Pago de factura/orden de compra (empresa paga a proveedor)
+            // Debe: Cuentas por pagar (proveedor), Haber: Bancos/Caja (empresa principal)
+            $supplier = $payableModel->supplier;
+            $supplierLegalId = $supplier->legal_id ?? 'N/A';
+            
             $journalEntry->lines()->createMany([
                 [
                     'account_code' => '2101',
-                    'account_name' => $getAccountName('2101'),
+                    'account_name' => $getAccountName('2101') . ' (' . $supplierLegalId . ')',
                     'debit_amount' => $payment->amount,
                     'credit_amount' => 0,
                     'entity_id' => $payableModel->supplier_id,
                     'entity_type' => \App\Models\Supplier::class,
+                    'description' => 'Supplier accounts payable',
                 ],
                 [
                     'account_code' => '1101',
-                    'account_name' => $getAccountName('1101'),
+                    'account_name' => $getAccountName('1101') . ' (' . $companyLegalId . ')',
                     'debit_amount' => 0,
                     'credit_amount' => $payment->amount,
+                    'description' => 'Bank account of main company',
                 ]
             ]);
         }

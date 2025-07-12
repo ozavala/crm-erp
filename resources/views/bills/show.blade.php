@@ -32,6 +32,7 @@
     @endif
     <div class="mb-3">
         <a href="{{ route('bills.edit', $bill) }}" class="btn btn-warning">Edit Bill</a>
+        <a href="{{ route('bills.pdf', $bill->bill_id) }}" class="btn btn-info" target="_blank">Download PDF</a>
         {{-- Add delete button here later --}}
     </div>
 

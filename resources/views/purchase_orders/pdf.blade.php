@@ -102,6 +102,7 @@
                         <img src="{{ $logoData }}" alt="Logo" style="max-height: 80px; margin-bottom: 15px;">
                     @endif
                     <p><strong>{{ config('settings.company_name', 'Your Company Name') }}</strong><br>
+                    Legal ID: {{ config('settings.company_legal_id', 'N/A') }}<br>
                     {{ config('settings.company_address_line_1', '123 Your Street') }}<br>
                     {{ config('settings.company_address_line_2', 'Your City, ST 12345') }}<br>
                     {{ config('settings.company_email', 'your.email@example.com') }}<br>
@@ -121,13 +122,13 @@
             <tr>
                 <td class="vendor-details">
                     <strong>Vendor:</strong><br>
+                    <strong>{{ $purchaseOrder->supplier->name }}</strong><br>
+                    Legal ID: {{ $purchaseOrder->supplier->legal_id ?? 'N/A' }}<br>
                     @if($supplierAddress = $purchaseOrder->supplier->addresses->first())
-                        <strong>{{ $purchaseOrder->supplier->name }}</strong><br>
                         {{ $supplierAddress->street_address_line_1 }}<br>
                         @if($supplierAddress->street_address_line_2){{ $supplierAddress->street_address_line_2 }}<br>@endif
                         {{ $supplierAddress->city }}, {{ $supplierAddress->state_province }} {{ $supplierAddress->postal_code }}
                     @else
-                        {{ $purchaseOrder->supplier->name }}<br>
                         No address on file.
                     @endif
                 </td>

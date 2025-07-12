@@ -17,7 +17,10 @@
                     <p><strong>Contacto:</strong> {{ $supplier->contact_person}}</p>
                     <p><strong>Correo:</strong> {{ $supplier->email ?: 'N/A' }}</p>
                     <p><strong>Teléfono:</strong> {{ $supplier->phone_number ?: 'N/A' }}</p>
-                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('Legal ID') }} / {{ __('Tax ID') }}</label>
+                        <div>{{ $supplier->legal_id }}</div>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <h5>Direcciones</h5>

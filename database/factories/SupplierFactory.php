@@ -22,11 +22,12 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company(),
-            'contact_person' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'phone_number' => $this->faker->phoneNumber(),
+            'name' => $this->faker->company,
+            'contact_person' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'phone_number' => $this->faker->phoneNumber,
             'notes' => $this->faker->optional()->sentence(),
+            'legal_id' => $this->faker->unique()->bothify('SUP-####'),
         ];
     }
 }

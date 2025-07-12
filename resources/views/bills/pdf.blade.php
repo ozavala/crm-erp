@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Invoice {{ $invoice->invoice_number }}</title>
+    <meta charset="UTF-8">
+    <title>Bill {{ $bill->bill_number }}</title>
     <style>
         body { font-family: 'Helvetica', sans-serif; font-size: 12px; color: #333; }
         .container { width: 100%; margin: 0 auto; }
         .header-table { width: 100%; border: 0; margin-bottom: 30px; }
         .header-table td { border: 0; padding: 0; vertical-align: top; }
         .company-logo { max-height: 80px; margin-bottom: 10px; }
-        .company-details p, .invoice-details p { margin: 0; line-height: 1.4; }
-        .bill-to { margin-top: 30px; margin-bottom: 20px; }
+        .company-details p, .bill-details p { margin: 0; line-height: 1.4; }
+        .supplier-details { margin-top: 30px; margin-bottom: 20px; }
         .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .items-table th { background-color: #f2f2f2; font-weight: bold; }
@@ -42,29 +42,28 @@
                         @endif
                     </p>
                 </td>
-                <td class="invoice-details" style="text-align: right;">
-                    <h1>INVOICE</h1>
+                <td class="bill-details" style="text-align: right;">
+                    <h1>BILL</h1>
                     <p>
-                        <strong>Invoice #:</strong> {{ $invoice->invoice_number }}<br>
-                        <strong>Date:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}<br>
-                        <strong>Due Date:</strong> {{ $invoice->due_date->format('Y-m-d') }}<br>
-                        <strong>Payment Terms:</strong> {{ $invoice->payment_terms ?? config('settings.default_payment_terms', 'Cash') }}<br>
-                        <strong>Due Days:</strong> {{ $invoice->due_date ? $invoice->invoice_date->diffInDays($invoice->due_date) : config('settings.default_due_days', 30) }}
+                        <strong>Bill #:</strong> {{ $bill->bill_number }}<br>
+                        <strong>Date:</strong> {{ $bill->bill_date->format('Y-m-d') }}<br>
+                        <strong>Due Date:</strong> {{ $bill->due_date->format('Y-m-d') }}<br>
                     </p>
                 </td>
             </tr>
         </table>
 
-        <div class="bill-to">
-            <h4>Bill To:</h4>
+        <div class="supplier-details">
+            <h4>Supplier:</h4>
             <p>
-                <strong>{{ $invoice->customer->full_name }}</strong><br>
-                Legal ID: {{ $invoice->customer->legal_id ?? 'N/A' }}<br>
-                {{ $invoice->customer->company_name ? $invoice->customer->company_name . '<br>' : '' }}
-                @if($invoice->customer->primaryAddress)
-                    {{ $invoice->customer->primaryAddress->street_address_line_1 }}<br>
-                    {{ $invoice->customer->primaryAddress->street_address_line_2 ? $invoice->customer->primaryAddress->street_address_line_2 . '<br>' : '' }}
-                    {{ $invoice->customer->primaryAddress->city }}, {{ $invoice->customer->primaryAddress->state }} {{ $invoice->customer->primaryAddress->postal_code }}
+                <strong>{{ $bill->supplier->name }}</strong><br>
+                Legal ID: {{ $bill->supplier->legal_id ?? 'N/A' }}<br>
+                @if($bill->supplier->addresses->first())
+                    {{ $bill->supplier->addresses->first()->street_address_line_1 }}<br>
+                    @if($bill->supplier->addresses->first()->street_address_line_2)
+                        {{ $bill->supplier->addresses->first()->street_address_line_2 }}<br>
+                    @endif
+                    {{ $bill->supplier->addresses->first()->city }}, {{ $bill->supplier->addresses->first()->state_province }} {{ $bill->supplier->addresses->first()->postal_code }}
                 @endif
             </p>
         </div>
@@ -79,7 +78,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($invoice->items as $item)
+                @foreach($bill->items as $item)
                     <tr>
                         <td>
                             <strong>{{ $item->item_name }}</strong><br>
@@ -96,23 +95,17 @@
         <table class="totals-table">
             <tr>
                 <td class="total-label">Subtotal:</td>
-                <td class="text-right">${{ number_format($invoice->subtotal, 2) }}</td>
+                <td class="text-right">${{ number_format($bill->subtotal, 2) }}</td>
             </tr>
-            @if($invoice->discount_amount > 0)
             <tr>
-                <td class="total-label">Discount:</td>
-                <td class="text-right text-danger">-${{ number_format($invoice->discount_amount, 2) }}</td>
-            </tr>
-            @endif
-            <tr>
-                <td class="total-label">Tax ({{ $invoice->tax_percentage }}%):</td>
-                <td class="text-right">${{ number_format($invoice->tax_amount, 2) }}</td>
+                <td class="total-label">Tax:</td>
+                <td class="text-right">${{ number_format($bill->tax_amount, 2) }}</td>
             </tr>
             <tr class="grand-total">
                 <td class="total-label">Total:</td>
-                <td class="text-right">${{ number_format($invoice->total_amount, 2) }}</td>
+                <td class="text-right">${{ number_format($bill->total_amount, 2) }}</td>
             </tr>
         </table>
     </div>
 </body>
-</html>
+</html> 

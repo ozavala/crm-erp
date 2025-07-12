@@ -3,6 +3,7 @@ return [
     'Core Settings' => 'Settings',
     'Custom Settings' => 'Custom Settings',
     'Company Name' => 'Company Name',
+    'Company Legal ID' => 'Company Legal ID',
     'Address' => 'Address',
     'Address 2' => 'Address 2',
     'Email' => 'Email',

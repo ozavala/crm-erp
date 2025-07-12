@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             SettingsTableSeeder::class,
             UserRoleSeeder::class,
             CrmUserSeeder::class, // Creates specific users like 'Admin', 'Sales'
-           /** ProductCategorySeeder::class,
+            ProductCategorySeeder::class,
             ProductFeatureSeeder::class,
             WarehouseSeeder::class,
             SupplierSeeder::class,
@@ -51,10 +51,10 @@ class DatabaseSeeder extends Seeder
             QuotationSeeder::class,
             OrderSeeder::class,
             PaymentSeeder::class,
-            AccountSeeder::class,*/
+            AccountSeeder::class,
         ]);
 
-       /* // 2. Use factories to create a rich, dynamic dataset for testing
+        // 2. Use factories to create a rich, dynamic dataset for testing
         $this->command->info('Creating dynamic data using factories...');
 
         // Get all users (from seeder and potentially new ones) to assign tasks/opportunities
@@ -120,6 +120,6 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Report data created.');
        
         // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
-        // We will refactor them next.*/
+        // We will refactor them next.
     }
 }

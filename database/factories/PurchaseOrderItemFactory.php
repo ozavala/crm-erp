@@ -13,19 +13,15 @@ class PurchaseOrderItemFactory extends Factory
 
     public function definition(): array
     {
-        $product = Product::where('is_service', false)->inRandomOrder()->first() ?? Product::factory()->create(['is_service' => false]);
-        $quantity = $this->faker->numberBetween(5, 50);
-        $unitPrice = $product->cost ?? $product->price * 0.7; // Use cost if available, else estimate
-
         return [
-            'purchase_order_id' => PurchaseOrder::factory(),
-            'product_id' => $product->product_id,
-            'item_name' => $product->name,
-            'item_description' => $product->description,
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'item_total' => $quantity * $unitPrice,
-            'landed_cost_per_unit' => null, // Will be calculated by LandedCostService
+            'purchase_order_id' => \App\Models\PurchaseOrder::factory(),
+            'product_id' => \App\Models\Product::factory(),
+            'item_name' => $this->faker->words(3, true),
+            'item_description' => $this->faker->optional()->sentence(),
+            'quantity' => $this->faker->numberBetween(1, 10),
+            'unit_price' => $this->faker->randomFloat(2, 10, 1000),
+            'item_total' => $this->faker->randomFloat(2, 100, 10000),
+            'landed_cost_per_unit' => $this->faker->optional()->randomFloat(4, 0, 100),
         ];
     }
 }

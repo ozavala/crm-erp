@@ -16,7 +16,8 @@ class SettingsTableSeeder extends Seeder
     {
         // Core settings
         $coreSettings = [
-            ['key' => 'company_name', 'value' => 'CRM-ERP Inc.', 'type' => 'core', 'is_editable' => false],
+            ['key' => 'company_name', 'value' => 'Ingeconsersa SA', 'type' => 'core', 'is_editable' => false],
+            ['key' => 'company_legal_id', 'value' => '0992793747-001', 'type' => 'core', 'is_editable' => false],
             ['key' => 'company_address_line_1', 'value' => '123 Innovation Drive', 'type' => 'core', 'is_editable' => false],
             ['key' => 'company_address_line_2', 'value' => 'Suite 456, Tech Park, CA 90210', 'type' => 'core', 'is_editable' => false],
             ['key' => 'company_email', 'value' => 'contact@crm-erp.example.com', 'type' => 'core', 'is_editable' => false],
@@ -28,15 +29,21 @@ class SettingsTableSeeder extends Seeder
             ['key' => 'tax_includes_transport', 'value' => 'false', 'type' => 'core', 'is_editable' => false],
         ];
         foreach ($coreSettings as $setting) {
-            \App\Models\Setting::create($setting);
+            \App\Models\Setting::updateOrCreate(
+                ['key' => $setting['key']],
+                $setting
+            );
         }
 
         // Custom settings de ejemplo
-        \App\Models\Setting::create([
-            'key' => 'custom_message',
-            'value' => 'Bienvenido al sistema',
-            'type' => 'custom',
-            'is_editable' => true,
-        ]);
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'custom_message'],
+            [
+                'key' => 'custom_message',
+                'value' => 'Bienvenido al sistema',
+                'type' => 'custom',
+                'is_editable' => true,
+            ]
+        );
     }
 }

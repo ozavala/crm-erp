@@ -47,7 +47,10 @@
                             @elseif($setting->key === 'company_name')
                                 <label for="company_name" class="form-label">{{ __('messages.Company Name') }}</label>
                                 <input type="text" class="form-control" id="company_name" name="company_name" value="{{ old('company_name', $setting->value) }}">
-                            @elseif($setting->key === 'company_address_line_1')
+                            
+                                <label for="company_legal_id" class="form-label">{{ __('messages.Company Legal ID') }}</label>
+                                <input type="text" class="form-control" id="company_legal_id" name="company_legal_id" value="{{ old('company_legal_id', $setting->value) }}">
+                            
                                 <label for="company_address_line_1" class="form-label">{{ __('messages.Address') }}</label>
                                 <input type="text" class="form-control" id="company_address_line_1" name="company_address_line_1" value="{{ old('company_address_line_1', $setting->value) }}">
                             @elseif($setting->key === 'company_address_line_2')

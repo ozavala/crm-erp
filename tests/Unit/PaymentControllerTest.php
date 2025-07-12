@@ -262,16 +262,20 @@ class PaymentControllerTest extends TestCase
         ]);
 
         $journalEntry = JournalEntry::latest('journal_entry_id')->first();
+        $supplierLegalId = $bill->supplier->legal_id ?? 'N/A';
+        $companyLegalId = \App\Models\Setting::where('key', 'company_legal_id')->first()?->value ?? 'N/A';
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Accounts Payable',
+            'account_name' => 'Accounts Payable (' . $supplierLegalId . ')',
             'debit_amount' => number_format($paymentAmount, 2, '.', ''),
             'entity_id' => $bill->supplier_id,
+            'description' => 'Supplier accounts payable',
         ]);
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Bank',
+            'account_name' => 'Bank (' . $companyLegalId . ')',
             'credit_amount' => number_format($paymentAmount, 2, '.', ''),
+            'description' => 'Bank account of main company',
         ]);
     }
 
@@ -298,16 +302,110 @@ class PaymentControllerTest extends TestCase
         ]);
 
         $journalEntry = JournalEntry::latest('journal_entry_id')->first();
+        $supplierLegalId = $purchaseOrder->supplier->legal_id ?? 'N/A';
+        $companyLegalId = \App\Models\Setting::where('key', 'company_legal_id')->first()?->value ?? 'N/A';
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Accounts Payable',
+            'account_name' => 'Accounts Payable (' . $supplierLegalId . ')',
             'debit_amount' => number_format($paymentAmount, 2, '.', ''),
             'entity_id' => $purchaseOrder->supplier_id,
+            'description' => 'Supplier accounts payable',
         ]);
         $this->assertDatabaseHas('journal_entry_lines', [
             'journal_entry_id' => $journalEntry->journal_entry_id,
-            'account_name' => 'Bank',
+            'account_name' => 'Bank (' . $companyLegalId . ')',
             'credit_amount' => number_format($paymentAmount, 2, '.', ''),
+            'description' => 'Bank account of main company',
+        ]);
+    }
+
+    #[Test]
+    public function it_creates_journal_entries_with_description_and_legal_id_for_bill_payment()
+    {
+        // Arrange
+        $bill = Bill::factory()->create();
+        $paymentAmount = 150.00;
+        $paymentData = [
+            'payable_id' => $bill->bill_id,
+            'payable_type' => Bill::class,
+            'amount' => $paymentAmount,
+            'payment_date' => now()->toDateString(),
+        ];
+
+        // Act
+        $this->post(route('bills.payments.store', $bill), $paymentData);
+
+        // Assert
+        $journalEntry = JournalEntry::latest('journal_entry_id')->first();
+        
+        // Verificar que las líneas del asiento contable tengan description
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'description' => 'Supplier accounts payable',
+        ]);
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'description' => 'Bank account of main company',
+        ]);
+        
+        // Verificar que account_name contenga legal_id
+        $supplierLegalId = $bill->supplier->legal_id ?? 'N/A';
+        $companyLegalId = \App\Models\Setting::where('key', 'company_legal_id')->first()?->value ?? 'N/A';
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'account_name' => 'Accounts Payable (' . $supplierLegalId . ')',
+        ]);
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'account_name' => 'Bank (' . $companyLegalId . ')',
+        ]);
+    }
+
+    #[Test]
+    public function it_creates_journal_entries_with_description_and_legal_id_for_invoice_payment()
+    {
+        // Arrange
+        $invoice = \App\Models\Invoice::factory()->create();
+        $paymentAmount = 200.00;
+        $paymentData = [
+            'payable_id' => $invoice->invoice_id,
+            'payable_type' => \App\Models\Invoice::class,
+            'amount' => $paymentAmount,
+            'payment_date' => now()->toDateString(),
+        ];
+
+        // Act
+        $this->post(route('invoices.payments.store', $invoice), $paymentData);
+
+        // Assert
+        $journalEntry = JournalEntry::latest('journal_entry_id')->first();
+        
+        // Verificar que las líneas del asiento contable tengan description
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'description' => 'Customer accounts receivable',
+        ]);
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'description' => 'Bank account of main company',
+        ]);
+        
+        // Verificar que account_name contenga legal_id
+        $customerLegalId = $invoice->customer->legal_id ?? 'N/A';
+        $companyLegalId = \App\Models\Setting::where('key', 'company_legal_id')->first()?->value ?? 'N/A';
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'account_name' => 'Accounts Receivable (' . $customerLegalId . ')',
+        ]);
+        
+        $this->assertDatabaseHas('journal_entry_lines', [
+            'journal_entry_id' => $journalEntry->journal_entry_id,
+            'account_name' => 'Bank (' . $companyLegalId . ')',
         ]);
     }
 }

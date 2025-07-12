@@ -58,7 +58,7 @@ class TaxSettingsController extends Controller
             Setting::create([
                 'key' => "tax_rates_{$countryCode}",
                 'value' => json_encode($request->rates),
-                'type' => 'json',
+                'type' => 'custom',
             ]);
         } else {
             $setting->update(['value' => json_encode($request->rates)]);
@@ -82,7 +82,7 @@ class TaxSettingsController extends Controller
             Setting::create([
                 'key' => 'default_country_tax',
                 'value' => $request->country_code,
-                'type' => 'string',
+                'type' => 'custom',
             ]);
         } else {
             $setting->update(['value' => $request->country_code]);
@@ -108,7 +108,7 @@ class TaxSettingsController extends Controller
                 Setting::create([
                     'key' => $key,
                     'value' => $value ? 'true' : 'false',
-                    'type' => 'boolean',
+                    'type' => 'custom',
                 ]);
             } else {
                 $setting->update(['value' => $value ? 'true' : 'false']);
@@ -149,7 +149,7 @@ class TaxSettingsController extends Controller
             Setting::create([
                 'key' => "tax_rates_{$countryCode}",
                 'value' => json_encode($defaultRates),
-                'type' => 'json',
+                'type' => 'custom',
             ]);
         } else {
             $setting->update(['value' => json_encode($defaultRates)]);

@@ -143,4 +143,23 @@ class BillController extends Controller
     }
 
     // ... other resource methods (destroy)
+
+    /**
+     * Generate PDF for the bill
+     */
+    public function printPdf(Bill $bill)
+    {
+        $bill->load(['supplier.addresses', 'items.product']);
+        
+        // Get company logo if available
+        $logoData = null;
+        $companyLogo = \App\Models\Setting::where('key', 'company_logo')->first();
+        if ($companyLogo && $companyLogo->value) {
+            $logoData = 'data:image/png;base64,' . $companyLogo->value;
+        }
+        
+        $pdf = \PDF::loadView('bills.pdf', compact('bill', 'logoData'));
+        
+        return $pdf->stream("bill-{$bill->bill_number}.pdf");
+    }
 }

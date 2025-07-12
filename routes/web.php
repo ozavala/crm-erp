@@ -99,6 +99,7 @@ Route::middleware(['setlocale', 'auth'])->group(function () {
     Route::post('invoices/{invoice}/send-reminder', [InvoiceController::class, 'sendReminder'])->name('invoices.sendReminder');
     Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
     Route::get('invoices/{invoice}/pdf', [App\Http\Controllers\InvoiceController::class, 'printPdf'])->name('invoices.pdf');
+    Route::get('bills/{bill}/pdf', [App\Http\Controllers\BillController::class, 'printPdf'])->name('bills.pdf');
     Route::resource('journal-entries', JournalEntryController::class); // Allow full CRUD for manual entries
     Route::post('purchase-orders/{purchase_order}/payments', [PaymentController::class, 'store'])->name('purchase-orders.payments.store');
     Route::get('purchase-orders/{purchase_order}/print', [PurchaseOrderController::class, 'printPdf'])->name('purchase-orders.print');

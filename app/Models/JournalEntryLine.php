@@ -21,6 +21,7 @@ class JournalEntryLine extends Model
         'credit_amount',
         'entity_id',
         'entity_type',
+        'description',
     ];
 
     protected $casts = [

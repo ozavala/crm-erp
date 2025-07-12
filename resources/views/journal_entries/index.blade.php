@@ -43,6 +43,7 @@
                 <th>Created By</th>
                 <th class="text-end">Debits</th>
                 <th class="text-end">Credits</th>
+                <th>Lines</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -64,6 +65,11 @@
                     <td class="text-end">${{ number_format($entry->lines->sum('debit_amount'), 2) }}</td>
                     <td class="text-end">${{ number_format($entry->lines->sum('credit_amount'), 2) }}</td>
                     <td>
+                        @foreach($entry->lines as $line)
+                            <div><strong>{{ $line->account_name }}</strong><br><small>{{ $line->description ?? '-' }}</small></div>
+                        @endforeach
+                    </td>
+                    <td>
                         @if(!$entry->referenceable_id) {{-- Only allow edit/delete for manual entries --}}
                             <a href="{{ route('journal-entries.edit', $entry->journal_entry_id) }}" class="btn btn-warning btn-sm">Edit</a>
                             <form action="{{ route('journal-entries.destroy', $entry->journal_entry_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
@@ -76,7 +82,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="text-center">No journal entries found.</td>
+                    <td colspan="10" class="text-center">No journal entries found.</td>
                 </tr>
             @endforelse
         </tbody>

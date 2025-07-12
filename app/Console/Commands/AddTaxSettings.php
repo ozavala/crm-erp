@@ -56,7 +56,7 @@ class AddTaxSettings extends Command
                 Setting::create([
                     'key' => $key,
                     'value' => is_array($value) ? json_encode($value) : $value,
-                    'type' => is_array($value) ? 'json' : 'string',
+                    'type' => 'custom',
                 ]);
                 $this->info("  ✅ Creado: {$key}");
             } else {

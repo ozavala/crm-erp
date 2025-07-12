@@ -245,7 +245,7 @@ return [
     'Back to Customers' => 'Volver a Clientes',
     'Primary Information' => 'Información Principal',
     'Company Name' => 'Nombre de la Empresa',
-    'Legal ID' => 'ID Legal',
+    'Company Legal ID' => 'RUC/Cédula de la Empresa',
     'Tax ID' => 'ID Fiscal',
     'Primary Address' => 'Dirección Principal',
     'No addresses on file.' => 'No hay direcciones registradas.',
