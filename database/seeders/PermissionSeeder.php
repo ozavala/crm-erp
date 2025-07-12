@@ -36,7 +36,13 @@ class PermissionSeeder extends Seeder
             ['name' => 'delete-permissions', 'description' => 'Delete permissions'],
             // Admin Section
             ['name' => 'view-admin-section', 'description' => 'Can view the Admin dropdown in navigation'],
-            
+            ['name' => 'edit-settings', 'description' => 'Edit settings'],
+            ['name' => 'create-settings', 'description' => 'Create settingss'],
+            ['name' => 'view-settings', 'description' => 'View settings'],
+           
+            ['name' => 'view-audit-log', 'description' => 'View audit log'],
+            ['name' => 'view-activity-log', 'description' => 'View activity log'],
+
             //Feedback Permissions
             ['name' => 'view-feedback', 'description' => 'View feedback'],
             ['name' => 'edit-feedback', 'description' => 'Edit existing feedback'],

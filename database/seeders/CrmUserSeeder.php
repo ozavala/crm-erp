@@ -22,6 +22,7 @@ class CrmUserSeeder extends Seeder
             'full_name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'), // Use a secure password in production
+            'email_verified_at' => app()->environment('local', 'development') ? now() : null,
         ]);
 
         $salesUser = CrmUser::create([
@@ -29,6 +30,7 @@ class CrmUserSeeder extends Seeder
             'full_name' => 'Sales User',
             'email' => 'sales@example.com',
             'password' => bcrypt('password'),
+            'email_verified_at' => app()->environment('local', 'development') ? now() : null,
         ]);
 
         $supportUser = CrmUser::create([
@@ -36,6 +38,7 @@ class CrmUserSeeder extends Seeder
             'full_name' => 'Support User',
             'email' => 'support@example.com',
             'password' => bcrypt('password'),
+            'email_verified_at' => app()->environment('local', 'development') ? now() : null,
         ]);
 
         $marketingUser = CrmUser::create([
@@ -43,6 +46,7 @@ class CrmUserSeeder extends Seeder
             'full_name' => 'Marketing User',
             'email' => 'marketing@example.com',
             'password' => bcrypt('password'),
+            'email_verified_at' => app()->environment('local', 'development') ? now() : null,
         ]);
 
         // Assign Roles

@@ -18,12 +18,18 @@
                         {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}                        
                     </div>
 
-                    <form class="d-inline" method="POST" action="{{ route('verification.send') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-link p-0 m-0 align-baseline">
-                            {{ __('Resend Verification Email') }}
-                        </button>
-                    </form>
+                    @if (!app()->environment('local', 'development'))
+                        <form class="d-inline" method="POST" action="{{ route('verification.send') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">
+                                {{ __('Resend Verification Email') }}
+                            </button>
+                        </form>
+                    @else
+                        <div class="alert alert-info mt-3">
+                            {{ __('No es necesario verificar el correo electrónico en el entorno de desarrollo.') }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

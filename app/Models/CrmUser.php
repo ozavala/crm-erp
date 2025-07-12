@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use App\Models\UserRole; // Ensure you have the correct namespace for UserRole
 
  
-class CrmUser extends Authenticatable
+class CrmUser extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -50,6 +51,46 @@ class CrmUser extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Determine if the user has verified their email address.
+     * En desarrollo, siempre retorna true para evitar problemas de verificación.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        if (app()->environment('local', 'development')) {
+            return true;
+        }
+        
+        return ! is_null($this->email_verified_at);
+    }
+
+    /**
+     * Mark the given user's email as verified.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        if (app()->environment('local', 'development')) {
+            return true;
+        }
+        
+        return $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        if (app()->environment('local', 'development')) {
+            return; // No enviar emails en desarrollo
+        }
+        
+        parent::sendEmailVerificationNotification();
+    }
+
     /**
      * The roles that belong to the CRM user.
      */
