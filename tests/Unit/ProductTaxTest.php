@@ -28,7 +28,7 @@ class ProductTaxTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function producto_con_tasa_especifica_calcula_iva_correctamente()
     {
         $producto = new Product([
@@ -42,7 +42,7 @@ class ProductTaxTest extends TestCase
         $this->assertEquals(15.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function producto_con_tasa_del_modelo_calcula_iva_correctamente()
     {
         $taxRate = TaxRate::create([
@@ -66,7 +66,7 @@ class ProductTaxTest extends TestCase
         $this->assertEquals(22.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function producto_no_imponible_no_calcula_iva()
     {
         $producto = new Product([
@@ -80,7 +80,7 @@ class ProductTaxTest extends TestCase
         $this->assertEquals(0.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function producto_sin_tasa_usa_tasa_cero()
     {
         $producto = new Product([
@@ -93,7 +93,7 @@ class ProductTaxTest extends TestCase
         $this->assertEquals(0.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_obtener_tasas_disponibles_por_pais()
     {
         $producto = new Product([
@@ -112,7 +112,7 @@ class ProductTaxTest extends TestCase
         $this->assertEquals(22.00, $tasas[2]['rate']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_verificar_categorias_imponibles()
     {
         $productoBienes = new Product(['tax_category' => 'goods']);
@@ -128,7 +128,7 @@ class ProductTaxTest extends TestCase
         $this->assertTrue($productoSinCategoria->isCategoryTaxable());
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function prioriza_tasa_especifica_sobre_tasa_del_modelo()
     {
         $taxRate = TaxRate::create([

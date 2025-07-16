@@ -44,7 +44,7 @@ class TaxCalculationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_calcular_iva_con_tasa_especifica_del_producto()
     {
         $producto = Product::factory()->create([
@@ -60,7 +60,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals(15.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_calcular_iva_con_tasa_del_modelo()
     {
         $taxRate = TaxRate::create([
@@ -88,7 +88,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals(22.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function producto_exento_no_paga_iva()
     {
         $producto = Product::factory()->create([
@@ -104,7 +104,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals(0.00, $producto->effective_tax_rate);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_calcular_iva_para_costos_adicionales()
     {
         $taxService = new TaxCalculationService();
@@ -124,7 +124,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals(2326.00, $resultado['total_with_tax']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_obtener_tasas_disponibles_por_pais()
     {
         $producto = Product::factory()->create([
@@ -139,7 +139,7 @@ class TaxCalculationTest extends TestCase
         $this->assertEquals('IVA 22%', $tasas[2]['name']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_verificar_si_categoria_es_imponible()
     {
         $productoBienes = Product::factory()->create(['tax_category' => 'goods']);
@@ -151,7 +151,7 @@ class TaxCalculationTest extends TestCase
         $this->assertFalse($productoTransportePublico->isCategoryTaxable());
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_calcular_iva_para_caso_complejo_de_importacion()
     {
         // Simular el caso de importación de 6 computadoras

@@ -374,14 +374,14 @@ class ReportDataSeeder extends Seeder
     private function createSuppliers(): void
     {
         $suppliers = [
-            ['name' => 'Apple Inc', 'email' => 'supplier@apple.com', 'phone_number' => '+1-555-0201'],
-            ['name' => 'Samsung Electronics', 'email' => 'orders@samsung.com', 'phone_number' => '+1-555-0202'],
-            ['name' => 'Nike Inc', 'email' => 'supplier@nike.com', 'phone_number' => '+1-555-0203'],
-            ['name' => 'Adidas AG', 'email' => 'orders@adidas.com', 'phone_number' => '+1-555-0204'],
-            ['name' => 'IKEA Group', 'email' => 'supplier@ikea.com', 'phone_number' => '+1-555-0205'],
-            ['name' => 'Dell Technologies', 'email' => 'orders@dell.com', 'phone_number' => '+1-555-0206'],
-            ['name' => 'Sony Corporation', 'email' => 'supplier@sony.com', 'phone_number' => '+1-555-0207'],
-            ['name' => 'LG Electronics', 'email' => 'orders@lg.com', 'phone_number' => '+1-555-0208'],
+            ['name' => 'Apple Inc', 'legal_id' => 'SUP-3001', 'email' => 'supplier@apple.com', 'phone_number' => '+1-555-0201'],
+            ['name' => 'Samsung Electronics', 'legal_id' => 'SUP-3002', 'email' => 'orders@samsung.com', 'phone_number' => '+1-555-0202'],
+            ['name' => 'Nike Inc', 'legal_id' => 'SUP-3003', 'email' => 'supplier@nike.com', 'phone_number' => '+1-555-0203'],
+            ['name' => 'Adidas AG', 'legal_id' => 'SUP-3004', 'email' => 'orders@adidas.com', 'phone_number' => '+1-555-0204'],
+            ['name' => 'IKEA Group', 'legal_id' => 'SUP-3005', 'email' => 'supplier@ikea.com', 'phone_number' => '+1-555-0205'],
+            ['name' => 'Dell Technologies', 'legal_id' => 'SUP-3006', 'email' => 'orders@dell.com', 'phone_number' => '+1-555-0206'],
+            ['name' => 'Sony Corporation', 'legal_id' => 'SUP-3007', 'email' => 'supplier@sony.com', 'phone_number' => '+1-555-0207'],
+            ['name' => 'LG Electronics', 'legal_id' => 'SUP-3008', 'email' => 'orders@lg.com', 'phone_number' => '+1-555-0208'],
         ];
 
         foreach ($suppliers as $supplier) {

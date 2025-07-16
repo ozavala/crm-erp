@@ -15,6 +15,7 @@ class SupplierSeeder extends Seeder
     {
         Supplier::create([
             'name' => 'ABC Supplies',
+            'legal_id' => 'SUP-0001',
             'contact_person' => 'John Smith',
             'email' => 'john@example.com',
             'phone_number' => '123-456-7890',
@@ -30,6 +31,7 @@ class SupplierSeeder extends Seeder
         ]);
         Supplier::create([
             'name' => 'XYZ Distributors',
+            'legal_id' => 'SUP-0002',
             'contact_person' => 'Jane Doe',
             'email' => 'jane@example.com',
             'phone_number' => '987-654-3210',
@@ -45,6 +47,7 @@ class SupplierSeeder extends Seeder
         ]);
         Supplier::create([
             'name' => 'Global Traders',
+            'legal_id' => 'SUP-0003',
             'contact_person' => 'Alice Johnson',
             'email' => 'alice@example.com',
             'phone_number' => '555-123-4567',
@@ -60,6 +63,7 @@ class SupplierSeeder extends Seeder
         ]);
         Supplier::create([
             'name' => 'Local Goods',
+            'legal_id' => 'SUP-0004',
             'contact_person' => 'Bob Brown',
             'email' => 'bob@example.com',
             'phone_number' => '321-654-0987',

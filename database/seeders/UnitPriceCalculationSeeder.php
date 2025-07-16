@@ -24,18 +24,21 @@ class UnitPriceCalculationSeeder extends Seeder
         $suppliers = [
             [
                 'name' => 'Electronics Import Co.',
+                'legal_id' => 'SUP-2001',
                 'email' => 'import.electronics@example.com',
                 'phone_number' => '+1-555-ELECTRONICS',
                 'contact_person' => 'John Electronics',
             ],
             [
                 'name' => 'Raw Materials Supplier',
+                'legal_id' => 'SUP-2002',
                 'email' => 'supply.rawmaterials@example.com',
                 'phone_number' => '+1-555-RAWMATERIALS',
                 'contact_person' => 'Sarah Materials',
             ],
             [
                 'name' => 'Machinery Parts Inc.',
+                'legal_id' => 'SUP-2003',
                 'email' => 'parts.machinery@example.com',
                 'phone_number' => '+1-555-MACHINERY',
                 'contact_person' => 'Mike Machinery',

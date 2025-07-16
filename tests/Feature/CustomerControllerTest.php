@@ -123,6 +123,11 @@ class CustomerControllerTest extends TestCase
         $response->assertViewHas('customer');
         $response->assertSee($customer->first_name);
         $response->assertSee($customer->last_name);
+
+        // Solución rápida para cerrar buffers
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
     }
 
     #[Test]

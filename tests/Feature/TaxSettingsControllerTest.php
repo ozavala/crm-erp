@@ -20,7 +20,7 @@ class TaxSettingsControllerTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_actualizar_tasas_de_iva_para_un_pais()
     {
         $rates = [
@@ -50,7 +50,7 @@ class TaxSettingsControllerTest extends TestCase
         $this->assertEquals(json_encode($rates), $setting->value);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_establecer_pais_por_defecto()
     {
         $response = $this->post('/tax-settings/default-country', [
@@ -67,7 +67,7 @@ class TaxSettingsControllerTest extends TestCase
         $this->assertEquals('ES', $setting->value);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_actualizar_configuraciones_de_servicios()
     {
         $response = $this->post('/tax-settings/service-settings', [
@@ -90,7 +90,7 @@ class TaxSettingsControllerTest extends TestCase
         $this->assertEquals('false', $transportSetting->value);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_restaurar_tasas_por_defecto()
     {
         $response = $this->post('/tax-settings/ES/restore-defaults');
@@ -108,7 +108,7 @@ class TaxSettingsControllerTest extends TestCase
         $this->assertNotEmpty($rates);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function puede_mostrar_pagina_de_configuraciones()
     {
         $response = $this->get('/tax-settings');
