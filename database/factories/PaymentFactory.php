@@ -27,6 +27,7 @@ class PaymentFactory extends Factory
         $bill = \App\Models\Bill::factory()->create();
         return [
             'payable_id' => $bill->bill_id,
+            'owner_company_id' => \App\Models\OwnerCompany::factory(),
             'payable_type' => \App\Models\Bill::class,
             'created_by_user_id' => \App\Models\User::factory(),
             'amount' => $this->faker->randomFloat(2, 50, 1000),

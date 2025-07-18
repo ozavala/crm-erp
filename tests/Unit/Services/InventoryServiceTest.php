@@ -84,7 +84,7 @@ class InventoryServiceTest extends TestCase
 
         $this->assertTrue($result);
         
-        $stock = DB::table('product_warehouse')
+        $stock = DB::table('inventories')
             ->where('product_id', $product->product_id)
             ->where('warehouse_id', $warehouse->warehouse_id)
             ->value('quantity');
@@ -102,7 +102,7 @@ class InventoryServiceTest extends TestCase
 
         $this->assertFalse($result);
         
-        $stock = DB::table('product_warehouse')
+        $stock = DB::table('inventories')
             ->where('product_id', $product->product_id)
             ->where('warehouse_id', $warehouse->warehouse_id)
             ->value('quantity');

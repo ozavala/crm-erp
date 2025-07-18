@@ -1,4 +1,4 @@
-Sugerencias para el plan de implementación
+Plan de implementación
 
 ##### 1\. Diseño de las nuevas entidades y relaciones
 

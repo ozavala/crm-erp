@@ -20,7 +20,7 @@ class InventoryService
         }
 
         if ($warehouseId) {
-            $stock = DB::table('product_warehouse')
+            $stock = DB::table('inventories')
                 ->where('product_id', $productId)
                 ->where('warehouse_id', $warehouseId)
                 ->first();
@@ -45,7 +45,7 @@ class InventoryService
                 return false;
             }
 
-            $warehouseStock = DB::table('product_warehouse')
+            $warehouseStock = DB::table('inventories')
                 ->where('product_id', $productId)
                 ->where('warehouse_id', $warehouseId)
                 ->first();
@@ -55,7 +55,7 @@ class InventoryService
             }
 
             // Update stock
-            DB::table('product_warehouse')
+            DB::table('inventories')
                 ->where('product_id', $productId)
                 ->where('warehouse_id', $warehouseId)
                 ->update(['quantity' => $warehouseStock->quantity - $quantity]);

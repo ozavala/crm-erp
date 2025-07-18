@@ -678,10 +678,10 @@ CREATE TABLE `product_product_feature` (
   CONSTRAINT `product_product_feature_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `product_warehouse`;
+DROP TABLE IF EXISTS `inventories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `product_warehouse` (
+CREATE TABLE `inventories` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` bigint(20) unsigned NOT NULL,
   `warehouse_id` bigint(20) unsigned NOT NULL,
@@ -689,10 +689,10 @@ CREATE TABLE `product_warehouse` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `product_warehouse_product_id_warehouse_id_unique` (`product_id`,`warehouse_id`),
-  KEY `product_warehouse_warehouse_id_foreign` (`warehouse_id`),
-  CONSTRAINT `product_warehouse_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
-  CONSTRAINT `product_warehouse_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`warehouse_id`) ON DELETE CASCADE
+  UNIQUE KEY `inventories_product_id_warehouse_id_unique` (`product_id`,`warehouse_id`),
+  KEY `inventories_warehouse_id_foreign` (`warehouse_id`),
+  CONSTRAINT `inventories_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
+  CONSTRAINT `inventories_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`warehouse_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `products`;
@@ -961,7 +961,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (12,'2025_06_11_201
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (13,'2025_06_11_204241_create_product_features_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (14,'2025_06_11_204348_create_product_product_feature_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (15,'2025_06_11_213130_create_warehouses_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2025_06_11_214111_create_product_warehouse_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2025_06_11_214111_create_inventories_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (17,'2025_06_12_151332_create_addresses_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (18,'2025_06_12_173644_create_product_categories_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (19,'2025_06_12_173756_add_product_category_id_to_products_table',1);

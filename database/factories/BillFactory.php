@@ -20,6 +20,7 @@ class BillFactory extends Factory
 
         return [
             'purchase_order_id' => PurchaseOrder::factory(),
+            'owner_company_id' => \App\Models\OwnerCompany::factory(),
             'supplier_id' => Supplier::factory(),
             'bill_number' => 'BILL-' . $this->faker->unique()->numerify('################'),
             'bill_date' => $this->faker->date(),
