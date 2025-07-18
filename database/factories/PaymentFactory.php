@@ -32,7 +32,7 @@ class PaymentFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 50, 1000),
             'payment_date' => $this->faker->date(),
             'payment_method' => $this->faker->randomElement(['cash', 'bank_transfer', 'credit_card', 'cheque']),
-            'reference_number' => $this->faker->optional()->bothify('REF-####-????'),
+            'reference_number' => $this->faker->optional()->bothify('REF-########-??????'),
             'notes' => $this->faker->optional()->sentence,
         ];
     }

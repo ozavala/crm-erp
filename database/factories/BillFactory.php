@@ -21,7 +21,7 @@ class BillFactory extends Factory
         return [
             'purchase_order_id' => PurchaseOrder::factory(),
             'supplier_id' => Supplier::factory(),
-            'bill_number' => 'BILL-' . $this->faker->unique()->numerify('######'),
+            'bill_number' => 'BILL-' . $this->faker->unique()->numerify('################'),
             'bill_date' => $this->faker->date(),
             'due_date' => $this->faker->dateTimeBetween('+1 week', '+1 month')->format('Y-m-d'),
             'subtotal' => $subtotal,

@@ -16,6 +16,10 @@ class InvoiceSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \DB::table('invoices')->truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         // Seed invoices based on orders that are 'Processing' or 'Shipped' etc.
         $ordersToInvoice = Order::whereIn('status', ['Processing', 'Shipped', 'Delivered', 'Completed'])
                                 ->with(['customer', 'items', 'createdBy'])

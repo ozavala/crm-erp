@@ -21,7 +21,7 @@ class InvoiceFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'invoice_number' => 'INV-' . fake()->unique()->numberBetween(1000, 9999),
+            'invoice_number' => 'INV-' . fake()->unique()->numberBetween(100000, 99999999),
             'customer_id' => Customer::factory(),
             'created_by_user_id' => CrmUser::factory(),
             'invoice_date' => fake()->dateTimeBetween('-1 year', 'now'),
