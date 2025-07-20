@@ -18,12 +18,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer; // If you need to link payments to customers
 use App\Models\Account;
+use Illuminate\Support\Facades\Session;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
-    {   
-        $payments = Payment::with(['payable', 'createdBy'])->paginate(10);
+    {
+        $empresaActivaId = Session::get('owner_company_id');
+        $payments = Payment::with(['payable', 'createdBy'])
+            ->where('owner_company_id', $empresaActivaId)
+            ->paginate(10);
         return view('payments.index', compact('payments'));
     }
     
@@ -34,8 +38,10 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentRequest $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $validatedData = $request->validated();
         $validatedData['created_by_user_id'] = Auth::id();
+        $validatedData['owner_company_id'] = $empresaActivaId;
 
         $payableType = $validatedData['payable_type'];
         $payableId = $validatedData['payable_id'];
@@ -111,9 +117,10 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        $customers = Customer::orderBy('first_name')->get();
-        $invoices = Invoice::with('customer')->orderBy('invoice_date', 'desc')->get();
-        $orders = Order::with('customer')->orderBy('order_date', 'desc')->get();
+        $empresaActivaId = Session::get('owner_company_id');
+        $customers = Customer::where('owner_company_id', $empresaActivaId)->orderBy('first_name')->get();
+        $invoices = Invoice::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('invoice_date', 'desc')->get();
+        $orders = Order::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('order_date', 'desc')->get();
         
         return view('payments.create', compact('customers', 'invoices', 'orders'));
     }

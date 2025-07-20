@@ -16,6 +16,7 @@ use App\Models\BillItem;
 use App\Models\Payment;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
+use App\Models\OwnerCompany; // Asumiendo que el modelo existe
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -116,6 +117,9 @@ class IntegralFlowTest extends TestCase
      */
     public function test_complete_integral_flow()
     {
+        // 0. Crear la empresa propietaria
+        $ownerCompany = OwnerCompany::factory()->create();
+
         // 1. Crear datos base
         $user = User::factory()->create();
         $crmUser = \App\Models\CrmUser::factory()->create();
@@ -131,13 +135,15 @@ class IntegralFlowTest extends TestCase
         $product = Product::factory()->create([
             'name' => 'Producto Test',
             'price' => 100.00,
-            'cost' => 60.00
+            'cost' => 60.00,
+            'owner_company_id' => $ownerCompany->id // Asociar
         ]);
 
         // 2. Crear Purchase Order
         $purchaseOrder = PurchaseOrder::factory()->create([
             'supplier_id' => $supplier->supplier_id,
             'order_date' => now(),
+            'owner_company_id' => $ownerCompany->id, // Asociar
             'status' => 'pending',
             'total_amount' => 200.00,
             'tax_amount' => 20.00,
@@ -165,6 +171,7 @@ class IntegralFlowTest extends TestCase
             'invoice_date' => now(),
             'due_date' => now()->addDays(30),
             'status' => 'pending',
+            'owner_company_id' => $ownerCompany->id, // Asociar
             'subtotal' => 300.00,
             'tax_amount' => 30.00,
             'total_amount' => 330.00,
@@ -191,6 +198,7 @@ class IntegralFlowTest extends TestCase
             'bill_date' => now(),
             'due_date' => now()->addDays(15),
             'status' => 'pending',
+            'owner_company_id' => $ownerCompany->id, // Asociar
             'subtotal' => 150.00,
             'tax_amount' => 15.00,
             'total_amount' => 165.00,
@@ -219,6 +227,7 @@ class IntegralFlowTest extends TestCase
             'amount' => 330.00,
             'payment_method' => 'bank_transfer',
             'reference_number' => 'PAY-INV-001',
+            'owner_company_id' => $ownerCompany->id, // Asociar
             'created_by_user_id' => $user->id
         ]);
 
@@ -238,6 +247,7 @@ class IntegralFlowTest extends TestCase
             'amount' => 165.00,
             'payment_method' => 'bank_transfer',
             'reference_number' => 'PAY-BILL-001',
+            'owner_company_id' => $ownerCompany->id, // Asociar
             'created_by_user_id' => $user->id
         ]);
 
@@ -275,6 +285,7 @@ class IntegralFlowTest extends TestCase
         $journalEntry = JournalEntry::factory()->create([
             'created_by_user_id' => $crmUser->user_id,
             'transaction_type' => 'payment',
+            'owner_company_id' => $crmUser->owner_company_id, // Asumiendo relación
             'description' => 'Test journal entry'
         ]);
 

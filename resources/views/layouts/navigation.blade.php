@@ -1,3 +1,24 @@
+@php
+    $user = Auth::user();
+    $companies = $user->ownerCompanies ?? collect();
+    $activeCompanyId = session('owner_company_id');
+@endphp
+
+@if($companies->count() > 1)
+    <form action="{{ route('ownercompany.switch') }}" method="POST" style="display:inline;">
+        @csrf
+        <select name="owner_company_id" onchange="this.form.submit()" class="form-select form-select-sm" style="width:auto; display:inline;">
+            @foreach($companies as $company)
+                <option value="{{ $company->id }}" {{ $activeCompanyId == $company->id ? 'selected' : '' }}>
+                    {{ $company->name }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+@elseif($companies->count() === 1)
+    <span class="navbar-text">{{ $companies->first()->name }}</span>
+@endif
+
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ route('dashboard') }}">

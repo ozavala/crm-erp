@@ -13,6 +13,9 @@ class SupplierSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \DB::table('suppliers')->truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         Supplier::create([
             'name' => 'ABC Supplies',
             'legal_id' => 'SUP-0001',

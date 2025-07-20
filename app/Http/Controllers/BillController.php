@@ -11,6 +11,7 @@ use App\Http\Requests\StoreBillRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class BillController extends Controller
 {
@@ -19,7 +20,9 @@ class BillController extends Controller
 
     public function index()
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $bills = Bill::with(['supplier', 'purchaseOrder'])
+            ->where('owner_company_id', $empresaActivaId)
             ->orderBy('bill_date', 'desc')
             ->paginate(15);
 
@@ -28,12 +31,14 @@ class BillController extends Controller
 
     public function create(Request $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $purchaseOrder = null;
         if ($request->has('purchase_order_id')) {
-            $purchaseOrder = PurchaseOrder::with('items.product', 'supplier')->findOrFail($request->input('purchase_order_id'));
+            $purchaseOrder = PurchaseOrder::where('owner_company_id', $empresaActivaId)
+                ->with('items.product', 'supplier')->findOrFail($request->input('purchase_order_id'));
         }
 
-        $suppliers = Supplier::orderBy('name')->get();
+        $suppliers = Supplier::where('owner_company_id', $empresaActivaId)->orderBy('name')->get();
         $bill = new Bill(); // For form model binding
         $statuses = Bill::$statuses;
 
@@ -42,11 +47,13 @@ class BillController extends Controller
 
     public function store(StoreBillRequest $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $validatedData = $request->validated();
 
-        return DB::transaction(function () use ($validatedData) {
+        return DB::transaction(function () use ($validatedData, $empresaActivaId) {
             $billData = collect($validatedData)->except(['items'])->all();
             $billData['created_by_user_id'] = Auth::id();
+            $billData['owner_company_id'] = $empresaActivaId;
 
             // Calculate totals
             $subtotal = 0;

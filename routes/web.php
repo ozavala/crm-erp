@@ -39,7 +39,7 @@ use App\Http\Controllers\ProfitAndLossController;
 use App\Http\Controllers\MarketingCampaignController; // Add MarketingCampaignController
 use App\Http\Controllers\EmailTemplateController; // Add EmailTemplateController
 use App\Http\Controllers\EmailServiceController; // Add EmailServiceController
-
+use App\Http\Controllers\OwnerCompanyController;
 
 // In routes/web.php
 Route::get('/phpinfo', function () {
@@ -84,6 +84,7 @@ Route::middleware(['setlocale', 'auth'])->group(function () {
     Route::get('orders/{order}/items', [InvoiceController::class, 'getOrderItemsJson'])->name('orders.items.json');
     Route::resource('suppliers', SupplierController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::post('/switch-company', [OwnerCompanyController::class, 'switch'])->name('ownercompany.switch');
     
     // Purchase Order Status Management
     Route::post('purchase-orders/{purchase_order}/confirm', [PurchaseOrderStatusController::class, 'confirm'])->name('purchase-orders.confirm');

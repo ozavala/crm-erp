@@ -14,17 +14,21 @@ class SettingTest extends TestCase
 
     public function test_core_settings_cannot_be_deleted()
     {
+        // Asumimos que hay un Observer o lógica en el modelo que previene la eliminación
+        // de settings 'core'. El método delete() retornaría false.
         $core = Setting::create([
             'key' => 'company_name',
             'value' => 'Test Company',
             'type' => 'core',
             'is_editable' => false,
         ]);
+
         $this->assertDatabaseHas('settings', ['key' => 'company_name']);
-        $deleted = $core->delete();
-        $this->assertTrue($deleted); // Eloquent delete returns true, but you should protect via lógica de controlador
-        // Simular protección lógica:
-        $this->assertFalse($core->is_editable);
+        
+        // La lógica de negocio debería prevenir la eliminación
+        $this->assertFalse($core->delete(), "Core settings should not be deletable.");
+        
+        $this->assertDatabaseHas('settings', ['key' => 'company_name']);
     }
 
     public function test_custom_settings_can_be_created_and_deleted()

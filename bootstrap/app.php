@@ -12,12 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // This is where you register middleware aliases.
-        // The 'can' alias is now registered to your CheckPermission middleware.
+        // Aliases
         $middleware->alias([
             'can' => \App\Http\Middleware\CheckPermission::class,
             'setlocale' => \App\Http\Middleware\SetLocale::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'ownercompany' => \App\Http\Middleware\SetOwnerCompany::class,
+        ]);
+        // Middleware global
+        $middleware->append([
+            \App\Http\Middleware\SetOwnerCompany::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

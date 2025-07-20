@@ -33,6 +33,7 @@ return new class extends Migration
             $table->text('terms_and_conditions')->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
+            $table->unsignedBigInteger('owner_company_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

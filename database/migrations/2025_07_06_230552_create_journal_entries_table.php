@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('transaction_type')->nullable();
             $table->unsignedBigInteger('referenceable_id')->nullable();
             $table->string('referenceable_type')->nullable();
+            $table->unsignedBigInteger('owner_company_id')->nullable();
             $table->timestamps();
         });
     }

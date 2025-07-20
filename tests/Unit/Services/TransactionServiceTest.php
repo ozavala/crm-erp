@@ -21,7 +21,7 @@ class TransactionServiceTest extends TestCase
         $company = OwnerCompany::factory()->create();
         $invoice = Invoice::factory()->create([
             'owner_company_id' => $company->owner_company_id,
-            'total' => 1000,
+            'total_amount' => 1000,
         ]);
 
         $transaction = TransactionService::createFromInvoice($invoice, $company->owner_company_id);
@@ -45,7 +45,7 @@ class TransactionServiceTest extends TestCase
         $company = OwnerCompany::factory()->create();
         $bill = Bill::factory()->create([
             'owner_company_id' => $company->owner_company_id,
-            'total' => 500,
+            'subtotal' => 500,
         ]);
 
         $transaction = TransactionService::createFromBill($bill, $company->owner_company_id);

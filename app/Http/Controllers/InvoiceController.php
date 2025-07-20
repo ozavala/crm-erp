@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoiceReminder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Session;
 
 class InvoiceController extends Controller
 {
@@ -25,7 +26,10 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Invoice::with(['order', 'customer'])->latest();
+        $empresaActivaId = Session::get('owner_company_id');
+        $query = Invoice::with(['order', 'customer'])
+            ->where('owner_company_id', $empresaActivaId)
+            ->latest();
 
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -52,18 +56,23 @@ class InvoiceController extends Controller
      */
     public function create(Request $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $statuses = Invoice::$statuses;
         // Fetch orders that are not yet fully invoiced or are in a state that allows invoicing
         // This logic might need to be more sophisticated based on your workflow
-        $orders = Order::whereNotIn('status', ['Cancelled', 'Completed']) // Example filter
+        $orders = Order::where('owner_company_id', $empresaActivaId)
+                       ->whereNotIn('status', ['Cancelled', 'Completed']) // Example filter
                        ->orderBy('order_number')
                        ->get();
-        $quotations = Quotation::where('status', 'Accepted') // Only from accepted quotations
+        $quotations = Quotation::where('owner_company_id', $empresaActivaId)
+                               ->where('status', 'Accepted') // Only from accepted quotations
                                ->whereDoesntHave('invoice') // That don't have an invoice yet
                                ->orderBy('subject')
                                ->get();
-        $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
+        $customers = Customer::where('owner_company_id', $empresaActivaId)
+                             ->orderBy('first_name')->orderBy('last_name')->get();
+        $products = Product::where('owner_company_id', $empresaActivaId)
+                           ->where('is_active', true)->orderBy('name')->get();
 
         $invoice = new Invoice();
         $orderItems = [];
@@ -130,6 +139,7 @@ class InvoiceController extends Controller
 
         $order = $order ?? null;
         $invoice->invoice_number = 'INV-' . strtoupper(Str::random(8)); // Suggest an invoice number
+        $invoice->owner_company_id = $empresaActivaId;
 
         return view('invoices.create', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems', 'order', 'customer'));
     }
@@ -139,6 +149,7 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $validatedData = $request->validated();
 
         // Obtener parámetros de settings
@@ -147,10 +158,11 @@ class InvoiceController extends Controller
         $defaultTerms = Setting::where('key', 'default_payment_terms')->value('value') ?? 'Contado';
         $defaultDueDays = Setting::where('key', 'default_due_days')->value('value') ?? 30;
 
-        return DB::transaction(function () use ($validatedData, $invoicePrefix, $invoiceStart, $defaultTerms, $defaultDueDays) {
+        return DB::transaction(function () use ($validatedData, $invoicePrefix, $invoiceStart, $defaultTerms, $defaultDueDays, $empresaActivaId) {
             $invoiceData = collect($validatedData)->except(['items'])->all();
             $invoiceData['created_by_user_id'] = Auth::id();
             $invoiceData['amount_paid'] = 0; // Initially no amount paid
+            $invoiceData['owner_company_id'] = $empresaActivaId;
 
             // Generar número de factura correlativo
             $lastInvoice = Invoice::orderByDesc('id')->first();
