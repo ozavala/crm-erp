@@ -20,71 +20,94 @@ class TransactionServiceTest extends TestCase
     {
         $company = OwnerCompany::factory()->create();
         $invoice = Invoice::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
             'total_amount' => 1000,
         ]);
 
-        $transaction = TransactionService::createFromInvoice($invoice, $company->owner_company_id);
+        $transaction = TransactionService::createFromInvoice($invoice, $company->id);
 
         $this->assertDatabaseHas('transactions', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'id' => $transaction->id,
+            'owner_company_id' => $company->id,
             'type' => 'venta',
             'amount' => 1000,
             'invoice_id' => $invoice->invoice_id,
+            'created_by_user_id' => $invoice->created_by_user_id,
         ]);
 
         $this->assertDatabaseHas('journal_entries', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
+            'referenceable_id' => $transaction->id,
+            'referenceable_type' => Transaction::class,
         ]);
+
+        $journalEntry = JournalEntry::where('referenceable_id', $transaction->id)
+            ->where('referenceable_type', Transaction::class)
+            ->first();
+        $this->assertCount(2, $journalEntry->lines);
     }
 
     public function test_create_transaction_from_bill_creates_journal_entry()
     {
         $company = OwnerCompany::factory()->create();
         $bill = Bill::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
-            'subtotal' => 500,
+            'owner_company_id' => $company->id,
+            'total_amount' => 500,
         ]);
 
-        $transaction = TransactionService::createFromBill($bill, $company->owner_company_id);
+        $transaction = TransactionService::createFromBill($bill, $company->id);
 
         $this->assertDatabaseHas('transactions', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'id' => $transaction->id,
+            'owner_company_id' => $company->id,
             'type' => 'compra',
             'amount' => 500,
             'bill_id' => $bill->bill_id,
+            'created_by_user_id' => $bill->created_by_user_id,
         ]);
 
         $this->assertDatabaseHas('journal_entries', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
+            'referenceable_id' => $transaction->id,
+            'referenceable_type' => Transaction::class,
         ]);
+
+        $journalEntry = JournalEntry::where('referenceable_id', $transaction->id)
+            ->where('referenceable_type', Transaction::class)
+            ->first();
+        $this->assertCount(2, $journalEntry->lines);
     }
 
     public function test_create_transaction_from_payment_creates_journal_entry()
     {
         $company = OwnerCompany::factory()->create();
         $payment = Payment::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
             'amount' => 250,
         ]);
 
-        $transaction = TransactionService::createFromPayment($payment, $company->owner_company_id);
+        $transaction = TransactionService::createFromPayment($payment, $company->id);
 
         $this->assertDatabaseHas('transactions', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'id' => $transaction->id,
+            'owner_company_id' => $company->id,
             'type' => 'pago',
             'amount' => 250,
             'payment_id' => $payment->payment_id,
+            'created_by_user_id' => $payment->created_by_user_id,
         ]);
 
         $this->assertDatabaseHas('journal_entries', [
-            'transaction_id' => $transaction->transaction_id,
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
+            'referenceable_id' => $transaction->id,
+            'referenceable_type' => Transaction::class,
+           
         ]);
+
+        $journalEntry = JournalEntry::where('referenceable_id', $transaction->id)
+            ->where('referenceable_type', Transaction::class)
+            ->first();
+        $this->assertCount(2, $journalEntry->lines);
     }
+    
 }

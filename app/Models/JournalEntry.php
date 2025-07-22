@@ -15,30 +15,36 @@ class JournalEntry extends Model
     protected $primaryKey = 'journal_entry_id';
 
     protected $fillable = [
+        'owner_company_id', // This was the missing piece
         'entry_date',
-        'transaction_type',
         'description',
+        'transaction_type',
+        'created_by_user_id',
         'referenceable_id',
         'referenceable_type',
-        'created_by_user_id',
     ];
 
-    protected $casts = [
-        'entry_date' => 'date',
-    ];
-
+    /**
+     * Get the lines for the journal entry.
+     */
     public function lines(): HasMany
     {
         return $this->hasMany(JournalEntryLine::class, 'journal_entry_id', 'journal_entry_id');
     }
 
+    /**
+     * Get the parent referenceable model (e.g., Transaction).
+     */
     public function referenceable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /**
+     * Get the user who created the entry.
+     */
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(CrmUser::class, 'created_by_user_id', 'user_id');
+        return $this->belongsTo(User::class, 'created_by_user_id');
     }
 }

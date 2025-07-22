@@ -118,9 +118,17 @@ class PaymentController extends Controller
     public function create()
     {
         $empresaActivaId = Session::get('owner_company_id');
-        $customers = Customer::where('owner_company_id', $empresaActivaId)->orderBy('first_name')->get();
-        $invoices = Invoice::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('invoice_date', 'desc')->get();
-        $orders = Order::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('order_date', 'desc')->get();
+        $customers = Customer::where('owner_company_id', $empresaActivaId)
+                            ->orderBy('first_name')
+                            ->get();
+        $invoices = Invoice::where('owner_company_id', $empresaActivaId)
+                        ->with('customer')
+                        ->orderBy('invoice_date', 'desc')
+                        ->get();
+        $orders = Order::where('owner_company_id', $empresaActivaId)
+                    ->with('customer')
+                    ->orderBy('order_date', 'desc')
+                    ->get();
         
         return view('payments.create', compact('customers', 'invoices', 'orders'));
     }

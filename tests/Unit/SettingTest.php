@@ -40,7 +40,7 @@ class SettingTest extends TestCase
             'is_editable' => true,
         ]);
         $this->assertDatabaseHas('settings', ['key' => 'custom_field']);
-        $custom->delete();
+        $this->assertTrue($custom->delete(), "Custom settings should be deletable.");
         $this->assertDatabaseMissing('settings', ['key' => 'custom_field']);
     }
 
