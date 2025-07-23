@@ -10,21 +10,27 @@ use App\Models\Order;
 use App\Models\CrmUser;
 use App\Models\Permission;
 use App\Models\UserRole;
+use App\Models\OwnerCompany;
 use PHPUnit\Framework\Attributes\Test;
 
 class PaymentControllerTest extends TestCase
 {
     protected CrmUser $user;
+    protected OwnerCompany $ownerCompany;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = CrmUser::factory()->create();
+        $this->ownerCompany = OwnerCompany::factory()->create();
+        $this->user = CrmUser::factory()->create([
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
+        session(['owner_company_id' => $this->ownerCompany->id]);
         
         // Create permissions and roles for payment management
         $permissions = [
             'view-payments',
-            'create-payments', 
+            'create-payments',
             'delete-payments'
         ];
         
@@ -45,10 +51,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_payments_index()
     {
-        $invoice = \App\Models\Invoice::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         Payment::factory()->count(3)->state([
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ])->create();
 
         $response = $this->get(route('payments.index'));
@@ -61,16 +68,18 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_search_payments()
     {
-        $invoice = \App\Models\Invoice::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         Payment::factory()->create([
             'reference_number' => 'PAY-001',
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         Payment::factory()->create([
             'reference_number' => 'PAY-002',
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
 
         $response = $this->get(route('payments.index', ['search' => 'PAY-001']));
@@ -95,11 +104,12 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_store_a_new_payment_for_invoice()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $invoice = Invoice::factory()->create([
             'customer_id' => $customer->customer_id,
             'total_amount' => 200.00,
-            'amount_paid' => 0.00
+            'amount_paid' => 0.00,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $paymentData = [
@@ -135,11 +145,12 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_store_a_new_payment_for_order()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
             'total_amount' => 150.00,
-            'amount_paid' => 0.00
+            'amount_paid' => 0.00,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $paymentData = [
@@ -166,10 +177,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_payment_details()
     {
-        $invoice = \App\Models\Invoice::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $payment = Payment::factory()->create([
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
 
         $response = $this->get(route('payments.show', $payment));
@@ -182,10 +194,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_display_edit_payment_form()
     {
-        $invoice = \App\Models\Invoice::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $payment = Payment::factory()->create([
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
 
         $response = $this->get(route('payments.edit', $payment));
@@ -200,10 +213,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_update_payment()
     {
-        $invoice = \App\Models\Invoice::factory()->create();
+        $invoice = \App\Models\Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $payment = Payment::factory()->create([
             'payable_id' => $invoice->invoice_id,
             'payable_type' => \App\Models\Invoice::class,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $updateData = [
@@ -232,11 +246,12 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_delete_payment()
     {
-        $invoice = Invoice::factory()->create();
+        $invoice = Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $payment = Payment::factory()->state([
             'payable_id' => $invoice->invoice_id,
             'payable_type' => Invoice::class,
-            'amount' => 100
+            'amount' => 100,
+            'owner_company_id' => $this->ownerCompany->id,
         ])->create();
 
         $response = $this->delete(route('payments.destroy', $payment));
@@ -258,8 +273,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_validates_payment_date_format()
     {
-        $customer = Customer::factory()->create();
-        $invoice = Invoice::factory()->create(['customer_id' => $customer->customer_id]);
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
+        $invoice = Invoice::factory()->create([
+            'customer_id' => $customer->customer_id,
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
         
         $paymentData = [
             'payable_type' => 'App\Models\Invoice',
@@ -277,8 +295,11 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_validates_amount_is_numeric()
     {
-        $customer = Customer::factory()->create();
-        $invoice = Invoice::factory()->create(['customer_id' => $customer->customer_id]);
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
+        $invoice = Invoice::factory()->create([
+            'customer_id' => $customer->customer_id,
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
         
         $paymentData = [
             'payable_type' => 'App\Models\Invoice',
@@ -296,11 +317,12 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_can_handle_partial_payment()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $invoice = Invoice::factory()->create([
             'customer_id' => $customer->customer_id,
             'total_amount' => 300.00,
-            'amount_paid' => 0.00
+            'amount_paid' => 0.00,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $paymentData = [
@@ -325,11 +347,12 @@ class PaymentControllerTest extends TestCase
     #[Test]
     public function it_validates_payment_amount_does_not_exceed_amount_due()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $invoice = Invoice::factory()->create([
             'customer_id' => $customer->customer_id,
             'total_amount' => 200.00,
-            'amount_paid' => 0.00
+            'amount_paid' => 0.00,
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $paymentData = [

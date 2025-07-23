@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Invoices</h1>
+        <h1>Invoices for {{ $activeCompany->name ?? 'Default Company' }}</h1>
         <a href="{{ route('invoices.create') }}" class="btn btn-primary">Add Invoice</a>
     </div>
 

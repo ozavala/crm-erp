@@ -83,22 +83,34 @@ class BillController extends Controller
 
     public function show(Bill $bill)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($bill->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $bill->load(['supplier', 'items.product', 'purchaseOrder', 'payments']);
         return view('bills.show', compact('bill'));
     }
 
     public function edit(Bill $bill)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($bill->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $bill->load(['items.product', 'supplier', 'purchaseOrder']);
-        $suppliers = Supplier::orderBy('name')->get();
+        $suppliers = Supplier::where('owner_company_id', $empresaActivaId)->orderBy('name')->get();
         $statuses = Bill::$statuses;
-        $products = Product::orderBy('name')->get(); // For adding new items
+        $products = Product::where('owner_company_id', $empresaActivaId)->orderBy('name')->get(); // For adding new items
 
         return view('bills.edit', compact('bill', 'suppliers', 'statuses', 'products'));
     }
 
     public function update(UpdateBillRequest $request, Bill $bill)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($bill->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $validatedData = $request->validated();
 
         return DB::transaction(function () use ($validatedData, $bill) {
@@ -156,6 +168,10 @@ class BillController extends Controller
      */
     public function printPdf(Bill $bill)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($bill->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $bill->load(['supplier.addresses', 'items.product']);
         
         // Get company logo if available

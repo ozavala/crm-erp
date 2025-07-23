@@ -109,5 +109,5 @@ class TransactionServiceTest extends TestCase
             ->first();
         $this->assertCount(2, $journalEntry->lines);
     }
-    
+ 
 }

@@ -61,7 +61,7 @@ class PaymentController extends Controller
             $payableModel = Bill::find($payableId);
         }
 
-        if (!$payableModel) {
+        if (!$payableModel || $payableModel->owner_company_id != $empresaActivaId) {
             return back()->with('error', 'Invalid payable entity specified.');
         }
 
@@ -108,6 +108,10 @@ class PaymentController extends Controller
     }
     public function show(Payment $payment)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($payment->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $payable = $payment->payable;
         return view('payments.show', compact('payable'));
     }
@@ -138,9 +142,13 @@ class PaymentController extends Controller
      */
     public function edit(Payment $payment)
     {
-        $customers = Customer::orderBy('first_name')->get();
-        $invoices = Invoice::with('customer')->orderBy('invoice_date', 'desc')->get();
-        $orders = Order::with('customer')->orderBy('order_date', 'desc')->get();
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($payment->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
+        $customers = Customer::where('owner_company_id', $empresaActivaId)->orderBy('first_name')->get();
+        $invoices = Invoice::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('invoice_date', 'desc')->get();
+        $orders = Order::where('owner_company_id', $empresaActivaId)->with('customer')->orderBy('order_date', 'desc')->get();
         
         return view('payments.edit', compact('payment', 'customers', 'invoices', 'orders'));
     }
@@ -150,6 +158,10 @@ class PaymentController extends Controller
      */
     public function update(Request $request, Payment $payment)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($payment->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $validatedData = $request->validate([
             'payment_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
@@ -170,6 +182,10 @@ class PaymentController extends Controller
      */
     public function destroy(Payment $payment)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($payment->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $payable = $payment->payable; // Get the related Invoice or PurchaseOrder
 
         DB::transaction(function () use ($payment, $payable) {
