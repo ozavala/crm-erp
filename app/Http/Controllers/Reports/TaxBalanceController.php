@@ -171,8 +171,72 @@ class TaxBalanceController extends Controller
         
         $report = $this->generateTaxBalanceReport($startDate, $endDate);
         
-        // Aquí implementarías la exportación a Excel
-        // Por ahora retornamos un JSON
-        return response()->json($report);
+        // Create a new spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set the title
+        $sheet->setCellValue('A1', 'Tax Balance Report');
+        $sheet->setCellValue('A2', 'Period: ' . $report['period']['start_formatted'] . ' to ' . $report['period']['end_formatted']);
+        
+        // Set headers for summary
+        $sheet->setCellValue('A4', 'Summary');
+        $sheet->setCellValue('A5', 'Total Tax Collected');
+        $sheet->setCellValue('B5', $report['summary']['total_tax_collected']);
+        $sheet->setCellValue('A6', 'Total Tax Paid');
+        $sheet->setCellValue('B6', $report['summary']['total_tax_paid']);
+        $sheet->setCellValue('A7', 'Net Tax Balance');
+        $sheet->setCellValue('B7', $report['summary']['net_tax_balance']);
+        $sheet->setCellValue('A8', 'Balance Status');
+        $sheet->setCellValue('B8', $report['summary']['balance_status']);
+        
+        // Set headers for sales tax by rate
+        $sheet->setCellValue('A10', 'Sales Tax by Rate');
+        $sheet->setCellValue('A11', 'Tax Rate');
+        $sheet->setCellValue('B11', 'Percentage');
+        $sheet->setCellValue('C11', 'Total Amount');
+        $sheet->setCellValue('D11', 'Count');
+        
+        // Add sales tax by rate data
+        $row = 12;
+        foreach ($report['sales_tax_by_rate'] as $item) {
+            $sheet->setCellValue('A' . $row, $item['tax_rate_name']);
+            $sheet->setCellValue('B' . $row, $item['tax_rate_percentage'] . '%');
+            $sheet->setCellValue('C' . $row, $item['total_tax_collected']);
+            $sheet->setCellValue('D' . $row, $item['invoice_count']);
+            $row++;
+        }
+        
+        // Set headers for purchase tax by rate
+        $sheet->setCellValue('A' . ($row + 1), 'Purchase Tax by Rate');
+        $sheet->setCellValue('A' . ($row + 2), 'Tax Rate');
+        $sheet->setCellValue('B' . ($row + 2), 'Percentage');
+        $sheet->setCellValue('C' . ($row + 2), 'Total Amount');
+        $sheet->setCellValue('D' . ($row + 2), 'Count');
+        
+        // Add purchase tax by rate data
+        $row += 3;
+        foreach ($report['purchase_tax_by_rate'] as $item) {
+            $sheet->setCellValue('A' . $row, $item['tax_rate_name']);
+            $sheet->setCellValue('B' . $row, $item['tax_rate_percentage'] . '%');
+            $sheet->setCellValue('C' . $row, $item['total_tax_paid']);
+            $sheet->setCellValue('D' . $row, $item['bill_count']);
+            $row++;
+        }
+        
+        // Create Excel file
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        
+        // Set the filename
+        $filename = 'tax_balance_report_' . $startDate . '_to_' . $endDate . '.xlsx';
+        
+        // Create a temporary file
+        $tempFile = tempnam(sys_get_temp_dir(), 'tax_balance_report');
+        $writer->save($tempFile);
+        
+        // Return the file as a download
+        return response()->download($tempFile, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 } 

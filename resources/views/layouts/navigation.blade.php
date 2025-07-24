@@ -182,6 +182,44 @@
 
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
+                <!-- Notifications -->
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdownNotifications" class="nav-link dropdown-toggle position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        @if(Auth::user()->unreadNotifications->count() > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ Auth::user()->unreadNotifications->count() }}
+                                <span class="visually-hidden">unread notifications</span>
+                            </span>
+                        @endif
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownNotifications" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                        <h6 class="dropdown-header">Notifications</h6>
+                        @if(Auth::user()->notifications->count() > 0)
+                            @foreach(Auth::user()->notifications->take(5) as $notification)
+                                <div class="dropdown-item {{ $notification->read_at ? '' : 'bg-light' }}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            @if($notification->type == 'App\\Notifications\\AppointmentReminder')
+                                                <p class="mb-0 fw-bold">{{ $notification->data['title'] }}</p>
+                                                <p class="mb-0 small">{{ $notification->data['message'] }}</p>
+                                                <p class="mb-0 small text-muted">{{ $notification->created_at->diffForHumans() }}</p>
+                                            @else
+                                                <p class="mb-0">{{ class_basename($notification->type) }}</p>
+                                                <p class="mb-0 small text-muted">{{ $notification->created_at->diffForHumans() }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center" href="{{ route('notifications.index') }}">View All Notifications</a>
+                        @else
+                            <div class="dropdown-item text-center">No notifications</div>
+                        @endif
+                    </div>
+                </li>
+                
                 <!-- Authentication Links -->
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre="">

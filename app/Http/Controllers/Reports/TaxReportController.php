@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\TaxRecoveryService;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\IvaMensualExport;
+use App\Exports\IvaAnualExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaxReportController extends Controller
 {
@@ -85,5 +88,47 @@ class TaxReportController extends Controller
     {
         $stats = $this->taxRecoveryService->getTaxStatistics();
         return response()->json($stats);
+    }
+    
+    /**
+     * Export monthly report to Excel
+     */
+    public function exportMonthlyExcel(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'year' => 'required|integer|min:2000|max:2100',
+            'month' => 'required|integer|min:1|max:12',
+        ])->validate();
+        
+        $year = $request->input('year');
+        $month = $request->input('month');
+        $report = $this->taxRecoveryService->generateMonthlyReport($year, $month);
+        
+        return Excel::download(
+            new IvaMensualExport($report, $year, $month),
+            'iva_mensual_' . $year . '_' . str_pad($month, 2, '0', STR_PAD_LEFT) . '.xlsx'
+        );
+    }
+    
+    /**
+     * Export annual report to Excel
+     */
+    public function exportAnnualExcel(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'year' => 'required|integer|min:2000|max:2100',
+        ])->validate();
+        
+        $year = $request->input('year');
+        $summary = [];
+        
+        for ($month = 1; $month <= 12; $month++) {
+            $summary[$month-1] = $this->taxRecoveryService->generateMonthlyReport($year, $month);
+        }
+        
+        return Excel::download(
+            new IvaAnualExport($summary, $year),
+            'iva_anual_' . $year . '.xlsx'
+        );
     }
 }

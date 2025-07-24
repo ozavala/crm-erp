@@ -40,6 +40,11 @@ use App\Http\Controllers\MarketingCampaignController; // Add MarketingCampaignCo
 use App\Http\Controllers\EmailTemplateController; // Add EmailTemplateController
 use App\Http\Controllers\EmailServiceController; // Add EmailServiceController
 use App\Http\Controllers\OwnerCompanyController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AppointmentParticipantController;
+use App\Http\Controllers\CalendarEventController;
+use App\Http\Controllers\CalendarSettingController;
+use App\Http\Controllers\NotificationController;
 
 // In routes/web.php
 Route::get('/phpinfo', function () {
@@ -141,8 +146,39 @@ Route::middleware(['setlocale', 'auth'])->group(function () {
     Route::get('reports/sales-by-employee', [ReportController::class, 'salesByEmployee'])->name('reports.sales-by-employee');
     Route::get('reports/profit-and-loss', [ProfitAndLossController::class, 'index'])->name('reports.profit_and_loss');
     Route::resource('feedback', FeedBackController::class)->except(['edit', 'destroy']);
+    
+    // Calendar and Appointment Routes
+    Route::resource('appointments', AppointmentController::class);
+    Route::get('appointments/{appointment}/participants', [AppointmentParticipantController::class, 'index'])->name('appointments.participants.index');
+    Route::get('appointments/{appointment}/participants/create', [AppointmentParticipantController::class, 'create'])->name('appointments.participants.create');
+    Route::post('appointments/{appointment}/participants', [AppointmentParticipantController::class, 'store'])->name('appointments.participants.store');
+    Route::patch('appointment-participants/{participant}/status', [AppointmentParticipantController::class, 'updateStatus'])->name('appointment-participants.update-status');
+    Route::delete('appointment-participants/{participant}', [AppointmentParticipantController::class, 'destroy'])->name('appointment-participants.destroy');
+    Route::post('appointment-participants/{participant}/make-organizer', [AppointmentParticipantController::class, 'makeOrganizer'])->name('appointment-participants.make-organizer');
+    
+    Route::get('calendar', [AppointmentController::class, 'calendar'])->name('calendar');
+    Route::get('calendar/appointments', [AppointmentController::class, 'getAppointmentsJson'])->name('calendar.appointments.json');
+    Route::post('appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+    
+    Route::resource('calendar-settings', CalendarSettingController::class);
+    Route::post('calendar-settings/{calendarSetting}/test-connection', [CalendarSettingController::class, 'testConnection'])->name('calendar-settings.test-connection');
+    Route::post('calendar-settings/{calendarSetting}/sync-events', [CalendarSettingController::class, 'syncEvents'])->name('calendar-settings.sync-events');
+    
+    Route::resource('calendar-events', CalendarEventController::class)->except(['create', 'store', 'edit', 'update']);
+    Route::post('calendar-events/sync-all', [CalendarEventController::class, 'syncAll'])->name('calendar-events.sync-all');
+    Route::post('calendar-events/{calendarEvent}/sync', [CalendarEventController::class, 'sync'])->name('calendar-events.sync');
+    Route::post('appointments/{appointment}/calendar-events', [CalendarEventController::class, 'createForAppointment'])->name('appointments.calendar-events.create');
+    Route::post('tasks/{task}/calendar-events', [CalendarEventController::class, 'createForTask'])->name('tasks.calendar-events.create');
+    Route::post('calendar-events/import', [CalendarEventController::class, 'import'])->name('calendar-events.import');
+    Route::get('calendar-events/export', [CalendarEventController::class, 'export'])->name('calendar-events.export');
+    Route::get('calendar-events/export-form', [CalendarEventController::class, 'exportForm'])->name('calendar-events.export-form');
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
 });
-    Route::middleware('auth')->group(function () {
+
+Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/custom', [SettingsController::class, 'storeCustom'])->name('settings.custom.store');
@@ -180,6 +216,8 @@ Route::prefix('reportes/iva')->group(function () {
     Route::get('/anual', [TaxReportController::class, 'annual'])->name('iva.report.annual');
     Route::get('/personalizado', [TaxReportController::class, 'custom'])->name('iva.report.custom');
     Route::get('/dashboard', [TaxReportController::class, 'dashboard'])->name('iva.report.dashboard');
+    Route::get('/mensual/excel', [TaxReportController::class, 'exportMonthlyExcel'])->name('iva.report.monthly.excel');
+    Route::get('/anual/excel', [TaxReportController::class, 'exportAnnualExcel'])->name('iva.report.annual.excel');
 });
 
 // Tax Balance Report Routes

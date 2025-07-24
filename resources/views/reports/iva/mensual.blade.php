@@ -23,11 +23,18 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Period Summary: {{ $report['period']['start'] }} to {{ $report['period']['end'] }}</h5>
-            <ul>
-                <li><strong>VAT Paid:</strong> ${{ number_format($report['tax_paid']['total'], 2) }}</li>
-                <li><strong>VAT Collected:</strong> ${{ number_format($report['tax_collected']['total'], 2) }}</li>
-                <li><strong>Net VAT:</strong> ${{ number_format($report['net_tax']['amount'], 2) }} ({{ $report['net_tax']['status'] == 'payable' ? 'Payable' : 'Receivable' }})</li>
-            </ul>
+            <div class="d-flex justify-content-between align-items-start">
+                <ul>
+                    <li><strong>VAT Paid:</strong> ${{ number_format($report['tax_paid']['total'], 2) }}</li>
+                    <li><strong>VAT Collected:</strong> ${{ number_format($report['tax_collected']['total'], 2) }}</li>
+                    <li><strong>Net VAT:</strong> ${{ number_format($report['net_tax']['amount'], 2) }} ({{ $report['net_tax']['status'] == 'payable' ? 'Payable' : 'Receivable' }})</li>
+                </ul>
+                <div>
+                    <a href="{{ route('iva.report.monthly.excel') }}?year={{ request('year', now()->year) }}&month={{ request('month', now()->month) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

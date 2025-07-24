@@ -23,6 +23,10 @@ class JournalEntry extends Model
         'referenceable_id',
         'referenceable_type',
     ];
+    
+    protected $casts = [
+        'entry_date' => 'date',
+    ];
 
     /**
      * Get the lines for the journal entry.

@@ -76,4 +76,12 @@ class Appointment extends Model
     {
         return $this->start_datetime->diffInMinutes($this->end_datetime);
     }
+
+    /**
+     * Get the reminders for the appointment.
+     */
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(AppointmentReminder::class, 'appointment_id');
+    }
 }
