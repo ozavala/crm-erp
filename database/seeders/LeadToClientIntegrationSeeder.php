@@ -18,7 +18,9 @@ class LeadToClientIntegrationSeeder extends Seeder
     public function run(): void
     {
         // 1. Crear un usuario CRM para asignaciones
-        $user = CrmUser::factory()->create();
+        $user = CrmUser::factory()->create([
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
+        ]);
 
         // 2. Crear un lead
         $lead = Lead::factory()->create([
@@ -26,6 +28,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'contact_name' => 'Juan Pérez',
             'contact_email' => 'juan.perez@ejemplo.com',
             'status' => 'Qualified',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
         // 3. Convertir el lead en cliente
@@ -35,6 +38,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'company_name' => 'Empresa Ejemplo',
             'email' => 'juan.perez@ejemplo.com',
             'status' => 'Active',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
         // 4. Crear una oportunidad para el cliente
@@ -48,6 +52,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'probability' => 70,
             'assigned_to_user_id' => $user->user_id,
             'created_by_user_id' => $user->user_id,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
         // 5. Crear productos
@@ -55,11 +60,13 @@ class LeadToClientIntegrationSeeder extends Seeder
             'name' => 'Licencia ERP',
             'sku' => 'ERP-001',
             'price' => 15000.00,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
         $product2 = Product::factory()->create([
             'name' => 'Soporte Anual',
             'sku' => 'SUP-001',
             'price' => 10000.00,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
         // 6. Crear una factura para el cliente
@@ -74,6 +81,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'total_amount' => 27500.00,
             'amount_paid' => 0.00,
             'created_by_user_id' => $user->user_id,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
         // 7. Asociar productos a la factura
@@ -105,6 +113,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'payment_method' => 'Transferencia',
             'reference_number' => 'PAY-INT-001',
             'created_by_user_id' => $user->user_id,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
         Payment::create([
             'payable_type' => Invoice::class,
@@ -114,6 +123,7 @@ class LeadToClientIntegrationSeeder extends Seeder
             'payment_method' => 'Tarjeta',
             'reference_number' => 'PAY-INT-002',
             'created_by_user_id' => $user->user_id,
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
     }
 } 

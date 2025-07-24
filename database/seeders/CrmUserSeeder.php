@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\CrmUser; // Adjust the namespace according to your application structure
 use App\Models\UserRole;
+use App\Models\OwnerCompany;
 
 class CrmUserSeeder extends Seeder
 {
@@ -14,6 +15,12 @@ class CrmUserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get owner companies or create a default one if none exist
+        $ownerCompanies = OwnerCompany::all();
+        if ($ownerCompanies->isEmpty()) {
+            $ownerCompanies = collect([OwnerCompany::factory()->create()]);
+        }
+        
         // You can seed the crm_users table with some initial data here.
         // For example, you might want to create a few users with different roles.
 
@@ -23,6 +30,7 @@ class CrmUserSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => bcrypt('password'), // Use a secure password in production
             'email_verified_at' => app()->environment('local', 'development') ? now() : null,
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $salesUser = CrmUser::create([
@@ -31,6 +39,7 @@ class CrmUserSeeder extends Seeder
             'email' => 'sales@example.com',
             'password' => bcrypt('password'),
             'email_verified_at' => app()->environment('local', 'development') ? now() : null,
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $supportUser = CrmUser::create([
@@ -39,6 +48,7 @@ class CrmUserSeeder extends Seeder
             'email' => 'support@example.com',
             'password' => bcrypt('password'),
             'email_verified_at' => app()->environment('local', 'development') ? now() : null,
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $marketingUser = CrmUser::create([
@@ -47,6 +57,7 @@ class CrmUserSeeder extends Seeder
             'email' => 'marketing@example.com',
             'password' => bcrypt('password'),
             'email_verified_at' => app()->environment('local', 'development') ? now() : null,
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         // Assign Roles

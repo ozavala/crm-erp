@@ -9,6 +9,7 @@ use App\Models\Quotation;
 use App\Models\Customer;
 use App\Models\CrmUser;
 use App\Models\Address;
+use App\Models\OwnerCompany;
 use Illuminate\Support\Str;
 
 class OrderSeeder extends Seeder
@@ -47,6 +48,15 @@ class OrderSeeder extends Seeder
             if (!$billingAddress) $billingAddress = $customer->addresses()->first();
 
 
+            // Get owner company from customer or user
+            $ownerCompanyId = $customer->owner_company_id ?? $user->owner_company_id ?? null;
+            
+            // If no owner company found, get the first one or create one
+            if (!$ownerCompanyId) {
+                $ownerCompany = OwnerCompany::first() ?? OwnerCompany::factory()->create();
+                $ownerCompanyId = $ownerCompany->id;
+            }
+            
             $orderData = [
                 'customer_id' => $customer->customer_id,
                 'quotation_id' => $quotation->quotation_id,
@@ -65,6 +75,7 @@ class OrderSeeder extends Seeder
                 'total_amount' => $quotation->total_amount,
                 'notes' => 'Order created from Quotation: ' . $quotation->subject,
                 'created_by_user_id' => $user->user_id,
+                'owner_company_id' => $ownerCompanyId,
             ];
 
             $order = Order::create($orderData);

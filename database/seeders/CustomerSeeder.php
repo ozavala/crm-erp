@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Customer; // Adjust the namespace according to your application structure
 use App\Models\Address; // Add this line
+use App\Models\OwnerCompany;
 
 class CustomerSeeder extends Seeder
 {
@@ -14,15 +15,22 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get owner companies or create a default one if none exist
+        $ownerCompanies = OwnerCompany::all();
+        if ($ownerCompanies->isEmpty()) {
+            $ownerCompanies = collect([OwnerCompany::factory()->create()]);
+        }
+        
         $customer1 = Customer::create([
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john@example.com',
-            'phone_number' => '123-456-7890', 
+            'phone_number' => '123-456-7890',
             'company_name' => 'Doe Enterprises',
             'status' => 'active', // Example: Active, Inactive, Lead
             //'notes' => 'Important customer, handle with care.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $customer1->addresses()->create([
@@ -44,6 +52,7 @@ class CustomerSeeder extends Seeder
             'status' => 'inactive', // Example: Active, Inactive, Lead
             //'notes' => 'Potential lead, follow up next month.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $customer2->addresses()->create([
@@ -61,10 +70,11 @@ class CustomerSeeder extends Seeder
             'last_name' => 'Johnson',
             'email' => 'alice@example.com',
             'phone_number' => '555-123-4567',
-            'company_name' => 'Johnson Corp',       
-            'status' => 'lead', // Example: Active, Inactive, Lead  
+            'company_name' => 'Johnson Corp',
+            'status' => 'lead', // Example: Active, Inactive, Lead
             //'notes' => 'Interested in our services, needs more information.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $customer3->addresses()->create([
@@ -86,6 +96,7 @@ class CustomerSeeder extends Seeder
             'status' => 'active', // Example: Active, Inactive, Lead
             //'notes' => 'Regular customer, always on time with payments.',
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
+            'owner_company_id' => $ownerCompanies->first()->id,
         ]);
 
         $customer4->addresses()->create([

@@ -24,6 +24,7 @@ class OpportunitySeeder extends Seeder
             'assigned_to_user_id' => 1, // Assuming user with ID 1 exists
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
             'probability' => 75, // 75% probability of closing
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
         Opportunity::create([
             'name' => 'Contract Renewal',
@@ -36,6 +37,7 @@ class OpportunitySeeder extends Seeder
             'assigned_to_user_id' => 2, // Assuming user with ID 2 exists
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
             'probability' => 85, // 85% probability of closing
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
         Opportunity::create([
             'name' => 'Upsell Existing Customer',
@@ -48,6 +50,7 @@ class OpportunitySeeder extends Seeder
             'assigned_to_user_id' => 3, // Assuming user with ID 3 exists
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
             'probability' => 60, // 60% probability of closing
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
         Opportunity::create([
             'name' => 'New Market Entry',
@@ -60,6 +63,7 @@ class OpportunitySeeder extends Seeder
             'assigned_to_user_id' => 4, // Assuming user with ID 4 exists
             'created_by_user_id' => 1, // Assuming user with ID 1 exists
             'probability' => 50, // 50% probability of closing
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
         ]);
 
 

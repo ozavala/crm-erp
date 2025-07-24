@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Supplier; // Adjust the namespace according to your application structure
+use App\Models\OwnerCompany;
 
 class SupplierSeeder extends Seeder
 {
@@ -13,6 +14,12 @@ class SupplierSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get owner companies or create a default one if none exist
+        $ownerCompanies = OwnerCompany::all();
+        if ($ownerCompanies->isEmpty()) {
+            $ownerCompanies = collect([OwnerCompany::factory()->create()]);
+        }
+        
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         \DB::table('suppliers')->truncate();
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -23,6 +30,7 @@ class SupplierSeeder extends Seeder
             'email' => 'john@example.com',
             'phone_number' => '123-456-7890',
             'notes' => 'Reliable supplier with quick delivery times.',
+            'owner_company_id' => $ownerCompanies->first()->id,
         ])->addresses()->create([
             'address_type' => 'Primary',
             'street_address_line_1' => '123 Main St',
@@ -39,6 +47,7 @@ class SupplierSeeder extends Seeder
             'email' => 'jane@example.com',
             'phone_number' => '987-654-3210',
             'notes' => 'Specializes in electronic components.',
+            'owner_company_id' => $ownerCompanies->first()->id,
         ])->addresses()->create([
             'address_type' => 'Billing',
             'street_address_line_1' => '456 Elm St',
@@ -55,6 +64,7 @@ class SupplierSeeder extends Seeder
             'email' => 'alice@example.com',
             'phone_number' => '555-123-4567',
             'notes' => 'Offers a wide range of products at competitive prices.',
+            'owner_company_id' => $ownerCompanies->first()->id,
         ])->addresses()->create([
             'address_type' => 'Shipping',
             'street_address_line_1' => '789 Oak St',
@@ -71,6 +81,7 @@ class SupplierSeeder extends Seeder
             'email' => 'bob@example.com',
             'phone_number' => '321-654-0987',
             'notes' => 'Focuses on locally sourced products.',
+            'owner_company_id' => $ownerCompanies->first()->id,
         ])->addresses()->create([
             'address_type' => 'Primary',
             'street_address_line_1' => '321 Pine St',

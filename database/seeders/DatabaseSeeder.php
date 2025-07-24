@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
 
         // 1. Seed foundational data that is mostly static
         $this->call([
+            OwnerCompanySeeder::class, // Moved to the top since other seeders depend on it
             PermissionSeeder::class,
             TaxRateSeeder::class,
             SettingsTableSeeder::class,
@@ -54,8 +55,7 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             PaymentSeeder::class,
             AccountSeeder::class,
-            OwnerCompanySeeder::class, // <-- Agregado
-            TransactionSeeder::class,  // <-- Agregado
+            TransactionSeeder::class,
         ]);
 
         // 2. Use factories to create a rich, dynamic dataset for testing
@@ -68,9 +68,15 @@ class DatabaseSeeder extends Seeder
         }
 
         // Create customers, each with contacts and opportunities
+        // Get owner company for factory creation
+        $ownerCompany = \App\Models\OwnerCompany::first();
+        
         Customer::factory(25)
             ->has(Contact::factory()->count(rand(1, 3)), 'contacts')
-            ->create(['created_by_user_id' => $users->random()->user_id])
+            ->create([
+                'created_by_user_id' => $users->random()->user_id,
+                'owner_company_id' => $ownerCompany->id,
+            ])
             ->each(function ($customer) use ($users) {
                 // For each customer, create some opportunities to populate the Kanban board
                 if ($customer->contacts->isNotEmpty()) {
@@ -100,6 +106,7 @@ class DatabaseSeeder extends Seeder
             'customer_id' => Customer::all()->random()->customer_id,
             'assigned_to_user_id' => $users->random()->user_id,
             'created_by_user_id' => $users->random()->user_id,
+            'owner_company_id' => $ownerCompany->id,
         ]);
         $this->command->info('Leads created.');
 
@@ -123,6 +130,11 @@ class DatabaseSeeder extends Seeder
         $this->call(ReportDataSeeder::class);
         $this->command->info('Report data created.');
        
+        // Uncomment the line below to create multi-tenancy demo data
+        // This creates multiple owner companies with their own sets of data
+        // $this->call(MultiTenancyDemoSeeder::class);
+        // $this->command->info('Multi-tenancy demo data created.');
+        
         // The OrderSeeder and InvoiceSeeder depend on the above, so they should be called after.
         // We will refactor them next.
     }

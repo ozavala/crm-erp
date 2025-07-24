@@ -39,7 +39,8 @@ class QuotationSeeder extends Seeder
                 'discount_value' => 10, // Example discount value
                 'discount_amount' => $opportunity->value * 0.10, // 10% discount
                 'tax_percentage' => 15, // Example tax percentage
-                'tax_amount' => ($opportunity->value - ($opportunity->value * 0.10)) * 0.15, // 15% tax on discounted value)
+                'tax_amount' => ($opportunity->value - ($opportunity->value * 0.10)) * 0.15, // 15% tax on discounted value
+                'owner_company_id' => $opportunity->owner_company_id, // Use the same owner_company_id as the opportunity
             ]);
         }
         

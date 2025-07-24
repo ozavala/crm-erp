@@ -19,6 +19,7 @@ class LeadSeeder extends Seeder
             'value' => 5000.00,
             'status' => 'new',
             'source' => 'website',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
             'customer_id' => 1, // Assuming customer with ID 1 exists
             'contact_name' => 'John Doe',
             'contact_email' => 'john@example.com',
@@ -34,6 +35,7 @@ class LeadSeeder extends Seeder
             'value' => 3000.00,
             'status' => 'follow-up',
             'source' => 'email',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
             'customer_id' => 2, // Assuming customer with ID 2 exists
             'contact_name' => 'Jane Smith',
             'contact_email' => 'jane@example.com',
@@ -48,6 +50,7 @@ class LeadSeeder extends Seeder
             'value' => 10000.00,
             'status' => 'negotiation',
             'source' => 'networking',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
             'customer_id' => 3, // Assuming customer with ID 3 exists
             'contact_name' => 'Alice Johnson',
             'contact_email' => 'alice@example.com',
@@ -62,6 +65,7 @@ class LeadSeeder extends Seeder
             'value' => 0.00, // No monetary value for feedback
             'status' => 'feedback',
             'source' => 'customer',
+            'owner_company_id' => 1, // Assuming owner company with ID 1 exists
             'customer_id' => 4, // Assuming customer with ID 4 exists
             'contact_name' => 'Bob Brown',
             'contact_email' => 'bob@example.com',
