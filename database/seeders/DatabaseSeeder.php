@@ -23,6 +23,10 @@ use Database\Seeders\SupplierSeeder;
 use App\Models\Supplier;
 use Database\Seeders\TaxRateSeeder;
 use Database\Seeders\AccountSeeder;
+use Database\Seeders\AppointmentSeeder;
+use Database\Seeders\AppointmentParticipantSeeder;
+use Database\Seeders\CalendarSettingSeeder;
+use Database\Seeders\CalendarEventSeeder;
 use Database\Seeders\OwnerCompanySeeder;
 use Database\Seeders\TransactionSeeder;
 
@@ -56,6 +60,10 @@ class DatabaseSeeder extends Seeder
             PaymentSeeder::class,
             AccountSeeder::class,
             TransactionSeeder::class,
+            CalendarSettingSeeder::class,
+            AppointmentSeeder::class,
+            AppointmentParticipantSeeder::class,
+            CalendarEventSeeder::class,
         ]);
 
         // 2. Use factories to create a rich, dynamic dataset for testing
