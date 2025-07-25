@@ -2,36 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\BaseCompanyController;
 use App\Models\CalendarSetting;
 use App\Models\CrmUser;
 use App\Http\Requests\StoreCalendarSettingRequest;
 use App\Http\Requests\UpdateCalendarSettingRequest;
 use App\Services\GoogleCalendarService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 
-class CalendarSettingController extends Controller
+class CalendarSettingController extends BaseCompanyController
 {
     /**
      * Display a listing of the calendar settings.
      */
     public function index()
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
         // Get company-wide settings
-        $companySettings = CalendarSetting::with('ownerCompany')
-            ->where('owner_company_id', $ownerCompanyId)
-            ->whereNull('user_id')
-            ->get();
+        $companySettings = CalendarSetting::with('ownerCompany')->whereNull('user_id')->get();
             
         // Get user-specific settings
-        $userSettings = CalendarSetting::with(['ownerCompany', 'user'])
-            ->where('owner_company_id', $ownerCompanyId)
-            ->whereNotNull('user_id')
-            ->get();
+        // The CompanyScope is automatically applied here.
+        $userSettings = CalendarSetting::with(['ownerCompany', 'user'])->whereNotNull('user_id')->get();
             
         return view('calendar_settings.index', compact('companySettings', 'userSettings'));
     }
@@ -41,10 +33,9 @@ class CalendarSettingController extends Controller
      */
     public function create()
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
         // Get users for dropdown
-        $users = CrmUser::where('owner_company_id', $ownerCompanyId)->get();
+        // Note: Applying the CompanyScope to the CrmUser model would simplify this as well.
+        $users = CrmUser::where('owner_company_id', $this->currentCompanyId)->get();
         
         return view('calendar_settings.create', compact('users'));
     }
@@ -54,9 +45,8 @@ class CalendarSettingController extends Controller
      */
     public function store(StoreCalendarSettingRequest $request)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
         $validatedData = $request->validated();
-        $validatedData['owner_company_id'] = $ownerCompanyId;
+        $validatedData['owner_company_id'] = $this->currentCompanyId;
         
         DB::transaction(function () use ($validatedData) {
             // If this is a primary calendar, unset any other primary calendars
@@ -77,11 +67,7 @@ class CalendarSettingController extends Controller
      */
     public function show(CalendarSetting $calendarSetting)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         
         // Load relationships
         $calendarSetting->load(['ownerCompany', 'user']);
@@ -94,14 +80,11 @@ class CalendarSettingController extends Controller
      */
     public function edit(CalendarSetting $calendarSetting)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         
         // Get users for dropdown
-        $users = CrmUser::where('owner_company_id', $ownerCompanyId)->get();
+        // Note: Applying the CompanyScope to the CrmUser model would simplify this as well.
+        $users = CrmUser::where('owner_company_id', $this->currentCompanyId)->get();
         
         return view('calendar_settings.edit', compact('calendarSetting', 'users'));
     }
@@ -111,12 +94,7 @@ class CalendarSettingController extends Controller
      */
     public function update(UpdateCalendarSettingRequest $request, CalendarSetting $calendarSetting)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
-        
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         $validatedData = $request->validated();
         
         DB::transaction(function () use ($calendarSetting, $validatedData) {
@@ -138,11 +116,7 @@ class CalendarSettingController extends Controller
      */
     public function destroy(CalendarSetting $calendarSetting)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         
         // Delete the calendar setting
         $calendarSetting->delete();
@@ -156,9 +130,7 @@ class CalendarSettingController extends Controller
      */
     private function unsetOtherPrimaryCalendars($userId)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        $query = CalendarSetting::where('owner_company_id', $ownerCompanyId)
-            ->where('is_primary', true);
+        $query = CalendarSetting::where('is_primary', true);
             
         if ($userId) {
             // If this is a user-specific calendar, only unset other primary calendars for this user
@@ -176,11 +148,7 @@ class CalendarSettingController extends Controller
      */
     public function testConnection(CalendarSetting $calendarSetting, GoogleCalendarService $googleCalendarService)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         
         $success = $googleCalendarService->testConnection($calendarSetting->google_calendar_id);
         
@@ -198,15 +166,10 @@ class CalendarSettingController extends Controller
      */
     public function syncEvents(CalendarSetting $calendarSetting, GoogleCalendarService $googleCalendarService)
     {
-        $ownerCompanyId = Session::get('owner_company_id');
-        
-        if ($calendarSetting->owner_company_id != $ownerCompanyId) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization is now handled automatically by Route Model Binding + CompanyScope.
         
         // Get all pending calendar events for this calendar
-        $pendingEvents = \App\Models\CalendarEvent::where('owner_company_id', $ownerCompanyId)
-            ->where('google_calendar_id', $calendarSetting->google_calendar_id)
+        $pendingEvents = \App\Models\CalendarEvent::where('google_calendar_id', $calendarSetting->google_calendar_id)
             ->where('sync_status', 'pending')
             ->get();
             

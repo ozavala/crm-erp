@@ -1,0 +1,470 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Account;
+use App\Models\CrmUser;
+use App\Models\JournalEntry;
+use App\Models\OwnerCompany;
+use App\Models\TaxRate;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+class AccountingMultiCompanyTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected OwnerCompany $company1;
+    protected OwnerCompany $company2;
+    protected CrmUser $user1;
+    protected CrmUser $user2;
+    protected CrmUser $superAdmin;
+    protected Account $asset1;
+    protected Account $liability1;
+    protected Account $income1;
+    protected Account $expense1;
+    protected Account $asset2;
+    protected Account $liability2;
+    protected Account $income2;
+    protected Account $expense2;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\SettingsTableSeeder::class);
+
+        // Create two companies
+        $this->company1 = OwnerCompany::create([
+            'name' => 'Company One',
+            'legal_name' => 'Company One LLC',
+            'tax_id' => 'TAX-001',
+            'email' => 'info@company1.com',
+            'phone' => '123-456-7890',
+            'address' => '123 Main St, Anytown, USA',
+            'is_active' => true,
+        ]);
+
+        $this->company2 = OwnerCompany::create([
+            'name' => 'Company Two',
+            'legal_name' => 'Company Two Inc',
+            'tax_id' => 'TAX-002',
+            'email' => 'info@company2.com',
+            'phone' => '987-654-3210',
+            'address' => '456 Oak Ave, Somewhere, USA',
+            'is_active' => true,
+        ]);
+
+        // Create users for each company
+        $this->user1 = CrmUser::factory()->create([
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        $this->user2 = CrmUser::factory()->create([
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        // Create a super admin user
+        $this->superAdmin = CrmUser::factory()->create([
+            'is_super_admin' => true,
+            'owner_company_id' => $this->company1->owner_company_id, // Primary company
+        ]);
+
+        // Give necessary permissions to users
+        $this->givePermission($this->user1, [
+            'view-accounts',
+            'create-accounts',
+            'edit-accounts',
+            'delete-accounts',
+            'view-journal-entries',
+            'create-journal-entries',
+            'edit-journal-entries',
+            'delete-journal-entries',
+            'view-financial-reports',
+            'view-tax-reports'
+        ]);
+
+        $this->givePermission($this->user2, [
+            'view-accounts',
+            'create-accounts',
+            'edit-accounts',
+            'delete-accounts',
+            'view-journal-entries',
+            'create-journal-entries',
+            'edit-journal-entries',
+            'delete-journal-entries',
+            'view-financial-reports',
+            'view-tax-reports'
+        ]);
+
+        $this->givePermission($this->superAdmin, [
+            'view-accounts',
+            'create-accounts',
+            'edit-accounts',
+            'delete-accounts',
+            'view-journal-entries',
+            'create-journal-entries',
+            'edit-journal-entries',
+            'delete-journal-entries',
+            'view-financial-reports',
+            'view-tax-reports',
+            'manage-companies'
+        ]);
+
+        // Create accounts for company 1
+        $this->asset1 = Account::create([
+            'name' => 'Cash - Company 1',
+            'account_number' => '1000',
+            'account_type' => 'asset',
+            'description' => 'Cash account for Company 1',
+            'is_active' => true,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        $this->liability1 = Account::create([
+            'name' => 'Accounts Payable - Company 1',
+            'account_number' => '2000',
+            'account_type' => 'liability',
+            'description' => 'Accounts Payable for Company 1',
+            'is_active' => true,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        $this->income1 = Account::create([
+            'name' => 'Sales Revenue - Company 1',
+            'account_number' => '4000',
+            'account_type' => 'income',
+            'description' => 'Sales Revenue for Company 1',
+            'is_active' => true,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        $this->expense1 = Account::create([
+            'name' => 'Office Supplies - Company 1',
+            'account_number' => '5000',
+            'account_type' => 'expense',
+            'description' => 'Office Supplies for Company 1',
+            'is_active' => true,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        // Create accounts for company 2
+        $this->asset2 = Account::create([
+            'name' => 'Cash - Company 2',
+            'account_number' => '1000',
+            'account_type' => 'asset',
+            'description' => 'Cash account for Company 2',
+            'is_active' => true,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        $this->liability2 = Account::create([
+            'name' => 'Accounts Payable - Company 2',
+            'account_number' => '2000',
+            'account_type' => 'liability',
+            'description' => 'Accounts Payable for Company 2',
+            'is_active' => true,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        $this->income2 = Account::create([
+            'name' => 'Sales Revenue - Company 2',
+            'account_number' => '4000',
+            'account_type' => 'income',
+            'description' => 'Sales Revenue for Company 2',
+            'is_active' => true,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        $this->expense2 = Account::create([
+            'name' => 'Office Supplies - Company 2',
+            'account_number' => '5000',
+            'account_type' => 'expense',
+            'description' => 'Office Supplies for Company 2',
+            'is_active' => true,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        // Create tax rates for both companies
+        TaxRate::create([
+            'name' => 'IVA 12% - Company 1',
+            'rate' => 12.00,
+            'is_active' => true,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        TaxRate::create([
+            'name' => 'IVA 12% - Company 2',
+            'rate' => 12.00,
+            'is_active' => true,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+    }
+
+    #[Test]
+    public function accounts_are_isolated_between_companies()
+    {
+        // Verify that company 1 user can only see company 1 accounts
+        $this->actingAs($this->user1);
+        $response = $this->get(route('accounts.index'));
+        $response->assertOk();
+        $response->assertSee('Cash - Company 1');
+        $response->assertDontSee('Cash - Company 2');
+
+        // Verify that company 2 user can only see company 2 accounts
+        $this->actingAs($this->user2);
+        $response = $this->get(route('accounts.index'));
+        $response->assertOk();
+        $response->assertSee('Cash - Company 2');
+        $response->assertDontSee('Cash - Company 1');
+
+        // Verify that super admin can see both companies' accounts
+        $this->actingAs($this->superAdmin);
+        $response = $this->get(route('accounts.index'));
+        $response->assertOk();
+        $response->assertSee('Cash - Company 1');
+        $response->assertSee('Cash - Company 2');
+    }
+
+    #[Test]
+    public function journal_entries_are_isolated_between_companies()
+    {
+        // Create journal entries for company 1
+        $this->actingAs($this->user1);
+        $journalEntry1 = JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'JE-001-C1',
+            'description' => 'Journal Entry for Company 1',
+            'debit_account_id' => $this->asset1->account_id,
+            'credit_account_id' => $this->income1->account_id,
+            'amount' => 1000.00,
+            'created_by_user_id' => $this->user1->user_id,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        // Create journal entries for company 2
+        $this->actingAs($this->user2);
+        $journalEntry2 = JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'JE-001-C2',
+            'description' => 'Journal Entry for Company 2',
+            'debit_account_id' => $this->asset2->account_id,
+            'credit_account_id' => $this->income2->account_id,
+            'amount' => 2000.00,
+            'created_by_user_id' => $this->user2->user_id,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        // Verify that company 1 user can only see company 1 journal entries
+        $this->actingAs($this->user1);
+        $response = $this->get(route('journal-entries.index'));
+        $response->assertOk();
+        $response->assertSee('JE-001-C1');
+        $response->assertDontSee('JE-001-C2');
+
+        // Verify that company 2 user can only see company 2 journal entries
+        $this->actingAs($this->user2);
+        $response = $this->get(route('journal-entries.index'));
+        $response->assertOk();
+        $response->assertSee('JE-001-C2');
+        $response->assertDontSee('JE-001-C1');
+
+        // Verify that super admin can see both companies' journal entries
+        $this->actingAs($this->superAdmin);
+        $response = $this->get(route('journal-entries.index'));
+        $response->assertOk();
+        $response->assertSee('JE-001-C1');
+        $response->assertSee('JE-001-C2');
+    }
+
+    #[Test]
+    public function users_cannot_create_journal_entries_with_accounts_from_other_companies()
+    {
+        // Try to create a journal entry for company 1 with company 2 accounts
+        $this->actingAs($this->user1);
+        
+        $journalEntryData = [
+            'entry_date' => now()->format('Y-m-d'),
+            'reference' => 'JE-002-C1',
+            'description' => 'Invalid Journal Entry',
+            'debit_account_id' => $this->asset2->account_id, // Company 2 account
+            'credit_account_id' => $this->income1->account_id, // Company 1 account
+            'amount' => 1000.00,
+        ];
+        
+        $response = $this->post(route('journal-entries.store'), $journalEntryData);
+        
+        // The request should fail because the accounts belong to different companies
+        $response->assertSessionHasErrors(['debit_account_id']);
+        
+        // Verify that no journal entry was created
+        $this->assertDatabaseMissing('journal_entries', [
+            'reference' => 'JE-002-C1',
+        ]);
+    }
+
+    #[Test]
+    public function tax_reports_are_isolated_between_companies()
+    {
+        // Create journal entries with tax for company 1
+        $this->actingAs($this->user1);
+        $taxRate1 = TaxRate::where('owner_company_id', $this->company1->owner_company_id)->first();
+        
+        $journalEntry1 = JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'TAX-001-C1',
+            'description' => 'Taxable Entry for Company 1',
+            'debit_account_id' => $this->asset1->account_id,
+            'credit_account_id' => $this->income1->account_id,
+            'amount' => 1000.00,
+            'tax_rate_id' => $taxRate1->tax_rate_id,
+            'tax_amount' => 120.00, // 12% of 1000
+            'created_by_user_id' => $this->user1->user_id,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        // Create journal entries with tax for company 2
+        $this->actingAs($this->user2);
+        $taxRate2 = TaxRate::where('owner_company_id', $this->company2->owner_company_id)->first();
+        
+        $journalEntry2 = JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'TAX-001-C2',
+            'description' => 'Taxable Entry for Company 2',
+            'debit_account_id' => $this->asset2->account_id,
+            'credit_account_id' => $this->income2->account_id,
+            'amount' => 2000.00,
+            'tax_rate_id' => $taxRate2->tax_rate_id,
+            'tax_amount' => 240.00, // 12% of 2000
+            'created_by_user_id' => $this->user2->user_id,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        // Verify that company 1 user can only see company 1 tax reports
+        $this->actingAs($this->user1);
+        $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
+        $response->assertOk();
+        $response->assertSee('TAX-001-C1');
+        $response->assertDontSee('TAX-001-C2');
+        $response->assertSee('120.00'); // Company 1 tax amount
+        $response->assertDontSee('240.00'); // Company 2 tax amount
+
+        // Verify that company 2 user can only see company 2 tax reports
+        $this->actingAs($this->user2);
+        $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
+        $response->assertOk();
+        $response->assertSee('TAX-001-C2');
+        $response->assertDontSee('TAX-001-C1');
+        $response->assertSee('240.00'); // Company 2 tax amount
+        $response->assertDontSee('120.00'); // Company 1 tax amount
+
+        // Verify that super admin can see both companies' tax reports
+        $this->actingAs($this->superAdmin);
+        $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
+        $response->assertOk();
+        $response->assertSee('TAX-001-C1');
+        $response->assertSee('TAX-001-C2');
+        $response->assertSee('120.00'); // Company 1 tax amount
+        $response->assertSee('240.00'); // Company 2 tax amount
+    }
+
+    #[Test]
+    public function financial_reports_are_isolated_between_companies()
+    {
+        // Create journal entries for company 1
+        $this->actingAs($this->user1);
+        
+        // Revenue entry
+        JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'FIN-001-C1',
+            'description' => 'Revenue Entry for Company 1',
+            'debit_account_id' => $this->asset1->account_id,
+            'credit_account_id' => $this->income1->account_id,
+            'amount' => 5000.00,
+            'created_by_user_id' => $this->user1->user_id,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+        
+        // Expense entry
+        JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'FIN-002-C1',
+            'description' => 'Expense Entry for Company 1',
+            'debit_account_id' => $this->expense1->account_id,
+            'credit_account_id' => $this->asset1->account_id,
+            'amount' => 2000.00,
+            'created_by_user_id' => $this->user1->user_id,
+            'owner_company_id' => $this->company1->owner_company_id,
+        ]);
+
+        // Create journal entries for company 2
+        $this->actingAs($this->user2);
+        
+        // Revenue entry
+        JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'FIN-001-C2',
+            'description' => 'Revenue Entry for Company 2',
+            'debit_account_id' => $this->asset2->account_id,
+            'credit_account_id' => $this->income2->account_id,
+            'amount' => 8000.00,
+            'created_by_user_id' => $this->user2->user_id,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+        
+        // Expense entry
+        JournalEntry::create([
+            'entry_date' => now(),
+            'reference' => 'FIN-002-C2',
+            'description' => 'Expense Entry for Company 2',
+            'debit_account_id' => $this->expense2->account_id,
+            'credit_account_id' => $this->asset2->account_id,
+            'amount' => 3000.00,
+            'created_by_user_id' => $this->user2->user_id,
+            'owner_company_id' => $this->company2->owner_company_id,
+        ]);
+
+        // Verify that company 1 user can only see company 1 financial reports
+        $this->actingAs($this->user1);
+        
+        // Income statement
+        $response = $this->get(route('financial-reports.income-statement', [
+            'start_date' => now()->startOfMonth()->format('Y-m-d'),
+            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+        ]));
+        $response->assertOk();
+        $response->assertSee('5000.00'); // Company 1 revenue
+        $response->assertSee('2000.00'); // Company 1 expense
+        $response->assertDontSee('8000.00'); // Company 2 revenue
+        $response->assertDontSee('3000.00'); // Company 2 expense
+
+        // Verify that company 2 user can only see company 2 financial reports
+        $this->actingAs($this->user2);
+        
+        // Income statement
+        $response = $this->get(route('financial-reports.income-statement', [
+            'start_date' => now()->startOfMonth()->format('Y-m-d'),
+            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+        ]));
+        $response->assertOk();
+        $response->assertSee('8000.00'); // Company 2 revenue
+        $response->assertSee('3000.00'); // Company 2 expense
+        $response->assertDontSee('5000.00'); // Company 1 revenue
+        $response->assertDontSee('2000.00'); // Company 1 expense
+
+        // Verify that super admin can see both companies' financial reports
+        $this->actingAs($this->superAdmin);
+        
+        // Income statement
+        $response = $this->get(route('financial-reports.income-statement', [
+            'start_date' => now()->startOfMonth()->format('Y-m-d'),
+            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+        ]));
+        $response->assertOk();
+        $response->assertSee('5000.00'); // Company 1 revenue
+        $response->assertSee('2000.00'); // Company 1 expense
+        $response->assertSee('8000.00'); // Company 2 revenue
+        $response->assertSee('3000.00'); // Company 2 expense
+    }
+}
