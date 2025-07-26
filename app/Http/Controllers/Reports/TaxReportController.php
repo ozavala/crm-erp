@@ -39,6 +39,7 @@ class TaxReportController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json($report);
         }
+        dd($report);
         return view('reports.iva.mensual', compact('report'));
     }
 

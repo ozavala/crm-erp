@@ -21,10 +21,18 @@ class CalendarEvent extends Model
         'related_id',
         'sync_status',
         'last_synced_at',
+        'title',
+        'start',
+        'end',
+        'description',
+        'allDay',
     ];
 
     protected $casts = [
         'last_synced_at' => 'datetime',
+        'start' => 'datetime',
+        'end' => 'datetime',
+        'allDay' => 'boolean',
     ];
 
     public static array $syncStatuses = ['synced', 'pending', 'failed'];

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\InvoiceApiController;
 use App\Http\Controllers\Api\PurchaseOrderApiController;
 use App\Http\Controllers\Api\ReportingApiController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\CalendarEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +91,12 @@ Route::middleware('auth:sanctum')->group(function () {
             'monthly_sales' => \App\Models\Order::whereMonth('created_at', now()->month)->sum('total_amount'),
         ]);
     });
+
+    // Calendar Events API
+    Route::apiResource('calendar-events', CalendarEventController::class);
+    Route::get('accounts', [App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
+    Route::get('financial-reports/income-statement', [App\Http\Controllers\ProfitAndLossController::class, 'index'])->name('financial-reports.income-statement');
+    Route::get('tax-reports/monthly', [App\Http\Controllers\Reports\TaxReportController::class, 'monthly'])->name('tax-reports.monthly');
 });
 
 // Auth routes (no authentication required)

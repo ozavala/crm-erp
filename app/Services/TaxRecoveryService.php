@@ -78,11 +78,15 @@ class TaxRecoveryService
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
-        $taxPayments = TaxPayment::whereBetween('payment_date', [$start, $end])
+        $ownerCompanyId = auth()->user()->owner_company_id;
+
+        $taxPayments = TaxPayment::where('owner_company_id', $ownerCompanyId)
+            ->whereBetween('payment_date', [$start, $end])
             ->where('status', 'paid')
             ->get();
 
-        $taxCollections = TaxCollection::whereBetween('collection_date', [$start, $end])
+        $taxCollections = TaxCollection::where('owner_company_id', $ownerCompanyId)
+            ->whereBetween('collection_date', [$start, $end])
             ->where('status', 'collected')
             ->get();
 

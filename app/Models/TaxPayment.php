@@ -14,6 +14,7 @@ class TaxPayment extends Model
     protected $primaryKey = 'tax_payment_id';
 
     protected $fillable = [
+        'owner_company_id',
         'purchase_order_id',
         'invoice_id',
         'tax_rate_id',
@@ -78,6 +79,11 @@ class TaxPayment extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(CrmUser::class, 'created_by_user_id', 'user_id');
+    }
+
+    public function ownerCompany(): BelongsTo
+    {
+        return $this->belongsTo(OwnerCompany::class, 'owner_company_id');
     }
 
     /**

@@ -52,8 +52,12 @@ Route::get('/phpinfo', function () {
 });
 
 
+Route::get('/calendar', function () {
+    return view('calendar.index');
+});
+
 Route::get('/', function () {
-    return view('landing');
+    return view('welcome');
 });
 
 Route::get('/dashboard', function () {
