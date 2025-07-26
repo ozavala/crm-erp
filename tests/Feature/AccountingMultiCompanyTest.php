@@ -348,8 +348,8 @@ class AccountingMultiCompanyTest extends TestCase
         $this->actingAs($this->user1);
         $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
         $response->assertOk();
-        $response->assertSee('Taxable Entry for Company 1');
-        $response->assertDontSee('Taxable Entry for Company 2');
+        $response->assertSee('IVA 12% - Company 1');
+        $response->assertDontSee('IVA 12% - Company 2');
         $response->assertSee('120.00'); // Company 1 tax amount
         $response->assertDontSee('240.00'); // Company 2 tax amount
 
@@ -357,8 +357,8 @@ class AccountingMultiCompanyTest extends TestCase
         $this->actingAs($this->user2);
         $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
         $response->assertOk();
-        $response->assertSee('Taxable Entry for Company 2');
-        $response->assertDontSee('Taxable Entry for Company 1');
+        $response->assertSee('IVA 12% - Company 2');
+        $response->assertDontSee('IVA 12% - Company 1');
         $response->assertSee('240.00'); // Company 2 tax amount
         $response->assertDontSee('120.00'); // Company 1 tax amount
 
@@ -366,8 +366,8 @@ class AccountingMultiCompanyTest extends TestCase
         $this->actingAs($this->superAdmin);
         $response = $this->get(route('tax-reports.monthly', ['year' => now()->year, 'month' => now()->month]));
         $response->assertOk();
-        $response->assertSee('Taxable Entry for Company 1');
-        $response->assertSee('Taxable Entry for Company 2');
+        $response->assertSee('IVA 12% - Company 1');
+        $response->assertSee('IVA 12% - Company 2');
         $response->assertSee('120.00'); // Company 1 tax amount
         $response->assertSee('240.00'); // Company 2 tax amount
     }
@@ -438,8 +438,8 @@ class AccountingMultiCompanyTest extends TestCase
         
         // Income statement
         $response = $this->get(route('financial-reports.income-statement', [
-            'start_date' => now()->startOfMonth()->format('Y-m-d'),
-            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+            'from' => now()->startOfMonth()->format('Y-m-d'),
+            'to' => now()->endOfMonth()->format('Y-m-d'),
         ]));
         $response->assertOk();
         $response->assertSee('5000.00'); // Company 1 revenue
@@ -452,8 +452,8 @@ class AccountingMultiCompanyTest extends TestCase
         
         // Income statement
         $response = $this->get(route('financial-reports.income-statement', [
-            'start_date' => now()->startOfMonth()->format('Y-m-d'),
-            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+            'from' => now()->startOfMonth()->format('Y-m-d'),
+            'to' => now()->endOfMonth()->format('Y-m-d'),
         ]));
         $response->assertOk();
         $response->assertSee('8000.00'); // Company 2 revenue
@@ -466,10 +466,11 @@ class AccountingMultiCompanyTest extends TestCase
         
         // Income statement
         $response = $this->get(route('financial-reports.income-statement', [
-            'start_date' => now()->startOfMonth()->format('Y-m-d'),
-            'end_date' => now()->endOfMonth()->format('Y-m-d'),
+            'from' => now()->startOfMonth()->format('Y-m-d'),
+            'to' => now()->endOfMonth()->format('Y-m-d'),
         ]));
         $response->assertOk();
+        dump($response->getContent());
         $response->assertSee('5000.00'); // Company 1 revenue
         $response->assertSee('2000.00'); // Company 1 expense
         $response->assertSee('8000.00'); // Company 2 revenue
