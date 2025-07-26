@@ -37,37 +37,31 @@ class AccountingMultiCompanyTest extends TestCase
         // Create two companies
         $this->company1 = OwnerCompany::create([
             'name' => 'Company One',
-            'legal_name' => 'Company One LLC',
-            'tax_id' => 'TAX-001',
-            'email' => 'info@company1.com',
+            'legal_id' => 'TAX-001',
             'phone' => '123-456-7890',
             'address' => '123 Main St, Anytown, USA',
-            'is_active' => true,
         ]);
 
         $this->company2 = OwnerCompany::create([
             'name' => 'Company Two',
-            'legal_name' => 'Company Two Inc',
-            'tax_id' => 'TAX-002',
-            'email' => 'info@company2.com',
+            'legal_id' => 'TAX-002',
             'phone' => '987-654-3210',
             'address' => '456 Oak Ave, Somewhere, USA',
-            'is_active' => true,
         ]);
 
         // Create users for each company
         $this->user1 = CrmUser::factory()->create([
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         $this->user2 = CrmUser::factory()->create([
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         // Create a super admin user
         $this->superAdmin = CrmUser::factory()->create([
             'is_super_admin' => true,
-            'owner_company_id' => $this->company1->owner_company_id, // Primary company
+            'owner_company_id' => $this->company1->id, // Primary company
         ]);
 
         // Give necessary permissions to users
@@ -115,74 +109,82 @@ class AccountingMultiCompanyTest extends TestCase
         $this->asset1 = Account::create([
             'name' => 'Cash - Company 1',
             'account_number' => '1000',
-            'account_type' => 'asset',
+            'type' => 'asset',
             'description' => 'Cash account for Company 1',
+            'code' => 'CASH1',
             'is_active' => true,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         $this->liability1 = Account::create([
             'name' => 'Accounts Payable - Company 1',
             'account_number' => '2000',
-            'account_type' => 'liability',
+            'type' => 'liability',
             'description' => 'Accounts Payable for Company 1',
+            'code' => 'AP1',
             'is_active' => true,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         $this->income1 = Account::create([
             'name' => 'Sales Revenue - Company 1',
             'account_number' => '4000',
-            'account_type' => 'income',
+            'type' => 'income',
             'description' => 'Sales Revenue for Company 1',
+            'code' => 'REV1',
             'is_active' => true,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         $this->expense1 = Account::create([
             'name' => 'Office Supplies - Company 1',
             'account_number' => '5000',
-            'account_type' => 'expense',
+            'type' => 'expense',
+            'code' => 'EXP1',
             'description' => 'Office Supplies for Company 1',
             'is_active' => true,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         // Create accounts for company 2
         $this->asset2 = Account::create([
             'name' => 'Cash - Company 2',
             'account_number' => '1000',
-            'account_type' => 'asset',
+            'type' => 'asset',
+            'code' => 'CASH2',
             'description' => 'Cash account for Company 2',
             'is_active' => true,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         $this->liability2 = Account::create([
             'name' => 'Accounts Payable - Company 2',
             'account_number' => '2000',
-            'account_type' => 'liability',
+            'type' => 'liability',
+            'code' => 'AP2',
             'description' => 'Accounts Payable for Company 2',
             'is_active' => true,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         $this->income2 = Account::create([
             'name' => 'Sales Revenue - Company 2',
             'account_number' => '4000',
-            'account_type' => 'income',
+            'type' => 'income',
+            'code' => 'REV2',
             'description' => 'Sales Revenue for Company 2',
             'is_active' => true,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         $this->expense2 = Account::create([
             'name' => 'Office Supplies - Company 2',
             'account_number' => '5000',
-            'account_type' => 'expense',
+            'type' => 'expense',
+            'code' => 'EXP2',
             'description' => 'Office Supplies for Company 2',
             'is_active' => true,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         // Create tax rates for both companies
@@ -190,14 +192,14 @@ class AccountingMultiCompanyTest extends TestCase
             'name' => 'IVA 12% - Company 1',
             'rate' => 12.00,
             'is_active' => true,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         TaxRate::create([
             'name' => 'IVA 12% - Company 2',
             'rate' => 12.00,
             'is_active' => true,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
     }
 
@@ -239,7 +241,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->income1->account_id,
             'amount' => 1000.00,
             'created_by_user_id' => $this->user1->user_id,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         // Create journal entries for company 2
@@ -252,7 +254,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->income2->account_id,
             'amount' => 2000.00,
             'created_by_user_id' => $this->user2->user_id,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         // Verify that company 1 user can only see company 1 journal entries
@@ -308,7 +310,7 @@ class AccountingMultiCompanyTest extends TestCase
     {
         // Create journal entries with tax for company 1
         $this->actingAs($this->user1);
-        $taxRate1 = TaxRate::where('owner_company_id', $this->company1->owner_company_id)->first();
+        $taxRate1 = TaxRate::where('owner_company_id', $this->company1->id)->first();
         
         $journalEntry1 = JournalEntry::create([
             'entry_date' => now(),
@@ -320,12 +322,12 @@ class AccountingMultiCompanyTest extends TestCase
             'tax_rate_id' => $taxRate1->tax_rate_id,
             'tax_amount' => 120.00, // 12% of 1000
             'created_by_user_id' => $this->user1->user_id,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         // Create journal entries with tax for company 2
         $this->actingAs($this->user2);
-        $taxRate2 = TaxRate::where('owner_company_id', $this->company2->owner_company_id)->first();
+        $taxRate2 = TaxRate::where('owner_company_id', $this->company2->id)->first();
         
         $journalEntry2 = JournalEntry::create([
             'entry_date' => now(),
@@ -337,7 +339,7 @@ class AccountingMultiCompanyTest extends TestCase
             'tax_rate_id' => $taxRate2->tax_rate_id,
             'tax_amount' => 240.00, // 12% of 2000
             'created_by_user_id' => $this->user2->user_id,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         // Verify that company 1 user can only see company 1 tax reports
@@ -383,7 +385,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->income1->account_id,
             'amount' => 5000.00,
             'created_by_user_id' => $this->user1->user_id,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
         
         // Expense entry
@@ -395,7 +397,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->asset1->account_id,
             'amount' => 2000.00,
             'created_by_user_id' => $this->user1->user_id,
-            'owner_company_id' => $this->company1->owner_company_id,
+            'owner_company_id' => $this->company1->id,
         ]);
 
         // Create journal entries for company 2
@@ -410,7 +412,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->income2->account_id,
             'amount' => 8000.00,
             'created_by_user_id' => $this->user2->user_id,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
         
         // Expense entry
@@ -422,7 +424,7 @@ class AccountingMultiCompanyTest extends TestCase
             'credit_account_id' => $this->asset2->account_id,
             'amount' => 3000.00,
             'created_by_user_id' => $this->user2->user_id,
-            'owner_company_id' => $this->company2->owner_company_id,
+            'owner_company_id' => $this->company2->id,
         ]);
 
         // Verify that company 1 user can only see company 1 financial reports
