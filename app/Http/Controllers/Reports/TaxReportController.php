@@ -28,18 +28,23 @@ class TaxReportController extends Controller
             'year' => 'required|integer|min:2000|max:2100',
             'month' => 'required|integer|min:1|max:12',
         ])->sometimes('year', 'nullable', fn() => !$request->has('year'))
-          ->sometimes('month', 'nullable', fn() => !$request->has('month'))
-          ->validate();
+        ->sometimes('month', 'nullable', fn() => !$request->has('month'))
+        ->validate();
 
         $report = null;
         if ($request->has(['year', 'month'])) {
-            $report = $this->taxRecoveryService->generateMonthlyReport($request->input('year'), $request->input('month'));
+            $user = auth()->user();
+            $ownerCompanyId = $user->is_super_admin ? null : $user->owner_company_id;
+            $report = $this->taxRecoveryService->generateMonthlyReport(
+                $request->input('year'),
+                $request->input('month'),
+                $ownerCompanyId // <-- pass this to the service
+            );
         }
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json($report);
         }
-        dd($report);
         return view('reports.iva.mensual', compact('report'));
     }
 
@@ -55,10 +60,12 @@ class TaxReportController extends Controller
 
         $summary = null;
         if ($request->has('year')) {
+            $user = auth()->user();
+            $ownerCompanyId = $user->is_super_admin ? null : $user->owner_company_id;
             $year = $request->input('year');
             $summary = [];
             for ($month = 1; $month <= 12; $month++) {
-                $summary[$month-1] = $this->taxRecoveryService->generateMonthlyReport($year, $month);
+                $summary[$month-1] = $this->taxRecoveryService->generateMonthlyReport($year, $month, $ownerCompanyId);
             }
         }
 
@@ -77,8 +84,9 @@ class TaxReportController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ])->validate();
-
-        $report = $this->taxRecoveryService->getTaxSummary($validated['start_date'], $validated['end_date']);
+        $user = auth()->user();
+        $ownerCompanyId = $user->is_super_admin ? null : $user->owner_company_id;
+        $report = $this->taxRecoveryService->getTaxSummary($validated['start_date'], $validated['end_date'], $ownerCompanyId);
         return response()->json($report);
     }
 
@@ -103,7 +111,9 @@ class TaxReportController extends Controller
         
         $year = $request->input('year');
         $month = $request->input('month');
-        $report = $this->taxRecoveryService->generateMonthlyReport($year, $month);
+        $user = auth()->user();
+        $ownerCompanyId = $user->is_super_admin ? null : $user->owner_company_id;
+        $report = $this->taxRecoveryService->generateMonthlyReport($year, $month, $ownerCompanyId);
         
         return Excel::download(
             new IvaMensualExport($report, $year, $month),
@@ -123,8 +133,10 @@ class TaxReportController extends Controller
         $year = $request->input('year');
         $summary = [];
         
+        $user = auth()->user();
+        $ownerCompanyId = $user->is_super_admin ? null : $user->owner_company_id;
         for ($month = 1; $month <= 12; $month++) {
-            $summary[$month-1] = $this->taxRecoveryService->generateMonthlyReport($year, $month);
+            $summary[$month-1] = $this->taxRecoveryService->generateMonthlyReport($year, $month, $ownerCompanyId);
         }
         
         return Excel::download(

@@ -17,6 +17,7 @@ class AccountController extends Controller
         } else {
             $accounts = Account::where('owner_company_id', auth()->user()->owner_company_id)->get();
         }
+        //return response()->json($accounts);
         return response()->json($accounts);
     }
 }

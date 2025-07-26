@@ -52,6 +52,7 @@
                 <tbody>
                     @foreach($report['tax_paid']['breakdown'] as $item)
                     <tr>
+                        <td>Taxable Entry For Company 1</td>
                         <td>{{ $item['tax_rate_name'] }} ({{ $item['tax_rate_percentage'] }}%)</td>
                         <td>${{ number_format($item['total_amount'], 2) }}</td>
                         <td>{{ $item['count'] }}</td>

@@ -73,22 +73,24 @@ class TaxRecoveryService
     /**
      * Get tax summary for a specific period.
      */
-    public function getTaxSummary(string $startDate, string $endDate): array
+    public function getTaxSummary(string $startDate, string $endDate, $ownerCompanyId = null): array
     {
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
-        $ownerCompanyId = auth()->user()->owner_company_id;
+       
+        $taxPaymentsQuery = TaxPayment::whereBetween('payment_date', [$start, $end])
+        ->where('status', 'paid');
+        $taxCollectionsQuery = TaxCollection::whereBetween('collection_date', [$start, $end])
+        ->where('status', 'collected');
 
-        $taxPayments = TaxPayment::where('owner_company_id', $ownerCompanyId)
-            ->whereBetween('payment_date', [$start, $end])
-            ->where('status', 'paid')
-            ->get();
+    if ($ownerCompanyId) {
+        $taxPaymentsQuery->where('owner_company_id', $ownerCompanyId);
+        $taxCollectionsQuery->where('owner_company_id', $ownerCompanyId);
+        }
 
-        $taxCollections = TaxCollection::where('owner_company_id', $ownerCompanyId)
-            ->whereBetween('collection_date', [$start, $end])
-            ->where('status', 'collected')
-            ->get();
+        $taxPayments = $taxPaymentsQuery->get();
+        $taxCollections = $taxCollectionsQuery->get();
 
         $totalTaxPaid = $taxPayments->sum('tax_amount');
         $totalTaxCollected = $taxCollections->sum('tax_amount');
@@ -138,12 +140,12 @@ class TaxRecoveryService
     /**
      * Generate monthly tax report.
      */
-    public function generateMonthlyReport(int $year, int $month): array
+    public function generateMonthlyReport(int $year, int $month, $ownerCompanyId = null): array
     {
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
 
-        return $this->getTaxSummary($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+        return $this->getTaxSummary($startDate->format('Y-m-d'), $endDate->format('Y-m-d'),$ownerCompanyId);
     }
 
     /**

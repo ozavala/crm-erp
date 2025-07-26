@@ -13,7 +13,7 @@ class JournalEntryController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+    /**{
         $query = JournalEntry::where('owner_company_id', auth()->user()->owner_company_id)
             ->with(['lines', 'referenceable', 'createdBy'])->latest('entry_date')->latest('journal_entry_id');
 
@@ -29,8 +29,20 @@ class JournalEntryController extends Controller
         $transactionTypes = JournalEntry::select('transaction_type')->distinct()->pluck('transaction_type');
 
         return view('journal_entries.index', compact('journalEntries', 'transactionTypes'));
+    }*/
+    
+// Change made by GithubCopilot In JournalEntryController.php
+    
+    {
+        if (auth()->user()->is_super_admin) {
+    $journalEntries = JournalEntry::orderByDesc('entry_date')->paginate(15);
+} else {
+    $journalEntries = JournalEntry::where('owner_company_id', auth()->user()->owner_company_id)
+        ->orderByDesc('entry_date')
+        ->paginate(15);
+}
+return view('journal_entries.index', compact('journalEntries'));
     }
-
     /**
      * Display the specified resource.
      */

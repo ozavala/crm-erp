@@ -229,7 +229,7 @@ class AccountingMultiCompanyTest extends TestCase
     }
 
     #[Test]
-    /**public function journal_entries_are_isolated_between_companies()
+    public function journal_entries_are_isolated_between_companies()
     {
         // Create journal entries for company 1
         $this->actingAs($this->user1);
@@ -279,9 +279,8 @@ class AccountingMultiCompanyTest extends TestCase
         $response->assertOk();
         $response->assertSee('Journal Entry for Company 1');
         $response->assertSee('Journal Entry for Company 2');
-    }*/
+    }
 
-    #[Test]
     public function users_cannot_create_journal_entries_with_accounts_from_other_companies()
     {
         // Try to create a journal entry for company 1 with company 2 accounts
@@ -315,32 +314,34 @@ class AccountingMultiCompanyTest extends TestCase
         $this->actingAs($this->user1);
         $taxRate1 = TaxRate::where('owner_company_id', $this->company1->id)->first();
         
-        $journalEntry1 = JournalEntry::create([
+        \App\Models\TaxPayment::create([
             'owner_company_id' => $this->company1->id,
-            'entry_date' => now(),
-            'transaction_type' => 'Manual Entry',
+            'tax_rate_id' => $taxRate1->tax_rate_id,
+            'taxable_amount' => 1000.00,
+            'tax_amount' => 120.00,
+            'payment_type' => 'purchase',
+            'payment_date' => now(),
+            'document_number' => 'PO-001-C1',
             'description' => 'Taxable Entry for Company 1',
-            'created_by_user_id' => $this->user1->user_id,
-        ]);
-        $journalEntry1->lines()->createMany([
-            ['account_code' => $this->asset1->code, 'debit_amount' => 1000.00, 'credit_amount' => 0.00],
-            ['account_code' => $this->income1->code, 'debit_amount' => 0.00, 'credit_amount' => 1000.00],
+            'status' => 'paid',
+            'created_by_user_id' => $this->user1->id,
         ]);
 
         // Create journal entries with tax for company 2
         $this->actingAs($this->user2);
         $taxRate2 = TaxRate::where('owner_company_id', $this->company2->id)->first();
         
-        $journalEntry2 = JournalEntry::create([
+        \App\Models\TaxCollection::create([
             'owner_company_id' => $this->company2->id,
-            'entry_date' => now(),
-            'transaction_type' => 'Manual Entry',
+            'tax_rate_id' => $taxRate2->tax_rate_id,
+            'taxable_amount' => 2000.00,
+            'tax_amount' => 240.00,
+            'collection_type' => 'sale',
+            'collection_date' => now(),
+            'customer_name' => 'Customer A',
             'description' => 'Taxable Entry for Company 2',
-            'created_by_user_id' => $this->user2->user_id,
-        ]);
-        $journalEntry2->lines()->createMany([
-            ['account_code' => $this->asset2->code, 'debit_amount' => 2000.00, 'credit_amount' => 0.00],
-            ['account_code' => $this->income2->code, 'debit_amount' => 0.00, 'credit_amount' => 2000.00],
+            'status' => 'collected',
+            'created_by_user_id' => $this->user2->id,
         ]);
 
         // Verify that company 1 user can only see company 1 tax reports
