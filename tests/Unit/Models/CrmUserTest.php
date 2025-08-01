@@ -15,18 +15,10 @@ class CrmUserTest extends TestCase
     #[Test]
     public function it_belongs_to_an_owner_company()
     {
-        $company = OwnerCompany::create([
-            'name' => 'Test Company',
-            'legal_name' => 'Test Company LLC',
-            'tax_id' => 'TAX-001',
-            'email' => 'info@testcompany.com',
-            'phone' => '123-456-7890',
-            'address' => '123 Main St, Anytown, USA',
-            'is_active' => true,
-        ]);
+        $company = OwnerCompany::factory()->create();
 
         $user = CrmUser::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
         ]);
 
         $this->assertInstanceOf(OwnerCompany::class, $user->ownerCompany);
@@ -64,25 +56,17 @@ class CrmUserTest extends TestCase
         ]);
 
         // Create a company
-        $company = OwnerCompany::create([
-            'name' => 'Test Company',
-            'legal_name' => 'Test Company LLC',
-            'tax_id' => 'TAX-001',
-            'email' => 'info@testcompany.com',
-            'phone' => '123-456-7890',
-            'address' => '123 Main St, Anytown, USA',
-            'is_active' => true,
-        ]);
+        $company = OwnerCompany::factory()->create();
 
         // Create a company admin user
         $adminUser = CrmUser::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
         ]);
         $adminUser->roles()->attach($adminRole);
 
         // Create a regular user
         $regularUser = CrmUser::factory()->create([
-            'owner_company_id' => $company->owner_company_id,
+            'owner_company_id' => $company->id,
         ]);
         $regularUser->roles()->attach($regularRole);
 
@@ -104,25 +88,9 @@ class CrmUserTest extends TestCase
     public function it_can_only_access_data_from_its_company()
     {
         // Create two companies
-        $company1 = OwnerCompany::create([
-            'name' => 'Company One',
-            'legal_name' => 'Company One LLC',
-            'tax_id' => 'TAX-001',
-            'email' => 'info@company1.com',
-            'phone' => '123-456-7890',
-            'address' => '123 Main St, Anytown, USA',
-            'is_active' => true,
-        ]);
+        $company1 = OwnerCompany::factory()->create();
 
-        $company2 = OwnerCompany::create([
-            'name' => 'Company Two',
-            'legal_name' => 'Company Two Inc',
-            'tax_id' => 'TAX-002',
-            'email' => 'info@company2.com',
-            'phone' => '987-654-3210',
-            'address' => '456 Oak Ave, Somewhere, USA',
-            'is_active' => true,
-        ]);
+        $company2 = OwnerCompany::factory()->create();
 
         // Create a user for company 1
         $user = CrmUser::factory()->create([
@@ -149,25 +117,9 @@ class CrmUserTest extends TestCase
     public function super_admin_can_access_any_company()
     {
         // Create two companies
-        $company1 = OwnerCompany::create([
-            'name' => 'Company One',
-            'legal_name' => 'Company One LLC',
-            'tax_id' => 'TAX-001',
-            'email' => 'info@company1.com',
-            'phone' => '123-456-7890',
-            'address' => '123 Main St, Anytown, USA',
-            'is_active' => true,
-        ]);
+        $company1 = OwnerCompany::factory()->create();
 
-        $company2 = OwnerCompany::create([
-            'name' => 'Company Two',
-            'legal_name' => 'Company Two Inc',
-            'tax_id' => 'TAX-002',
-            'email' => 'info@company2.com',
-            'phone' => '987-654-3210',
-            'address' => '456 Oak Ave, Somewhere, USA',
-            'is_active' => true,
-        ]);
+        $company2 = OwnerCompany::factory()->create();
 
         // Create a super admin user
         $superAdmin = CrmUser::factory()->create([

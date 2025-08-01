@@ -27,6 +27,8 @@ class CrmUser extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'locale',
+        'owner_company_id',
+        'is_super_admin',
     ];
 
     /**
@@ -124,6 +126,26 @@ class CrmUser extends Authenticatable implements MustVerifyEmail
     public function addresses()
     {
         return $this->morphMany(Address::class, 'addressable');
+    }
+
+    public function ownerCompany()
+    {
+        return $this->belongsTo(OwnerCompany::class, 'owner_company_id', 'id');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return (bool) $this->is_super_admin;
+    }
+
+    public function isCompanyAdmin(): bool
+    {
+        return $this->roles()->where('name', 'Company Admin')->exists();
+    }
+
+    public function canAccessCompany(int $companyId): bool
+    {
+        return $this->isSuperAdmin() || $this->owner_company_id === $companyId;
     }
 }
    

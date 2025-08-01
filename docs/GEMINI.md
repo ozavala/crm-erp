@@ -43,3 +43,59 @@ To access the calendar interface, navigate to `/calendar` in your web browser (e
 ```javascript
 // 'Authorization': 'Bearer ' + YOUR_AUTH_TOKEN
 ```
+
+# Kanban Interface Implementation
+
+This section details the implementation of the Kanban-style interface for the application's main navigation and administration, leveraging Livewire for dynamic interactions.
+
+## Backend Implementation
+
+1.  **Livewire Component (`app/Livewire/KanbanBoard.php`)**:
+    *   A new Livewire component, `KanbanBoard`, was created to manage the state and logic of the Kanban board.
+    *   It includes properties for `allColumns` (the full dataset of columns and cards), `columns` (the filtered columns for display), `search` (for filtering cards), and `wipLimitReached` (to indicate if a WIP limit has been hit).
+    *   The `mount()` method initializes `allColumns` with sample data, including `id`, `title`, `wipLimit`, `cards` (each with `id`, `title`, `icon`, `description`, `notifications`, `shortcut_url`, and `category`).
+    *   The `updatedSearch()` method triggers `applySearch()` whenever the `search` property changes, enabling real-time filtering.
+    *   The `applySearch()` method filters cards based on the `search` term, matching against card `title` and `description`.
+    *   The `onCardDrop()` method handles drag-and-drop events, updating the card's position within `allColumns`. It also includes logic to check and enforce `wipLimit` for the target column, dispatching a `wip-limit-reached` event if the limit is exceeded.
+    *   Placeholder `editCard()` and `viewCard()` methods were added to demonstrate future functionality for card actions.
+
+## Frontend Implementation
+
+1.  **Livewire View (`resources/views/livewire/kanban-board.blade.php`)**:
+    *   This Blade file renders the Kanban board using the `KanbanBoard` Livewire component.
+    *   It includes a search input field (`wire:model.live="search"`).
+    *   The columns and cards are rendered dynamically using `@foreach` loops.
+    *   Livewire's `wire:sortable` and `wire:sortable-group` directives are used to enable drag-and-drop functionality for cards between and within columns.
+    *   Each card displays its `icon`, `title`, `description`, and `notifications` count.
+    *   A "Go" button (`shortcut-button`) is provided for direct navigation.
+    *   "Edit" and "View" buttons (`quick-action-button`) are included with `wire:click` directives to call the respective Livewire methods.
+    *   A `wip-limit-warning` message is displayed conditionally if `wipLimitReached` is true.
+    *   Columns exceeding their WIP limit are given the `wip-limit-exceeded` class.
+    *   Cards are assigned a CSS class based on their `category` property (e.g., `critical`, `frequent`, `settings`) for color-coding.
+
+2.  **Kanban Styles (`resources/css/kanban.css`)**:
+    *   This CSS file provides the styling for the Kanban board, columns, and cards.
+    *   It includes styles for the card header, title, notifications, body, description, and footer.
+    *   Styles for the `shortcut-button` and `quick-action-button` are defined.
+    *   Responsive adjustments are included using media queries to ensure the layout adapts to different screen sizes (e.g., columns stack vertically on smaller screens).
+    *   Specific styles for `wip-limit-warning` and `wip-limit-exceeded` classes are added for visual feedback on WIP limits.
+    *   CSS rules for card categories (`.kanban-card.critical`, `.kanban-card.frequent`, `.kanban-card.settings`) are defined to apply different `border-left` colors.
+    *   Styles for drag-and-drop visual feedback (`.kanban-card.sortable-chosen`, `.kanban-card.sortable-ghost`) are included.
+
+3.  **Kanban JavaScript (`resources/js/kanban.js`)**:
+    *   This file now primarily contains Livewire hooks (`livewire:init`, `morph.removed`, `morph.added`) for potential future JavaScript interactions related to Livewire component lifecycle events. Livewire 3 handles drag-and-drop animations automatically via Sortable.js, so explicit DOM manipulation for sorting is no longer needed here.
+
+4.  **Web Routes (`routes/web.php`)**:
+    *   A new route `/kanban` was added to display the Kanban board, rendering the `livewire.kanban.index` view. This route is protected by the `auth` middleware.
+
+5.  **Blade View (`resources/views/livewire/kanban/index.blade.php`)**:
+    *   This view extends the main application layout (`layouts.app`).
+    *   It includes the `@livewire('kanban-board')` directive to render the Livewire component.
+    *   The `@vite('resources/js/kanban.js')` directive is used to include the Kanban JavaScript file.
+
+6.  **Main JavaScript (`resources/js/app.js`)**:
+    *   The `resources/css/kanban.css` file is imported into `resources/js/app.js` to ensure Vite processes and bundles the CSS correctly.
+
+## Usage
+
+To access the Kanban interface, navigate to `/kanban` in your web browser (e.g., `http://your-app-url/kanban`). Ensure you are authenticated to access this route.

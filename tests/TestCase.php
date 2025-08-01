@@ -12,6 +12,8 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Disable CSRF for tests
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // El seeder de settings solo debe ejecutarse en tests funcionales que lo requieran
     }
 
