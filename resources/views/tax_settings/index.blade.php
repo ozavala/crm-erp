@@ -5,8 +5,8 @@
 @section('content')
 <div class="container py-4">
     <div class="mb-4">
-        <h1 class="h3 mb-1">IVA Settings</h1>
-        <p class="text-muted">Gestiona las tasas de IVA por país y configuraciones de servicios</p>
+        <h1 class="h3 mb-1">Sale Taxes Settings</h1>
+        <p class="text-muted">Manage VAT rates by country and service configurations</p>
     </div>
 
     @if(session('success'))
@@ -28,7 +28,7 @@
     <!-- Configuración de País por Defecto -->
     <div class="card mb-4">
         <div class="card-header d-flex align-items-center">
-            <span class="fw-semibold">País por Defecto</span>
+            <span class="fw-semibold">Default Country</span>
             <span class="ms-2 text-muted" data-bs-toggle="tooltip" title="El país seleccionado será el predeterminado para facturación.">
                 <i class="bi bi-info-circle"></i>
             </span>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary">
-                        Establecer País por Defecto
+                        Set Default Country
                     </button>
                 </div>
             </form>
@@ -57,7 +57,7 @@
     <!-- Configuraciones de Servicios -->
     <div class="card mb-4">
         <div class="card-header d-flex align-items-center">
-            <span class="fw-semibold">Configuraciones de Servicios</span>
+            <span class="fw-semibold">Service Configurations</span>
             <span class="ms-2 text-muted" data-bs-toggle="tooltip" title="Define si los servicios y el transporte público están sujetos a IVA.">
                 <i class="bi bi-info-circle"></i>
             </span>
@@ -68,17 +68,17 @@
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" name="tax_includes_services" id="tax_includes_services" value="1" {{ $serviceSettings['tax_includes_services'] === 'true' ? 'checked' : '' }}>
                     <label class="form-check-label" for="tax_includes_services" data-bs-toggle="tooltip" title="Si está marcado, los servicios pagarán IVA.">
-                        Los servicios pagan IVA
+                        Services pay VAT
                     </label>
                 </div>
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" name="tax_includes_transport" id="tax_includes_transport" value="1" {{ $serviceSettings['tax_includes_transport'] === 'true' ? 'checked' : '' }}>
                     <label class="form-check-label" for="tax_includes_transport" data-bs-toggle="tooltip" title="Si está marcado, el transporte público pagará IVA.">
-                        El transporte público paga IVA
+                        Transport services pay VAT
                     </label>
                 </div>
                 <button type="submit" class="btn btn-success">
-                    Guardar Configuraciones
+                    Save Settings
                 </button>
             </form>
         </div>
@@ -92,7 +92,7 @@
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <span class="fw-semibold">{{ $settings['name'] }} <span class="badge bg-light text-secondary ms-1" data-bs-toggle="tooltip" title="Código de país">{{ $countryCode }}</span></span>
                         @if($settings['is_default'])
-                            <span class="badge bg-primary">Por Defecto</span>
+                            <span class="badge bg-primary">By Default</span>
                         @endif
                     </div>
                     <div class="card-body">
@@ -120,15 +120,15 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRate('{{ $countryCode }}')" title="Agregar nueva tasa">
-                                    <i class="bi bi-plus-circle"></i> Agregar Tasa
+                                    <i class="bi bi-plus-circle"></i> Add Tax
                                 </button>
                                 <button type="submit" class="btn btn-primary btn-sm">
-                                    Guardar Tasas
+                                    Save Taxes
                                 </button>
                             </div>
                         </form>
                         <button type="button" onclick="restoreDefaultRates('{{ $countryCode }}')" class="btn btn-warning btn-sm mt-2 w-100" title="Restaurar tasas por defecto (no guarda automáticamente)">
-                            <i class="bi bi-arrow-clockwise"></i> Restaurar por defecto
+                            <i class="bi bi-arrow-clockwise"></i> Restores Default Rates
                         </button>
                     </div>
                 </div>

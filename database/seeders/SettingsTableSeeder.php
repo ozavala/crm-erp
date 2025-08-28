@@ -25,8 +25,6 @@ class SettingsTableSeeder extends Seeder
             ['key' => 'company_logo', 'value' => null, 'type' => 'core', 'is_editable' => false],
             ['key' => 'default_locale', 'value' => 'es', 'type' => 'core', 'is_editable' => false],
             ['key' => 'default_currency', 'value' => 'USD', 'type' => 'core', 'is_editable' => false],
-            ['key' => 'tax_includes_services', 'value' => 'true', 'type' => 'core', 'is_editable' => false],
-            ['key' => 'tax_includes_transport', 'value' => 'false', 'type' => 'core', 'is_editable' => false],
         ];
         foreach ($coreSettings as $setting) {
             \App\Models\Setting::updateOrCreate(

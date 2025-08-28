@@ -134,16 +134,16 @@ class TaxSettingsController extends Controller
     }
     
     /**
-     * Restaurar tasas por defecto para un país.
+     * Restore default tax rates for a country.
      */
     public function restoreDefaultRates(Request $request, string $countryCode)
     {
-        // Obtener tasas por defecto del helper
+        // Get default rates from the helper
         $defaultRates = TaxRateDefaults::getTaxRatesForCountry($countryCode);
         if (!$defaultRates) {
             return response()->json(['success' => false, 'message' => 'No hay tasas por defecto para este país.'], 404);
         }
-        // Sobrescribir en settings
+        // Overwrite in settings
         $setting = Setting::where('key', "tax_rates_{$countryCode}")->first();
         if (!$setting) {
             Setting::create([

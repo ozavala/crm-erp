@@ -6,4 +6,5 @@ return [
     App\Providers\EventServiceProvider::class,
     App\Providers\MailConfigServiceProvider::class,
     App\Providers\SettingsServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
 ];

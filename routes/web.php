@@ -141,7 +141,7 @@ Route::middleware(['setlocale', 'auth'])->group(function () {
     Route::get('reports/profit-and-loss', [ProfitAndLossController::class, 'index'])->name('reports.profit_and_loss');
     Route::resource('feedback', FeedBackController::class)->except(['edit', 'destroy']);
 });
-    Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/custom', [SettingsController::class, 'storeCustom'])->name('settings.custom.store');
@@ -196,6 +196,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tax-settings/{countryCode}/rates', [App\Http\Controllers\TaxSettingsController::class, 'updateCountryRates'])->name('tax-settings.update-rates');
     Route::post('/tax-settings/{countryCode}/restore-defaults', [\App\Http\Controllers\TaxSettingsController::class, 'restoreDefaultRates'])->name('tax-settings.restore-defaults');
 });
+
 
 require __DIR__.'/auth.php';
 

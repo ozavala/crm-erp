@@ -9,6 +9,10 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <!-- images -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon.ico') }}">
+    <link rel="image/x-icon" type="image/x-icon" href="{{ asset('img/favicon.ico') }}">
+ 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">

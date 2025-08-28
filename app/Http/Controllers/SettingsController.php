@@ -27,16 +27,30 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         Gate::authorize('edit-settings');
-        // Validar solo los core settings
-        $coreKeys = Setting::where('type', 'core')->pluck('key');
+
+        $coreKeys = Setting::where('type', 'core')->pluck('key')->toArray();
         $rules = [];
         foreach ($coreKeys as $key) {
-            $rules[$key] = 'nullable|string|max:255';
+            if ($key === 'company_logo') {
+                $rules[$key] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
+            } else {
+                $rules[$key] = 'nullable|string|max:255';
+            }
         }
+
         $validated = $request->validate($rules);
+
         foreach ($validated as $key => $value) {
-            Setting::where('key', $key)->update(['value' => $value]);
+            if ($request->hasFile($key) && $request->file($key)->isValid()) {
+                $path = $request->file($key)->store('logos', 'public');
+                Setting::where('key', $key)->update(['value' => $path]);
+            } else {
+                if ($value !== null) {
+                    Setting::where('key', $key)->update(['value' => $value]);
+                }
+            }
         }
+
         return redirect()->route('settings.edit')->with('success', __('settings.Updated successfully'));
     }
 

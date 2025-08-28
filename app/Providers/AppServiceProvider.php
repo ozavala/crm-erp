@@ -14,7 +14,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if ($this->app->environment('local')) {
+                    $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+                }
     }
 
     /**
@@ -23,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Payment::observe(PaymentObserver::class);
-        // Solo intentar leer settings si la tabla existe
+        // Only attempt to read settings if the table exists
         if (\Schema::hasTable('settings')) {
             $defaultLocale = Setting::where('key', 'default_locale')->value('value') ?? config('app.locale');
             app()->setLocale($defaultLocale);
