@@ -540,6 +540,7 @@ return [
         'name' => 'Nombre',
         'description' => 'Descripción',
         'users' => 'Usuarios',
+        'Users' => 'Usuarios',
         'permissions' => 'Permisos',
         'actions' => 'Acciones',
         'view' => 'Ver',

@@ -64,6 +64,9 @@ return [
     'Cancel' => 'Cancel',
     'Back to List' => 'Back to List',
     'No results found' => 'No results found',
+    'settings.Updated successfully' => 'settings.Updated successfully',
+    'settings.Created successfully' => 'settings.Created successfully',
+    'settings.Deleted successfully' => 'settings.Deleted successfully',
     // Quotations
     'quotations' => [
         'title' => 'Quotations',

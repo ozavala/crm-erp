@@ -15,7 +15,7 @@
                 <th>{{ __('messages.ID') }}</th>
                 <th>{{ __('messages.Name') }}</th>
                 <th>{{ __('messages.Description') }}</th>
-                <th>{{ __('messages.Users') }}</th>
+                <th>{{ __('messages.user_roles.Users') }}</th>
                 <th>{{ __('messages.Permissions') }}</th>
                 <th>{{ __('messages.Actions') }}</th>
             </tr>

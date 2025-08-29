@@ -6,7 +6,8 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+
 
 class SettingsController extends Controller
 {
@@ -16,6 +17,7 @@ class SettingsController extends Controller
     public function edit()
     {
         Gate::authorize('edit-settings');
+
         $coreSettings = Setting::where('type', 'core')->get();
         $customSettings = Setting::where('type', 'custom')->get();
         return view('settings.edit', compact('coreSettings', 'customSettings'));
@@ -27,32 +29,39 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         Gate::authorize('edit-settings');
-
-        $coreKeys = Setting::where('type', 'core')->pluck('key')->toArray();
+    
+        $coreSettings = Setting::where('type', 'core')->get();
         $rules = [];
-        foreach ($coreKeys as $key) {
-            if ($key === 'company_logo') {
-                $rules[$key] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
+    
+        foreach ($coreSettings as $setting) {
+            if ($setting->key === 'company_logo') {
+                $rules[$setting->key] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
             } else {
-                $rules[$key] = 'nullable|string|max:255';
+                $rules[$setting->key] = 'nullable|string|max:255';
             }
         }
-
+    
         $validated = $request->validate($rules);
-
+    
+        if ($request->hasFile('company_logo') && $request->file('company_logo')->isValid()) {
+            $path = $request->file('company_logo')->store('logos', 'public');
+            Setting::where('key', 'company_logo')->update(['value' => $path]);
+        }
+    
         foreach ($validated as $key => $value) {
-            if ($request->hasFile($key) && $request->file($key)->isValid()) {
-                $path = $request->file($key)->store('logos', 'public');
-                Setting::where('key', $key)->update(['value' => $path]);
-            } else {
-                if ($value !== null) {
-                    Setting::where('key', $key)->update(['value' => $value]);
-                }
+            if ($key === 'company_logo') {
+                continue;
+            }
+    
+            if ($value !== null) {
+                Setting::where('key', $key)->update(['value' => $value]);
             }
         }
-
+    
         return redirect()->route('settings.edit')->with('success', __('settings.Updated successfully'));
     }
+   
+    
 
     public function storeCustom(Request $request)
     {

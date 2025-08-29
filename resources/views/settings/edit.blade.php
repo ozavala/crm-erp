@@ -22,17 +22,14 @@
             <div class="card-body">
                 <div class="row">
                     @foreach($coreSettings as $setting)
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="{{ $setting->key }}" class="form-label">{{ __(ucfirst(str_replace('_', ' ', $setting->key))) }}</label>
                             @if($setting->key === 'company_logo')
                                 <input type="file" class="form-control" id="{{ $setting->key }}" name="{{ $setting->key }}">
                                 @if ($setting->value)
                                     <img src="{{ asset('storage/' . $setting->value) }}" alt="Company Logo" class="img-thumbnail mt-2" style="max-height: 100px ; max-width: 100px">
                                 @endif
-                            @endif
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            @if($setting->key === 'default_locale')
+                            @elseif($setting->key === 'default_locale')
                                 <select class="form-control" id="{{ $setting->key }}" name="{{ $setting->key }}">
                                     <option value="en" @if(old($setting->key, $setting->value) === 'en') selected @endif>English</option>
                                     <option value="es" @if(old($setting->key, $setting->value) === 'es') selected @endif>Spanish</option>
@@ -41,7 +38,6 @@
                                 <input type="text" class="form-control" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}">
                             @endif
                         </div>
-                        
                     @endforeach
                 </div>
             </div>

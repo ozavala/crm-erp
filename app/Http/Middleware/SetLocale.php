@@ -20,6 +20,7 @@ class SetLocale
     {
         if (Auth::check() && Auth::user()->locale) {
             App::setLocale(Auth::user()->locale);
+            
         } elseif (Session::has('locale')) {
             App::setLocale(Session::get('locale'));
         } else {
@@ -27,4 +28,5 @@ class SetLocale
         }
         return $next($request);
     }
+    
 }
