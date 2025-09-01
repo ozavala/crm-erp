@@ -8,8 +8,8 @@
 
     <form action="{{ route('suppliers.store') }}" method="POST">
         @include('suppliers._form', ['supplier' => new \App\Models\Supplier()])
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 @endsection

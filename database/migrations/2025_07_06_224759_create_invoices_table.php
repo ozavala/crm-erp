@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id('invoice_id');
-            $table->foreignId('order_id')->nullable()->constrained('orders', 'order_id')->onDelete('cascade');
-            $table->foreignId('quotation_id')->nullable()->constrained('quotations', 'quotation_id')->onDelete('set null');
-            $table->foreignId('customer_id')->constrained('customers', 'customer_id')->onDelete('cascade');
+            $table->unsignedBigInteger('owner_company_id')->nullable();
+            $table->foreignId('order_id')->nullable();
+            $table->foreignId('quotation_id')->nullable();
+            $table->foreignId('customer_id');
             $table->string('invoice_number')->unique();
             $table->date('invoice_date');
             $table->date('due_date');
@@ -26,11 +27,12 @@ return new class extends Migration
             $table->decimal('discount_amount', 15, 2)->default(0.00);
             $table->decimal('tax_percentage', 5, 2)->nullable();
             $table->decimal('tax_amount', 15, 2)->default(0.00);
+            $table->foreignId('tax_rate_id')->nullable();
             $table->decimal('total_amount', 15, 2)->default(0.00);
             $table->decimal('amount_paid', 15, 2)->default(0.00);
             $table->text('terms_and_conditions')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
+            $table->foreignId('created_by_user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

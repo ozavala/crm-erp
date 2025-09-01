@@ -5,8 +5,8 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Proveedores</h1>
-        <a href="{{ route('suppliers.create') }}" class="btn btn-primary">Nuevo Proveedor</a>
+        <h1>Suppliers</h1>
+        <a href="{{ route('suppliers.create') }}" class="btn btn-primary">New Supplier</a>
     </div>
 
     @if (session('success'))
@@ -18,8 +18,8 @@
 
     <div class="mb-3">
         <form action="{{ route('suppliers.index') }}" method="GET" class="d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="Buscar" value="{{ request('search') }}">
-            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            <input type="text" name="search" class="form-control me-2" placeholder="Search" value="{{ request('search') }}">
+            <button type="submit" class="btn btn-outline-primary">Search</button>
             @if(request('search'))
                 <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary ms-2">Limpiar</a>
             @endif
@@ -30,11 +30,11 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
-                <th>Contacto</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -50,13 +50,13 @@
                         <form action="{{ route('suppliers.destroy', $supplier->supplier_id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">No se encontraron resultados</td>
+                    <td colspan="6" class="text-center">No results found</td>
                 </tr>
             @endforelse
         </tbody>

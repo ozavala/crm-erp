@@ -22,8 +22,13 @@ return new class extends Migration
             $table->integer('reorder_point')->default(10);
             $table->boolean('is_service')->default(false);
             $table->boolean('is_active')->default(true);
-            $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
-            $table->foreignId('product_category_id')->nullable()->constrained('product_categories', 'category_id')->onDelete('set null');
+            $table->foreignId('created_by_user_id')->nullable();
+            $table->foreignId('product_category_id')->nullable();
+            $table->foreignId('tax_rate_id')->nullable();
+            $table->boolean('is_taxable')->default(true);
+            $table->decimal('tax_rate_percentage', 5, 2)->nullable();
+            $table->string('tax_category')->nullable();
+            $table->string('tax_country_code', 3)->default('EC');
             $table->timestamps();
             $table->softDeletes();
         });

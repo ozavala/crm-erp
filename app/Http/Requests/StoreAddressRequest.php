@@ -34,7 +34,7 @@ class StoreAddressRequest extends FormRequest
             'city' => 'required|string|max:255',
             'state_province' => 'nullable|string|max:255',
             'postal_code' => 'required|string|max:20',
-            'country_code' => 'required|string|size:2',
+            'country_code' => 'required|string|max:3',
             'is_primary' => 'nullable|boolean',
         ];
     }

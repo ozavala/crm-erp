@@ -17,8 +17,8 @@ class TaxSettingsController extends Controller
     {
         $countries = [
             'EC' => 'Ecuador',
-            'ES' => 'España',
-            'MX' => 'México',
+           // 'ES' => 'España',
+            //'MX' => 'México',
         ];
         
         $defaultCountry = Setting::where('key', 'default_country_tax')->first()?->value ?? 'EC';
@@ -98,8 +98,8 @@ class TaxSettingsController extends Controller
     public function updateServiceSettings(Request $request)
     {
         $request->validate([
-            'tax_includes_services' => 'required|boolean',
-            'tax_includes_transport' => 'required|boolean',
+            'tax_includes_services' => 'boolean',
+            'tax_includes_transport' => 'boolean',
         ]);
         
         foreach ($request->only(['tax_includes_services', 'tax_includes_transport']) as $key => $value) {
@@ -111,6 +111,7 @@ class TaxSettingsController extends Controller
                     'type' => 'custom',
                 ]);
             } else {
+                
                 $setting->update(['value' => $value ? 'true' : 'false']);
             }
         }

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Usuarios CRM</h1>
+        <h3>Usuarios CRM</h3>
         <a href="{{ route('crm-users.create') }}" class="btn btn-primary">{{ __('messages.Add New') }}</a>
     </div>
 
@@ -14,9 +14,10 @@
             <tr>
                 <th>{{ __('messages.ID') }}</th>
                 <th>{{ __('messages.Name') }}</th>
+                <th>{{__('messages.Username')}}</th>
                 <th>{{ __('messages.Email') }}</th>
                 <th>{{ __('messages.Roles') }}</th>
-                <th>{{ __('messages.Status') }}</th>
+            
                 <th>{{ __('messages.Actions') }}</th>
             </tr>
         </thead>
@@ -24,6 +25,7 @@
             @forelse ($crmUsers as $user)
                 <tr>
                     <td>{{ $user->user_id }}</td>
+                    <td>{{ $user->full_name }}</td>
                     <td>{{ $user->username }}</td>
                     <td>{{ $user->email }}</td>
                     <td>
@@ -33,6 +35,7 @@
                             No roles
                         @endforelse
                     </td>
+                    
                     <td>
                         <a href="{{ route('crm-users.show', $user->user_id) }}" class="btn btn-info btn-sm">Ver</a>
                         <a href="{{ route('crm-users.edit', $user->user_id) }}" class="btn btn-warning btn-sm">{{ __('messages.Edit') }}</a>

@@ -12,7 +12,7 @@
         </div>
         <div>
             <span class="badge bg-primary fs-6 me-2">{{ $customer->status }}</span>
-            <a href="{{ route('customers.edit', $customer->customer_id) }}" class="btn btn-warning">{{ __('Edit') }}</a>
+            <a href="{{ route('customers.edit', $customer->customer_id) }}" class="btn btn-warning">{{ __('Edit Customer') }}</a>
             <a href="{{ route('customers.index') }}" class="btn btn-secondary">{{ __('Back to Customers') }}</a>
         </div>
     </div>
@@ -27,14 +27,15 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">{{ __('Details') }}</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">{{ __('Payments') }}</button>
-        </li>
+       
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab" aria-controls="contacts" aria-selected="false">{{ __('Contacts') }}</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">{{ __('Notes') }}</button>
+        </li>
+         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab" aria-controls="payments" aria-selected="false">{{ __('Payments') }}</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab" aria-controls="invoices" aria-selected="false">{{ __('Invoices') }}</button>
@@ -117,7 +118,89 @@
         </div>
 
         {{-- Payments Tab --}}
-        <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+
+        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+            <div class="card card-body border-top-0">
+                <h5>{{ __('Contacts') }}</h5>
+                @if($contacts->isEmpty())
+                    <p>{{ __('No contacts have been added for this customer.') }}</p>
+                @else
+                    <div class="contacts-list">
+                        @foreach($contacts as $contact)
+                            <div class="contact-item border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1">{{ $contact->full_name }}</p>
+                                        <small class="text-muted">
+                                            {{ __('Email') }}: {{ $contact->email }}<br>
+                                            {{ __('Phone') }}: {{ $contact->phone }}
+                                        </small>
+                                    </div>
+                                    <form action="{{ route('contacts.destroy', $contact) }}" method="POST" class="ms-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="return confirm('{{ __('Are you sure you want to delete this contact?') }}')">
+                                            {{ __('Delete') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+
+                                
+
+        {{-- Notes Tab --}}
+        <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+            <div class="card card-body border-top-0">
+                <h5>{{ __('Notes') }}</h5>
+                @if($customer->notes->isEmpty())
+                    <p>{{ __('No notes have been added for this customer.') }}</p>
+                @else
+                    <div class="notes-list">
+                        @foreach($customer->notes as $note)
+                            <div class="note-item border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1">{{ $note->body }}</p>
+                                        <small class="text-muted">
+                                            {{ __('Added by') }} {{ $note->createdBy->full_name ?? __('Unknown') }} {{ __('on') }} {{ $note->created_at->format('M d, Y \a\t g:i A') }}
+                                        </small>
+                                    </div>
+                                    <form action="{{ route('notes.destroy', $note) }}" method="POST" class="ms-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ __('Are you sure you want to delete this note?') }}')">
+                                            {{ __('Delete') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                
+                {{-- Add Note Form --}}
+                <div class="mt-4">
+                    <h6>{{ __('Add New Note') }}</h6>
+                    <form action="{{ route('notes.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="noteable_id" value="{{ $customer->customer_id }}">
+                        <input type="hidden" name="noteable_type" value="Customer">
+                        <div class="mb-3">
+                            <textarea name="body" class="form-control" rows="3" placeholder="{{ __('Enter your note here...') }}" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">{{ __('Add Note') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+                <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
             <div class="card card-body border-top-0">
                 <h5>{{ __('Payment History') }}</h5>
                 @if($payments->isEmpty())
@@ -167,52 +250,6 @@
             </div>
         </div>
 
-        {{-- Notes Tab --}}
-        <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-            <div class="card card-body border-top-0">
-                <h5>{{ __('Notes') }}</h5>
-                @if($customer->notes->isEmpty())
-                    <p>{{ __('No notes have been added for this customer.') }}</p>
-                @else
-                    <div class="notes-list">
-                        @foreach($customer->notes as $note)
-                            <div class="note-item border-bottom pb-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <p class="mb-1">{{ $note->body }}</p>
-                                        <small class="text-muted">
-                                            {{ __('Added by') }} {{ $note->createdBy->full_name ?? __('Unknown') }} {{ __('on') }} {{ $note->created_at->format('M d, Y \a\t g:i A') }}
-                                        </small>
-                                    </div>
-                                    <form action="{{ route('notes.destroy', $note) }}" method="POST" class="ms-2">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ __('Are you sure you want to delete this note?') }}')">
-                                            {{ __('Delete') }}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-                
-                {{-- Add Note Form --}}
-                <div class="mt-4">
-                    <h6>{{ __('Add New Note') }}</h6>
-                    <form action="{{ route('notes.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="noteable_id" value="{{ $customer->customer_id }}">
-                        <input type="hidden" name="noteable_type" value="Customer">
-                        <div class="mb-3">
-                            <textarea name="body" class="form-control" rows="3" placeholder="{{ __('Enter your note here...') }}" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{{ __('Add Note') }}</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         {{-- Invoices Tab --}}
         <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
             <div class="card card-body border-top-0">
@@ -253,3 +290,4 @@
         </div>
     </div>
 </div>
+@endsection

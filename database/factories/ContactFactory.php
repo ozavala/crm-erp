@@ -5,6 +5,9 @@ namespace Database\Factories;
 use App\Models\Contact;
 use App\Models\CrmUser;
 use Illuminate\Database\Eloquent\Factories\Factory;
+//use Database\Factories
+use App\Models\Customer;
+use App\Models\Supplier;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Contact>
@@ -18,7 +21,12 @@ class ContactFactory extends Factory
      */
     public function definition(): array
     {
+        $contactableType = $this->faker->randomElement([Customer::class, Supplier::class]);
+        $contactable = $contactableType::factory()->create();
+
         return [
+            'contactable_id' => $contactable->id,
+            'contactable_type' => $contactableType,
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),

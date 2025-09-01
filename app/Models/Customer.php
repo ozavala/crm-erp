@@ -108,4 +108,14 @@ class Customer extends Model
 
         return $invoicePayments->merge($orderPayments)->sortByDesc('payment_date');
     }
+
+    /**
+     * Get the customer's display name.
+     *
+     * @return string
+     */
+    public function getDisplayNameAttribute()
+    {
+        return $this->company_name ?: $this->full_name;
+    }
 }

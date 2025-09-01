@@ -85,6 +85,9 @@
     <h4>{{ __('Addresses') }}</h4>
     <button type="button" id="add-address-btn" class="btn btn-sm btn-success">{{ __('Add Address') }}</button>
 </div>
+@error('addresses')
+    <div class="alert alert-danger">{{ $message }}</div>
+@enderror
 
 <div id="addresses-container">
     @php

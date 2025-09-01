@@ -56,5 +56,15 @@ class Supplier extends Model
         return $this->morphMany(Task::class, 'taskable');
     }
 
+    /**
+     * Get the supplier's display name.
+     *
+     * @return string
+     */
+    public function getDisplayNameAttribute()
+    {
+        return $this->name;
+    }
+
     // public function products() { ... }
 }

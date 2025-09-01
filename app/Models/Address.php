@@ -36,4 +36,25 @@ class Address extends Model
     {
         return $this->morphTo();
     }
+
+    /**
+     * Get the name of the owner of the address.
+     *
+     * @return string
+     */
+    public function getOwnerNameAttribute(): string
+    {
+        if (!$this->addressable) {
+            return 'N/A';
+        }
+
+        switch ($this->addressable_type) {
+            case Customer::class:
+                return $this->addressable->company_name ?? ($this->addressable->first_name . ' ' . $this->addressable->last_name);
+            case Supplier::class:
+                return $this->addressable->name;
+            default:
+                return 'N/A';
+        }
+    }
 }

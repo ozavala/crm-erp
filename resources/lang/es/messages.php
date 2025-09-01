@@ -543,6 +543,7 @@ return [
         'Users' => 'Usuarios',
         'permissions' => 'Permisos',
         'actions' => 'Acciones',
+        'Roles' => 'Roles',
         'view' => 'Ver',
         'edit' => 'Editar',
         'delete' => 'Eliminar',
@@ -1016,6 +1017,21 @@ return [
         'Add a note...' => 'Agregar una nota...',
         'No notes yet.' => 'Aún no hay notas.',
         'View' => 'Ver',
+        'Actions' => 'Acciones',
+        'No notes found.' => 'No se encontraron notas.',
+        'Delete' => 'Eliminar',
+        'Are you sure?' => '¿Está seguro?',
+        'Back to List' => 'Volver a la lista',
+        'Cancel' => 'Cancelar',
+        'Notes' => 'Notas',
+        'Create New Note' => 'Crear nueva nota',
+        'Edit Note' => 'Editar nota',
+        'Note Details' => 'Detalles de la nota',
+        'Note' => 'Nota',
+        'N/A' => 'N/D',
+        
+        
+
     ],
     'payments' => [
         'Add Payment' => 'Agregar pago',

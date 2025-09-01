@@ -39,4 +39,29 @@ class NoteController extends Controller
 
         return back()->with('success', 'Note deleted successfully.');
     }
+
+    public function edit(Request $request){
+        $request->validate([
+            'body' => 'required|string',
+        ]);
+
+        $note = Note::findOrFail($request->param('note'));
+        $note->update(['body' => $request->input('body')]);
+
+        return back()->with('success', 'Note updated successfully.');
+    }
+
+    public function show($id) {
+
+        $note = Note::findOrFail($id);
+        return view('notes.show', compact('note'));
+    }
+
+    //Cretae an Index fuction to show all notes
+    public function index() {
+        $notes = Note::all();
+        return view('notes.index', compact('notes'));
+    }
+
+   
 }

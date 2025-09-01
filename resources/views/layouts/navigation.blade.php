@@ -26,14 +26,14 @@
                         </a>
                         @endcan
                         <a class="dropdown-item" href="{{ route('tax-settings.index') }}">
-                            Tax Settings
+                            Taxes Settings
                         </a>
                         <a class="dropdown-item" href="{{ route('crm-users.index') }}">
-                            CRM Users
+                            Users
                         </a>
                         @can('view-roles')
                         <a class="dropdown-item" href="{{ route('user-roles.index') }}">
-                            User Roles
+                            Roles
                         </a>
                         @endcan
                         @can('view-permissions')

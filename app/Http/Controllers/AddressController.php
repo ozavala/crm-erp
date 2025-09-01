@@ -28,6 +28,7 @@ class AddressController extends Controller
         }
 
         $addresses = $query->paginate(15)->withQueryString();
+        
         return view('addresses.index', compact('addresses'));
     }
 

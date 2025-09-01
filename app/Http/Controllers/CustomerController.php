@@ -81,7 +81,9 @@ class CustomerController extends Controller
         // The getAllPayments method was added in a previous step to fetch payments from orders and invoices
         $payments = method_exists($customer, 'getAllPayments') ? $customer->getAllPayments() : collect();
         $invoices = $customer->invoices;
-        return view('customers.show', compact('customer', 'payments', 'invoices'));
+        $contacts = $customer->contacts;
+        $notes = $customer->notes;
+        return view('customers.show', compact('customer', 'payments', 'contacts', 'notes', 'invoices'));
     }
 
     /**
@@ -145,7 +147,6 @@ class CustomerController extends Controller
     {
         $submittedAddressIds = [];
 
-        // First, handle the primary flag. Find if any submitted address is primary.
         $primaryAddressIndex = null;
         foreach ($addressesData as $index => $addressInput) {
             if (!empty($addressInput['is_primary'])) {
@@ -154,24 +155,36 @@ class CustomerController extends Controller
             }
         }
 
-        // If a primary address is set, un-set all others for this customer first.
         if ($primaryAddressIndex !== null) {
             $customer->addresses()->update(['is_primary' => false]);
         }
 
-        // Now, iterate and sync each address
         foreach ($addressesData as $index => $addressInput) {
-            // Skip empty address blocks that might be submitted
             if (empty($addressInput['street_address_line_1'])) {
                 continue;
             }
+
             $dataToSync = $addressInput;
             $dataToSync['is_primary'] = ($index === $primaryAddressIndex);
-            $address = $customer->addresses()->updateOrCreate(['address_id' => $addressInput['address_id'] ?? null], $dataToSync);
-            $submittedAddressIds[] = $address->address_id;
+
+            if (!empty($addressInput['address_id']) ) {
+                // Update existing address
+                $address = $customer->addresses()->find($addressInput['address_id']);
+                if ($address) {
+                    $address->update($dataToSync);
+                    $submittedAddressIds[] = $address->address_id;
+                }
+            } else {
+                // Create new address
+                unset($dataToSync['address_id']);
+                $address = $customer->addresses()->create($dataToSync);
+                $submittedAddressIds[] = $address->address_id;
+            }
         }
 
         // Delete addresses that were removed from the form
         $customer->addresses()->whereNotIn('address_id', $submittedAddressIds)->delete();
     }
+    
+
 }

@@ -29,7 +29,7 @@ class StoreContactRequest extends FormRequest
         $contactRules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => ['nullable', 'email', 'max:255', 'unique:contacts,email'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:contacts,email,'.$this->contact?->contact_id.',contact_id'],
             'phone' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
         ];

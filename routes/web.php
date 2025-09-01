@@ -117,6 +117,11 @@ Route::middleware(['setlocale', 'auth'])->group(function () {
 
     Route::post('notes', [NoteController::class, 'store'])->name('notes.store');
     Route::delete('notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
+    Route::get('notes/{note}/edit', [NoteController::class, 'edit'])->name('notes.edit');
+    Route::patch('notes/{note}', [NoteController::class, 'update'])->name('notes.update');
+    Route::get('notes/{note}/show', [NoteController::class, 'show'])->name('notes.show');
+    Route::get('notes', [NoteController::class, 'index'])->name('notes.index');
+
 
     Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');

@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>All Addresses</h1>
-        <a href="{{ route('addresses.create') }}" class="btn btn-primary">Add New Address (Standalone)</a> --}}
+        <a href="{{ route('addresses.create') }}" class="btn btn-primary">Add New Address (Standalone)</a>
         {{-- Standalone address creation is generally not recommended for polymorphic relations without context --}}
     </div>
 
@@ -53,8 +53,9 @@
                     <td>{!! $address->is_primary ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>' !!}</td>
                     <td>
                         @if($address->addressable)
-                            {{ class_basename($address->addressable_type) }} #{{ $address->addressable_id }}
-                            {{-- You could add a link to the parent here if you have a consistent way to generate it --}}
+                            <a href="{{ route(strtolower(class_basename($address->addressable_type)) . 's.show', $address->addressable_id) }}">
+                                {{ $address->addressable->display_name }}
+                            </a>
                         @else
                             N/A
                         @endif

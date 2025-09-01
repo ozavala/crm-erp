@@ -28,18 +28,18 @@ class StoreCustomerRequest extends FormRequest
             'first_name' => ['required_if:type,Person', 'nullable', 'string', 'max:100'],
             'last_name' => ['required_if:type,Person', 'nullable', 'string', 'max:100'],
             'company_name' => ['required_if:type,Company', 'nullable', 'string', 'max:255'],
-            'legal_id' => ['required', 'string', 'max:100', 'unique:customers,legal_id'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:customers,email'],
+            'legal_id' => ['required', 'string', 'max:100', 'unique:customers,legal_id,'.$this->customer?->customer_id.',customer_id'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:customers,email,'.$this->customer?->customer_id.',customer_id'],
             'phone_number' => ['nullable', 'string', 'max:50'],
             'status' => ['required', 'string', Rule::in(['Active', 'Inactive', 'Lead', 'Prospect'])],
             'addresses' => ['nullable', 'array'],
             'addresses.*.address_type' => ['nullable', 'string', 'max:255'],
-            'addresses.*.street_address_line_1' => ['required', 'string', 'max:255'],
+            'addresses.*.street_address_line_1' => ['nullable', 'string', 'max:255'],
             'addresses.*.street_address_line_2' => ['nullable', 'string', 'max:255'],
-            'addresses.*.city' => ['required', 'string', 'max:255'],
-            'addresses.*.state_province' => ['required', 'string', 'max:255'],
-            'addresses.*.postal_code' => ['required', 'string', 'max:20'],
-            'addresses.*.country_code' => ['required', 'string', 'max:3'],
+            'addresses.*.city' => ['required_with:addresses.*.street_address_line_1', 'nullable', 'string', 'max:255'],
+            'addresses.*.state_province' => ['required_with:addresses.*.street_address_line_1', 'nullable', 'string', 'max:255'],
+            'addresses.*.postal_code' => ['required_with:addresses.*.street_address_line_1', 'nullable', 'string', 'max:20'],
+            'addresses.*.country_code' => ['required_with:addresses.*.street_address_line_1', 'nullable', 'string', 'max:3'],
             'addresses.*.is_primary' => ['nullable', 'boolean'],
         ];
     }
@@ -61,5 +61,18 @@ class StoreCustomerRequest extends FormRequest
                 'last_name' => null,
             ]);
         }
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'addresses.required' => 'At least one address must be provided.',
+            'addresses.min' => 'At least one address must be provided.',
+        ];
     }
 }

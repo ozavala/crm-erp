@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ __('Create New Customer') }}</h1>
+    <h3>{{ __('Create New Customer') }}</h3>
 
     <form action="{{ route('customers.store') }}" method="POST" class="needs-validation" novalidate>
         @csrf

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id('quotation_id');
-            $table->foreignId('opportunity_id')->constrained('opportunities', 'opportunity_id')->onDelete('cascade');
+            $table->foreignId('opportunity_id');
             $table->string('subject');
             $table->date('quotation_date');
             $table->date('expiry_date')->nullable();
@@ -24,10 +24,11 @@ return new class extends Migration
             $table->decimal('discount_amount', 15, 2)->default(0.00);
             $table->decimal('tax_percentage', 5, 2)->nullable();
             $table->decimal('tax_amount', 15, 2)->default(0.00);
+            $table->foreignId('tax_rate_id')->nullable();
             $table->decimal('total_amount', 15, 2)->default(0.00);
             $table->text('terms_and_conditions')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignId('created_by_user_id')->nullable()->constrained('crm_users', 'user_id')->onDelete('set null');
+            $table->foreignId('created_by_user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
