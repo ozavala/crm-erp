@@ -12,7 +12,6 @@
             @foreach($opportunities as $opportunity)
                 <option value="{{ $opportunity->opportunity_id }}"
                         data-name="{{ $opportunity->name }}"
-                        data-amount="{{ $opportunity->amount ?? 0 }}"
                         {{ (old('opportunity_id', $quotation->opportunity_id ?? $selectedOpportunity?->opportunity_id ?? '') == $opportunity->opportunity_id) ? 'selected' : '' }}>
                     {{ $opportunity->name }}
                 </option>
@@ -48,43 +47,44 @@
 <h4>{{ __('quotations.line_items') }}</h4>
 <div id="quotation-items-container">
     @php
-        $quotationItems = old('items', isset($quotation) ? $quotation->items->toArray() : [['product_id' => '', 'item_name' => '', 'item_description' => '', 'quantity' => 1, 'unit_price' => '']]);
-        $itemIndex = 0;
+        // Use old input if available, otherwise use items from the model. Default to one empty item for new forms.
+        $items = old('items', $quotation->items->isNotEmpty() ? $quotation->items : [new \App\Models\QuotationItem()]);
     @endphp
 
-    @foreach($quotationItems as $index => $item)
-        @php $itemIndex = $index; @endphp
+    @foreach($items as $index => $item)
+        @php
+            // Ensure item is an object for consistent access, especially for old() data which is an array.
+            $item = is_array($item) ? (object) $item : $item;
+        @endphp
         <div class="row align-items-center mb-2 quotation-item-row border p-2 rounded">
-            <input type="hidden" name="items[{{ $index }}][quotation_item_id]" value="{{ $item['quotation_item_id'] ?? '' }}">
-            <div class="col-md-3 mb-2">
+            <input type="hidden" name="items[{{ $index }}][quotation_item_id]" value="{{ $item->quotation_item_id ?? '' }}">
+            <div class="col-md-3 mb-2 product-search-container position-relative">
                 <label class="form-label">{{ __('quotations.product_service') }}</label>
-                <select name="items[{{ $index }}][product_id]" class="form-select product-select">
-                    <option value="">{{ __('quotations.select_product') }}</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->product_id }}" data-price="{{ $product->price }}" data-description="{{ $product->description }}" {{ ($item['product_id'] ?? '') == $product->product_id ? 'selected' : '' }}>
-                            {{ $product->name }}
-                        </option>
-                    @endforeach
-                </select>
+                <input type="text" class="form-control product-search" 
+                       placeholder="{{ __('quotations.search_product_placeholder', ['default' => 'Search product...']) }}" 
+                       value="{{ optional($item->product)->name ?? $item->item_name ?? '' }}" 
+                       autocomplete="off">
+                <input type="hidden" name="items[{{ $index }}][product_id]" class="product-id" value="{{ $item->product_id ?? '' }}">
+                <div class="search-results-container"></div>
             </div>
             <div class="col-md-3 mb-2">
                 <label class="form-label">{{ __('quotations.item_name') }} <span class="text-danger">*</span></label>
-                <input type="text" name="items[{{ $index }}][item_name]" class="form-control item-name" value="{{ $item['item_name'] ?? '' }}" required>
+                <input type="text" name="items[{{ $index }}][item_name]" class="form-control item-name" value="{{ $item->item_name ?? '' }}" required>
             </div>
             <div class="col-md-3 mb-2">
                 <label class="form-label">{{ __('quotations.quantity') }} <span class="text-danger">*</span></label>
-                <input type="number" name="items[{{ $index }}][quantity]" class="form-control item-quantity" value="{{ $item['quantity'] ?? 1 }}" min="1" required>
+                <input type="number" name="items[{{ $index }}][quantity]" class="form-control item-quantity" value="{{ $item->quantity ?? 1 }}" min="1" required>
             </div>
             <div class="col-md-2 mb-2">
                 <label class="form-label">{{ __('quotations.unit_price') }} <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" name="items[{{ $index }}][unit_price]" class="form-control item-unit-price" value="{{ $item['unit_price'] ?? '' }}" min="0" required>
+                <input type="number" step="0.01" name="items[{{ $index }}][unit_price]" class="form-control item-unit-price" value="{{ $item->unit_price ?? '' }}" min="0" required>
             </div>
             <div class="col-md-1 mb-2 d-flex align-items-end">
                 <button type="button" class="btn btn-danger remove-item-btn">&times;</button>
             </div>
             <div class="col-md-12 mb-2">
                 <label class="form-label">{{ __('quotations.item_description') }}</label>
-                <textarea name="items[{{ $index }}][item_description]" class="form-control item-description" rows="1">{{ $item['item_description'] ?? '' }}</textarea>
+                <textarea name="items[{{ $index }}][item_description]" class="form-control item-description" rows="1">{{ $item->item_description ?? '' }}</textarea>
             </div>
         </div>
     @endforeach
@@ -98,7 +98,7 @@
 <hr>
 
 <div class="row justify-content-end">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="row mb-2">
             <label for="discount_type" class="col-sm-4 col-form-label">{{ __('quotations.discount_type') }}</label>
             <div class="col-sm-8">
@@ -124,6 +124,31 @@
                 @error('tax_percentage') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
+        <hr>
+        <div class="row mb-2">
+            <strong class="col-sm-4 col-form-label">{{ __('quotations.subtotal') }}</strong>
+            <div class="col-sm-8">
+                <span id="display-subtotal">$0.00</span>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <strong class="col-sm-4 col-form-label">{{ __('quotations.discount_amount') }}</strong>
+            <div class="col-sm-8">
+                <span id="display-discount">$0.00</span>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <strong class="col-sm-4 col-form-label">{{ __('quotations.tax_amount') }}</strong>
+            <div class="col-sm-8">
+                <span id="display-tax">$0.00</span>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <strong class="col-sm-4 col-form-label">{{ __('quotations.total_amount') }}</strong>
+            <div class="col-sm-8">
+                <span id="display-total" class="fw-bold fs-5">$0.00</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -147,84 +172,186 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const itemsContainer = document.getElementById('quotation-items-container'); // Container for item rows
-    const addItemBtn = document.getElementById('add-item-btn'); // "Add Item" button
-    const opportunitySelect = document.getElementById('opportunity_id'); // Opportunity dropdown
-    const subjectInput = document.getElementById('subject'); // Subject input field
-    let itemRowIndex = {{ old('items') ? count(old('items')) : ($quotation->items->count() ?: 0) }};
+    const itemsContainer = document.getElementById('quotation-items-container');
+    const addItemBtn = document.getElementById('add-item-btn');
+    const opportunitySelect = document.getElementById('opportunity_id');
+    const subjectInput = document.getElementById('subject');
+    let itemRowIndex = document.querySelectorAll('.quotation-item-row').length;
 
-    // --- Reusable function to add a new item row ---
-    function addItemRow(item = {}) {
-        const index = itemRowIndex++;
+    const translations = <?php echo json_encode([
+        'product_service' => __('quotations.product_service'),
+        'item_name' => __('quotations.item_name'),
+        'quantity' => __('quotations.quantity'),
+        'unit_price' => __('quotations.unit_price'),
+        'item_description' => __('quotations.item_description'),
+        'search_placeholder' => __('quotations.search_product_placeholder')
+    ]); ?>;
+
+    // --- Helper Functions ---
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat(document.documentElement.lang || 'en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    }
+
+    // --- Main Calculation Function ---
+    function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.quotation-item-row').forEach(row => {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const unitPrice = parseFloat(row.querySelector('.item-unit-price').value) || 0;
+            subtotal += quantity * unitPrice;
+        });
+
+        const discountType = document.getElementById('discount_type').value;
+        const discountValue = parseFloat(document.getElementById('discount_value').value) || 0;
+        let discountAmount = 0;
+        if (discountValue > 0) {
+            if (discountType === 'percentage') {
+                discountAmount = (subtotal * discountValue) / 100;
+            } else if (discountType === 'fixed') {
+                discountAmount = discountValue;
+            }
+        }
+
+        const subtotalAfterDiscount = subtotal - discountAmount;
+        const taxPercentage = parseFloat(document.getElementById('tax_percentage').value) || 0;
+        const taxAmount = (subtotalAfterDiscount * taxPercentage) / 100;
+        const totalAmount = subtotalAfterDiscount + taxAmount;
+
+        document.getElementById('display-subtotal').textContent = formatCurrency(subtotal);
+        document.getElementById('display-discount').textContent = formatCurrency(discountAmount);
+        document.getElementById('display-tax').textContent = formatCurrency(taxAmount);
+        document.getElementById('display-total').textContent = formatCurrency(totalAmount);
+    }
+
+    // --- Product Search Functions ---
+    async function searchProducts(term, resultsContainer) {
+        if (term.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+        try {
+            const response = await fetch(`/api/products/search?q=${encodeURIComponent(term)}`, {
+                headers: { 
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + (localStorage.getItem('api_token') || '')
+                }
+            });
+            if (!response.ok) throw new Error('Network response was not ok');
+            const products = await response.json();
+            
+            let resultsHtml = '<ul class="list-group position-absolute w-100" style="z-index: 1000;">';
+            if (products.length > 0) {
+                products.forEach(product => {
+                    resultsHtml += `<li class="list-group-item list-group-item-action search-result-item" 
+                                        data-product-id="${product.product_id}" 
+                                        data-name="${product.name}" 
+                                        data-price="${product.price}" 
+                                        data-description="${product.description || ''}">
+                                        <strong>${product.name}</strong> (${product.sku})
+                                    </li>`;
+                });
+            } else {
+                resultsHtml += '<li class="list-group-item">No products found</li>';
+            }
+            resultsHtml += '</ul>';
+            resultsContainer.innerHTML = resultsHtml;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            resultsContainer.innerHTML = '<div class="list-group-item text-danger">Error loading results</div>';
+        }
+    }
+
+    const debouncedSearch = debounce(searchProducts, 300);
+
+    // --- Row Management Functions ---
+    function createItemRow(index) {
         const newRow = document.createElement('div');
         newRow.classList.add('row', 'align-items-center', 'mb-2', 'quotation-item-row', 'border', 'p-2', 'rounded');
         newRow.innerHTML = `
-            <input type="hidden" name="items[${index}][quotation_item_id]" value="${item.quotation_item_id || ''}">
-            <div class="col-md-3 mb-2"><label class="form-label">${__('quotations.product_service')}</label><select name="items[${index}][product_id]" class="form-select product-select"><option value="">${__('quotations.select_product')}</option>@foreach($products as $product)<option value="{{ $product->product_id }}" data-price="{{ $product->price }}" data-description="{{ $product->description }}">{{ $product->name }}</option>@endforeach</select></div>
-            <div class="col-md-3 mb-2"><label class="form-label">${__('quotations.item_name')} <span class="text-danger">*</span></label><input type="text" name="items[${index}][item_name]" class="form-control item-name" value="${item.item_name || ''}" required></div>
-            <div class="col-md-3 mb-2"><label class="form-label">${__('quotations.quantity')} <span class="text-danger">*</span></label><input type="number" name="items[${index}][quantity]" class="form-control item-quantity" value="${item.quantity || 1}" min="1" required></div>
-            <div class="col-md-2 mb-2"><label class="form-label">${__('quotations.unit_price')} <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${index}][unit_price]" class="form-control item-unit-price" value="${parseFloat(item.unit_price || 0).toFixed(2)}" min="0" required></div>
+            <input type="hidden" name="items[${index}][quotation_item_id]" value="">
+            <div class="col-md-3 mb-2 product-search-container position-relative">
+                <label class="form-label">${translations.product_service}</label>
+                <input type="text" class="form-control product-search" placeholder="${translations.search_placeholder}" autocomplete="off">
+                <input type="hidden" name="items[${index}][product_id]" class="product-id">
+                <div class="search-results-container"></div>
+            </div>
+            <div class="col-md-3 mb-2"><label class="form-label">${translations.item_name} <span class="text-danger">*</span></label><input type="text" name="items[${index}][item_name]" class="form-control item-name" required></div>
+            <div class="col-md-3 mb-2"><label class="form-label">${translations.quantity} <span class="text-danger">*</span></label><input type="number" name="items[${index}][quantity]" class="form-control item-quantity" value="1" min="1" required></div>
+            <div class="col-md-2 mb-2"><label class="form-label">${translations.unit_price} <span class="text-danger">*</span></label><input type="number" step="0.01" name="items[${index}][unit_price]" class="form-control item-unit-price" value="0.00" min="0" required></div>
             <div class="col-md-1 mb-2 d-flex align-items-end"><button type="button" class="btn btn-danger remove-item-btn">&times;</button></div>
-            <div class="col-md-12 mb-2"><label class="form-label">${__('quotations.item_description')}</label><textarea name="items[${index}][item_description]" class="form-control item-description" rows="1">${item.item_description || ''}</textarea></div>
+            <div class="col-md-12 mb-2"><label class="form-label">${translations.item_description}</label><textarea name="items[${index}][item_description]" class="form-control item-description" rows="1"></textarea></div>
         `;
-        itemsContainer.appendChild(newRow);
-    }
-
-    // --- Function to pre-populate form from a selected opportunity ---
-    function prefillFromOpportunity(option) {
-        if (!option || !option.value) return;
-
-        const name = option.dataset.name;
-        const amount = parseFloat(option.dataset.amount) || 0;
-
-        subjectInput.value = name;
-        itemsContainer.innerHTML = ''; // Clear existing items
-
-        // Add a new line item based on the opportunity's details
-        addItemRow({
-            item_name: name,
-            quantity: 1,
-            unit_price: amount,
-            item_description: `Based on opportunity: ${name}`
-        });
+        return newRow;
     }
 
     // --- Event Listeners ---
-    addItemBtn.addEventListener('click', () => addItemRow());
-
-    itemsContainer.addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-item-btn')) {
-            e.target.closest('.quotation-item-row').remove();
+    itemsContainer.addEventListener('input', function(e) {
+        const target = e.target;
+        if (target.classList.contains('product-search')) {
+            const resultsContainer = target.closest('.product-search-container').querySelector('.search-results-container');
+            debouncedSearch(target.value, resultsContainer);
+        }
+        if (target.classList.contains('item-quantity') || target.classList.contains('item-unit-price')) {
+            updateTotals();
         }
     });
 
-    itemsContainer.addEventListener('change', function(e) {
-        if (event.target.classList.contains('product-select')) {
-            const selectedOption = event.target.options[event.target.selectedIndex];
-            const row = event.target.closest('.quotation-item-row');
-            if (selectedOption.value) {
-                row.querySelector('.item-name').value = selectedOption.text.trim();
-                row.querySelector('.item-unit-price').value = selectedOption.dataset.price || '';
-                row.querySelector('.item-description').value = selectedOption.dataset.description || '';
-            }
+    itemsContainer.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.classList.contains('search-result-item')) {
+            const product = target.dataset;
+            const row = target.closest('.quotation-item-row');
+
+            row.querySelector('.product-search').value = product.name;
+            row.querySelector('.product-id').value = product.productId;
+            row.querySelector('.item-name').value = product.name;
+            row.querySelector('.item-unit-price').value = parseFloat(product.price).toFixed(2);
+            row.querySelector('.item-description').value = product.description;
+
+            target.closest('.search-results-container').innerHTML = '';
+            updateTotals();
         }
+        if (target.classList.contains('remove-item-btn')) {
+            target.closest('.quotation-item-row').remove();
+            updateTotals();
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.product-search-container')) {
+            document.querySelectorAll('.search-results-container').forEach(container => {
+                container.innerHTML = '';
+            });
+        }
+    });
+
+    addItemBtn.addEventListener('click', () => {
+        const newRow = createItemRow(itemRowIndex++);
+        itemsContainer.appendChild(newRow);
     });
 
     opportunitySelect.addEventListener('change', function (e) {
-        prefillFromOpportunity(e.target.options[e.target.selectedIndex]);
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        if (!selectedOption || !selectedOption.value) {
+            subjectInput.value = '';
+            return;
+        }
+        subjectInput.value = selectedOption.dataset.name;
     });
 
-    // --- Initial Page Load Logic ---
-    const isCreating = {{ !isset($quotation->quotation_id) ? 'true' : 'false' }};
-    const hasOldItems = {{ count(old('items', [])) > 0 ? 'true' : 'false' }};
-
-    // Only pre-fill if creating a new quote from an opportunity and there are no validation errors.
-    if (isCreating && !hasOldItems) {
-        const selectedOption = opportunitySelect.options[opportunitySelect.selectedIndex];
-        if (selectedOption && selectedOption.value) {
-            prefillFromOpportunity(selectedOption);
-        }
-    }
+    document.getElementById('discount_type').addEventListener('change', updateTotals);
+    document.getElementById('discount_value').addEventListener('input', updateTotals);
+    document.getElementById('tax_percentage').addEventListener('input', updateTotals);
+    
+    updateTotals(); // Initial calculation
 });
 </script>
 @endpush

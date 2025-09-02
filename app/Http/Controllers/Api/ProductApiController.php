@@ -244,4 +244,27 @@ class ProductApiController extends Controller
             'data' => $this->getStock($product)->getData()->data
         ]);
     }
+
+    /**
+     * Search for products for autocomplete fields.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $term = $request->query('q', '');
+
+        if (strlen($term) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('is_active', true)
+            ->where(function ($query) use ($term) {
+                $query->where('name', 'like', "%{$term}%")
+                      ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->select('product_id', 'name', 'description', 'price', 'sku')
+            ->limit(10)
+            ->get();
+
+        return response()->json($products);
+    }
 } 

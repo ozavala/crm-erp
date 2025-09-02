@@ -11,7 +11,6 @@
             'quotation' => new \App\Models\Quotation(),
             'statuses' => $statuses,
             'opportunities' => $opportunities,
-            'products' => $products,
             'selectedOpportunity' => $selectedOpportunity ?? null
         ])
     </form>

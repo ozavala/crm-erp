@@ -51,7 +51,6 @@ class QuotationController extends Controller
     {
         $statuses = Quotation::$statuses;
         $opportunities = Opportunity::orderBy('name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
         
         $selectedOpportunity = null;
         if ($request->filled('opportunity_id')) {
@@ -59,7 +58,7 @@ class QuotationController extends Controller
             $selectedOpportunity = Opportunity::with('customer')->find($request->input('opportunity_id'));
         }
 
-        return view('quotations.create', compact('statuses', 'opportunities', 'products', 'selectedOpportunity'));
+        return view('quotations.create', compact('statuses', 'opportunities', 'selectedOpportunity'));
     }
 
     /**
@@ -131,9 +130,8 @@ class QuotationController extends Controller
     {
         $statuses = Quotation::$statuses;
         $opportunities = Opportunity::orderBy('name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
-        $quotation->load('items');
-        return view('quotations.edit', compact('quotation', 'statuses', 'opportunities', 'products'));
+        $quotation->load('items.product'); // Eager load product name for the form
+        return view('quotations.edit', compact('quotation', 'statuses', 'opportunities'));
     }
 
     /**
