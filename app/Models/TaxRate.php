@@ -15,6 +15,7 @@ class TaxRate extends Model
     protected $primaryKey = 'tax_rate_id';
 
     protected $fillable = [
+        'owner_company_id',
         'name',
         'rate',
         'country_code',
@@ -67,6 +68,14 @@ class TaxRate extends Model
             ->where('is_active', true)
             ->orderBy('rate', 'desc')
             ->get();
+    }
+
+    /**
+     * Get the owner company that the tax rate belongs to.
+     */
+    public function ownerCompany(): BelongsTo
+    {
+        return $this->belongsTo(OwnerCompany::class, 'owner_company_id');
     }
 
     /**

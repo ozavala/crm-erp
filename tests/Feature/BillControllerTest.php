@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Bill;
 use App\Models\BillItem;
 use App\Models\CrmUser;
+use App\Models\OwnerCompany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -13,12 +14,17 @@ use App\Models\PurchaseOrder;
 class BillControllerTest extends TestCase
 {
     protected CrmUser $user;
+    protected OwnerCompany $ownerCompany;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = CrmUser::factory()->create();
+        $this->ownerCompany = OwnerCompany::factory()->create();
+        $this->user = CrmUser::factory()->create([
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
         $this->actingAs($this->user);
+        session(['owner_company_id' => $this->ownerCompany->id]);
     }
 
      #[Test]
@@ -26,7 +32,7 @@ class BillControllerTest extends TestCase
     {
         // 1. Arrange
         // Create a Purchase Order with two items
-        $purchaseOrder = PurchaseOrder::factory()->hasItems(2)->create();
+        $purchaseOrder = PurchaseOrder::factory()->hasItems(2)->create(['owner_company_id' => $this->ownerCompany->id]);
         $poItem1 = $purchaseOrder->items[0];
         $poItem2 = $purchaseOrder->items[1];
 
@@ -84,9 +90,9 @@ class BillControllerTest extends TestCase
     {
         // 1. Arrange
         // Create an initial bill with two items
-        $bill = Bill::factory()->create();
-        $itemToUpdate = BillItem::factory()->create(['bill_id' => $bill->bill_id, 'quantity' => 2, 'unit_price' => 10.00]); // Total: 20.00
-        $itemToDelete = BillItem::factory()->create(['bill_id' => $bill->bill_id, 'quantity' => 1, 'unit_price' => 50.00]); // Total: 50.00
+        $bill = Bill::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
+        $itemToUpdate = BillItem::factory()->create(['bill_id' => $bill->bill_id, 'quantity' => 2, 'unit_price' => 10.00]);
+        $itemToDelete = BillItem::factory()->create(['bill_id' => $bill->bill_id, 'quantity' => 1, 'unit_price' => 50.00]);
 
         // Prepare the data for the update request
         $updatedData = [

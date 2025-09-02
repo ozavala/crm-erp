@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoiceReminder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Session;
 
 class InvoiceController extends Controller
 {
@@ -25,7 +26,12 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Invoice::with(['order', 'customer'])->latest();
+        $empresaActivaId = Session::get('owner_company_id');
+        $activeCompany = \App\Models\OwnerCompany::find($empresaActivaId);
+
+        $query = Invoice::with(['order', 'customer'])
+            ->where('owner_company_id', $empresaActivaId)
+            ->latest();
 
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -44,7 +50,7 @@ class InvoiceController extends Controller
 
         $invoices = $query->paginate(10)->withQueryString();
         $statuses = Invoice::$statuses;
-        return view('invoices.index', compact('invoices', 'statuses'));
+        return view('invoices.index', compact('invoices', 'statuses', 'activeCompany'));
     }
 
     /**
@@ -52,18 +58,23 @@ class InvoiceController extends Controller
      */
     public function create(Request $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $statuses = Invoice::$statuses;
         // Fetch orders that are not yet fully invoiced or are in a state that allows invoicing
         // This logic might need to be more sophisticated based on your workflow
-        $orders = Order::whereNotIn('status', ['Cancelled', 'Completed']) // Example filter
+        $orders = Order::where('owner_company_id', $empresaActivaId)
+                       ->whereNotIn('status', ['Cancelled', 'Completed']) // Example filter
                        ->orderBy('order_number')
                        ->get();
-        $quotations = Quotation::where('status', 'Accepted') // Only from accepted quotations
+        $quotations = Quotation::where('owner_company_id', $empresaActivaId)
+                               ->where('status', 'Accepted') // Only from accepted quotations
                                ->whereDoesntHave('invoice') // That don't have an invoice yet
                                ->orderBy('subject')
                                ->get();
-        $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
+        $customers = Customer::where('owner_company_id', $empresaActivaId)
+                             ->orderBy('first_name')->orderBy('last_name')->get();
+        $products = Product::where('owner_company_id', $empresaActivaId)
+                           ->where('is_active', true)->orderBy('name')->get();
 
         $invoice = new Invoice();
         $orderItems = [];
@@ -130,6 +141,7 @@ class InvoiceController extends Controller
 
         $order = $order ?? null;
         $invoice->invoice_number = 'INV-' . strtoupper(Str::random(8)); // Suggest an invoice number
+        $invoice->owner_company_id = $empresaActivaId;
 
         return view('invoices.create', compact('invoice', 'statuses', 'orders', 'quotations', 'customers', 'products', 'orderItems', 'order', 'customer'));
     }
@@ -139,6 +151,7 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
+        $empresaActivaId = Session::get('owner_company_id');
         $validatedData = $request->validated();
 
         // Obtener parámetros de settings
@@ -147,10 +160,11 @@ class InvoiceController extends Controller
         $defaultTerms = Setting::where('key', 'default_payment_terms')->value('value') ?? 'Contado';
         $defaultDueDays = Setting::where('key', 'default_due_days')->value('value') ?? 30;
 
-        return DB::transaction(function () use ($validatedData, $invoicePrefix, $invoiceStart, $defaultTerms, $defaultDueDays) {
+        return DB::transaction(function () use ($validatedData, $invoicePrefix, $invoiceStart, $defaultTerms, $defaultDueDays, $empresaActivaId) {
             $invoiceData = collect($validatedData)->except(['items'])->all();
             $invoiceData['created_by_user_id'] = Auth::id();
             $invoiceData['amount_paid'] = 0; // Initially no amount paid
+            $invoiceData['owner_company_id'] = $empresaActivaId;
 
             // Generar número de factura correlativo
             $lastInvoice = Invoice::orderByDesc('id')->first();
@@ -197,6 +211,10 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $invoice->load(['order', 'customer', 'createdBy', 'items', 'items.product', 'payments']);
         return view('invoices.show', compact('invoice'));
     }
@@ -206,11 +224,16 @@ class InvoiceController extends Controller
      */
     public function edit(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $statuses = Invoice::$statuses;
-        $orders = Order::orderBy('order_number')->get();
-        $quotations = Quotation::orderBy('subject')->get();
-        $customers = Customer::orderBy('first_name')->orderBy('last_name')->get();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
+        $orders = Order::where('owner_company_id', $empresaActivaId)->orderBy('order_number')->get();
+        $quotations = Quotation::where('owner_company_id', $empresaActivaId)->orderBy('subject')->get();
+        $customers = Customer::where('owner_company_id', $empresaActivaId)->orderBy('first_name')->orderBy('last_name')->get();
+        $products = Product::where('owner_company_id', $empresaActivaId)->where('is_active', true)->orderBy('name')->get();
         
         $invoice->load('items');
         $orderItems = $invoice->items->toArray(); // For the form structure
@@ -223,6 +246,10 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $validatedData = $request->validated();
 
         return DB::transaction(function () use ($validatedData, $invoice) {
@@ -278,6 +305,10 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         if ($invoice->payments()->exists()) {
             return redirect()->route('invoices.index')
                              ->with('error', 'Cannot delete invoice with existing payments. Please delete payments first.');
@@ -328,6 +359,10 @@ class InvoiceController extends Controller
      */
     public function printPdf(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         $invoice->load(['customer.addresses', 'items.product']);
 
         $logoPath = config('settings.company_logo');
@@ -368,6 +403,10 @@ class InvoiceController extends Controller
      */
     public function sendReminder(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         if ($invoice->status !== 'Overdue' && $invoice->amount_due <= 0) {
             return redirect()->back()->with('error', 'A reminder can only be sent for overdue invoices with an amount due.');
         }
@@ -387,6 +426,10 @@ class InvoiceController extends Controller
      */
     public function send(Invoice $invoice)
     {
+        $empresaActivaId = Session::get('owner_company_id');
+        if ($invoice->owner_company_id != $empresaActivaId) {
+            abort(403, 'Unauthorized action.');
+        }
         // Update invoice status to sent
         $invoice->update(['status' => 'Sent']);
         

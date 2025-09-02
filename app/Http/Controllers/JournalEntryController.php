@@ -13,8 +13,9 @@ class JournalEntryController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $query = JournalEntry::with(['lines', 'referenceable', 'createdBy'])->latest('entry_date')->latest('journal_entry_id');
+    /**{
+        $query = JournalEntry::where('owner_company_id', auth()->user()->owner_company_id)
+            ->with(['lines', 'referenceable', 'createdBy'])->latest('entry_date')->latest('journal_entry_id');
 
         if ($request->filled('search_description')) {
             $query->where('description', 'like', '%' . $request->input('search_description') . '%');
@@ -28,8 +29,20 @@ class JournalEntryController extends Controller
         $transactionTypes = JournalEntry::select('transaction_type')->distinct()->pluck('transaction_type');
 
         return view('journal_entries.index', compact('journalEntries', 'transactionTypes'));
+    }*/
+    
+// Change made by GithubCopilot In JournalEntryController.php
+    
+    {
+        if (auth()->user()->is_super_admin) {
+    $journalEntries = JournalEntry::orderByDesc('entry_date')->paginate(15);
+} else {
+    $journalEntries = JournalEntry::where('owner_company_id', auth()->user()->owner_company_id)
+        ->orderByDesc('entry_date')
+        ->paginate(15);
+}
+return view('journal_entries.index', compact('journalEntries'));
     }
-
     /**
      * Display the specified resource.
      */
@@ -64,7 +77,14 @@ class JournalEntryController extends Controller
             'lines.*.account_code' => 'required|string|max:255',
             'lines.*.debit_amount' => 'nullable|numeric|min:0|required_without:lines.*.credit_amount',
             'lines.*.credit_amount' => 'nullable|numeric|min:0|required_without:lines.*.debit_amount',
-            // Add validation for entity_id and entity_type if you implement them in the form
+            'lines.*.account_code' => ['required', 'string', 'max:255',
+                function ($attribute, $value, $fail) {
+                    $account = \App\Models\Account::where('code', $value)->first();
+                    if (!$account || $account->owner_company_id !== auth()->user()->owner_company_id) {
+                        $fail('The selected account code is invalid or does not belong to your company.');
+                    }
+                },
+            ],
         ]);
 
         // Basic check for balanced entry (sum of debits == sum of credits)

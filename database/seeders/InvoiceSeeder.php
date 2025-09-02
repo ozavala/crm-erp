@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\CrmUser;
+use App\Models\OwnerCompany;
 use Illuminate\Support\Str;
 
 class InvoiceSeeder extends Seeder
@@ -44,6 +45,15 @@ class InvoiceSeeder extends Seeder
                 continue;
             }
 
+            // Get owner company from order, customer, or user
+            $ownerCompanyId = $order->owner_company_id ?? $order->customer->owner_company_id ?? null;
+            
+            // If no owner company found, get the first one or create one
+            if (!$ownerCompanyId) {
+                $ownerCompany = OwnerCompany::first() ?? OwnerCompany::factory()->create();
+                $ownerCompanyId = $ownerCompany->id;
+            }
+            
             $invoiceData = [
                 'order_id' => $order->order_id,
                 'customer_id' => $order->customer_id,
@@ -62,6 +72,7 @@ class InvoiceSeeder extends Seeder
                 'terms_and_conditions' => 'Standard payment terms apply. Please pay within 30 days.',
                 'notes' => 'Invoice for Order: ' . $order->order_number,
                 'created_by_user_id' => $order->created_by_user_id ?? CrmUser::first()->user_id, // Fallback
+                'owner_company_id' => $ownerCompanyId,
             ];
 
             $invoice = Invoice::create($invoiceData);

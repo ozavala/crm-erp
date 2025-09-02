@@ -100,23 +100,23 @@
                 <tbody>
                     <tr>
                         <td><strong>Income (Sales)</strong></td>
-                        <td class="text-end text-success fw-bold">${{ number_format($ingresos, 2) }}</td>
+                        <td class="text-end text-success fw-bold">${{ number_format($ingresos, 2, '.') }}</td>
                     </tr>
                     <tr>
                         <td><strong>Costs (Inventory/Costs)</strong></td>
-                        <td class="text-end text-danger">-${{ number_format($costos, 2) }}</td>
+                        <td class="text-end text-danger">-${{ number_format($costos, 2, '.') }}</td>
                     </tr>
                     <tr>
                         <td><strong>Gross Profit</strong></td>
-                        <td class="text-end fw-bold">${{ number_format($utilidadBruta, 2) }}</td>
+                        <td class="text-end fw-bold">${{ number_format($utilidadBruta, 2, '.') }}</td>
                     </tr>
                     <tr>
                         <td><strong>Expenses</strong></td>
-                        <td class="text-end text-danger">-${{ number_format($gastos, 2) }}</td>
+                        <td class="text-end text-danger">-${{ number_format($gastos, 2, '.') }}</td>
                     </tr>
                     <tr class="table-info">
                         <td><strong>Net Profit</strong></td>
-                        <td class="text-end fw-bold">${{ number_format($utilidadNeta, 2) }}</td>
+                        <td class="text-end fw-bold">${{ number_format($utilidadNeta, 2, '.') }}</td>
                     </tr>
                 </tbody>
             </table>

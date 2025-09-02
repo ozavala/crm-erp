@@ -27,7 +27,7 @@ class SupplierFactory extends Factory
             'email' => $this->faker->unique()->safeEmail,
             'phone_number' => $this->faker->phoneNumber,
             'notes' => $this->faker->optional()->sentence(),
-            'legal_id' => $this->faker->unique()->bothify('SUP-####'),
+            'legal_id' => $this->faker->unique()->bothify('SUP-########'),
         ];
     }
 }

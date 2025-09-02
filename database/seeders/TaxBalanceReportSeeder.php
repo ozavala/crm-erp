@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\TaxRate;
 use App\Models\Order;
 use App\Models\PurchaseOrder;
+use App\Models\OwnerCompany;
 use Carbon\Carbon;
 
 class TaxBalanceReportSeeder extends Seeder
@@ -20,6 +21,12 @@ class TaxBalanceReportSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get owner companies or create a default one if none exist
+        $ownerCompanies = OwnerCompany::all();
+        if ($ownerCompanies->isEmpty()) {
+            $ownerCompanies = collect([OwnerCompany::factory()->create()]);
+        }
+        
         // Crear tasas de impuesto si no existen
         $taxRates = [
             ['name' => 'IVA 12%', 'rate' => 12.00, 'country_code' => 'EC', 'is_default' => true],
@@ -56,6 +63,7 @@ class TaxBalanceReportSeeder extends Seeder
     private function generateInvoices($customers, $products)
     {
         $taxRates = TaxRate::all();
+        $ownerCompanyId = OwnerCompany::first()->id;
         
         for ($i = 0; $i < 20; $i++) {
             $customer = $customers->random();
@@ -78,6 +86,7 @@ class TaxBalanceReportSeeder extends Seeder
                 'amount_paid' => 0,
                 'created_by_user_id' => 1,
                 'tax_rate_id' => $taxRate->tax_rate_id,
+                'owner_company_id' => $ownerCompanyId,
             ]);
 
             // Crear items de factura
@@ -96,6 +105,8 @@ class TaxBalanceReportSeeder extends Seeder
 
     private function generateBills($suppliers, $products)
     {
+        $ownerCompanyId = OwnerCompany::first()->id;
+        
         for ($i = 0; $i < 15; $i++) {
             $supplier = $suppliers->random();
             $taxPercentage = rand(0, 14); // 0%, 12%, o 14%
@@ -118,6 +129,7 @@ class TaxBalanceReportSeeder extends Seeder
                 'total_amount' => $totalAmount,
                 'amount_paid' => 0,
                 'created_by_user_id' => 1,
+                'owner_company_id' => $ownerCompanyId,
             ]);
 
             // Crear items de orden de compra
@@ -145,6 +157,7 @@ class TaxBalanceReportSeeder extends Seeder
                 'amount_paid' => 0,
                 'status' => 'Awaiting Payment',
                 'created_by_user_id' => 1,
+                'owner_company_id' => $ownerCompanyId,
             ]);
 
             // Crear items de factura de proveedor

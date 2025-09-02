@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Schema;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        \App\Models\CalendarEvent::class => \App\Policies\CalendarEventPolicy::class,
+    ];
+
     /**
      * Register services.
      */

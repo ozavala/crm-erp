@@ -18,7 +18,14 @@
     @isset($summary)
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">Annual Summary: {{ request('year', now()->year) }}</h5>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="card-title mb-0">Annual Summary: {{ request('year', now()->year) }}</h5>
+                <div>
+                    <a href="{{ route('iva.report.annual.excel') }}?year={{ request('year', now()->year) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </a>
+                </div>
+            </div>
             <table class="table table-bordered">
                 <thead>
                     <tr>

@@ -10,19 +10,25 @@ use App\Models\Order;
 use App\Models\CrmUser;
 use App\Models\Permission;
 use App\Models\UserRole;
+use App\Models\OwnerCompany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 
 class InvoiceControllerTest extends TestCase
 {
     protected CrmUser $user;
+    protected OwnerCompany $ownerCompany;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(\Database\Seeders\SettingsTableSeeder::class);
-        $this->user = CrmUser::factory()->create();
+        $this->ownerCompany = OwnerCompany::factory()->create();
+        $this->user = CrmUser::factory()->create([
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
         $this->actingAs($this->user);
+        session(['owner_company_id' => $this->ownerCompany->id]);
         // Asignar permisos necesarios para gestión de facturas
         // Esto es requerido por la lógica de autorización en el controlador de facturas
         $this->givePermission($this->user, [
@@ -36,7 +42,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_display_invoices_index()
     {
-        Invoice::factory()->count(3)->create();
+        Invoice::factory()->count(3)->create(['owner_company_id' => $this->ownerCompany->id]);
 
         $response = $this->get(route('invoices.index'));
 
@@ -48,8 +54,14 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_search_invoices()
     {
-        Invoice::factory()->create(['invoice_number' => 'INV-001']);
-        Invoice::factory()->create(['invoice_number' => 'INV-002']);
+        Invoice::factory()->create([
+            'invoice_number' => 'INV-001',
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
+        Invoice::factory()->create([
+            'invoice_number' => 'INV-002',
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
 
         $response = $this->get(route('invoices.index', ['search' => 'INV-001']));
 
@@ -73,12 +85,13 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_store_a_new_invoice()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
-            'status' => 'Completed'
+            'status' => 'Completed',
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $invoiceData = [
             'order_id' => $order->order_id,
@@ -122,7 +135,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_display_invoice_details()
     {
-        $invoice = Invoice::factory()->create();
+        $invoice = Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
 
         $response = $this->get(route('invoices.show', $invoice));
 
@@ -135,7 +148,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_display_edit_invoice_form()
     {
-        $invoice = Invoice::factory()->create();
+        $invoice = Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
 
         $response = $this->get(route('invoices.edit', $invoice));
 
@@ -149,13 +162,14 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_update_invoice()
     {
-        $invoice = Invoice::factory()->create();
-        $customer = Customer::factory()->create();
+        $invoice = Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
-            'status' => 'Completed'
+            'status' => 'Completed',
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $updateData = [
             'order_id' => $order->order_id,
@@ -197,7 +211,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_delete_invoice()
     {
-        $invoice = Invoice::factory()->create();
+        $invoice = Invoice::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
 
         $response = $this->delete(route('invoices.destroy', $invoice));
 
@@ -219,7 +233,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_validates_invoice_date_format()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $invoiceData = [
             'customer_id' => $customer->customer_id,
@@ -235,7 +249,7 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_validates_invoice_items_are_required()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $invoiceData = [
             'customer_id' => $customer->customer_id,
@@ -252,13 +266,14 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_handle_multiple_invoice_items()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
-            'status' => 'Completed'
+            'status' => 'Completed',
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
-        $product1 = Product::factory()->create();
-        $product2 = Product::factory()->create();
+        $product1 = Product::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
+        $product2 = Product::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $invoiceData = [
             'order_id' => $order->order_id,
@@ -302,12 +317,13 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_calculate_invoice_totals_with_tax()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
-            'status' => 'Completed'
+            'status' => 'Completed',
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         
         $invoiceData = [
             'order_id' => $order->order_id,
@@ -348,10 +364,11 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_create_invoice_from_order()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['owner_company_id' => $this->ownerCompany->id]);
         $order = Order::factory()->create([
             'customer_id' => $customer->customer_id,
-            'status' => 'Completed'
+            'status' => 'Completed',
+            'owner_company_id' => $this->ownerCompany->id,
         ]);
         
         $response = $this->get(route('invoices.create', ['order_id' => $order->order_id]));
@@ -365,7 +382,10 @@ class InvoiceControllerTest extends TestCase
     #[Test]
     public function it_can_send_invoice_email()
     {
-        $invoice = Invoice::factory()->create(['status' => 'Draft']);
+        $invoice = Invoice::factory()->create([
+            'status' => 'Draft',
+            'owner_company_id' => $this->ownerCompany->id,
+        ]);
 
         $response = $this->post(route('invoices.send', $invoice));
 

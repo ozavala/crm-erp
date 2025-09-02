@@ -15,6 +15,7 @@ class Task extends Model
     protected $primaryKey = 'task_id';
 
     protected $fillable = [
+        'owner_company_id',
         'title',
         'description',
         'due_date',
@@ -46,5 +47,21 @@ class Task extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(CrmUser::class, 'created_by_user_id');
+    }
+
+    /**
+     * Get the owner company that the task belongs to.
+     */
+    public function ownerCompany(): BelongsTo
+    {
+        return $this->belongsTo(OwnerCompany::class, 'owner_company_id');
+    }
+
+    /**
+     * Get the calendar event associated with the task.
+     */
+    public function calendarEvent()
+    {
+        return $this->morphOne(CalendarEvent::class, 'related');
     }
 }

@@ -10,6 +10,7 @@ class Account extends Model
     use HasFactory;
 
     protected $fillable = [
+        'owner_company_id',
         'code',
         'name',
         'type',
@@ -25,5 +26,10 @@ class Account extends Model
     public function children()
     {
         return $this->hasMany(Account::class, 'parent_id');
+    }
+
+    public function ownerCompany()
+    {
+        return $this->belongsTo(OwnerCompany::class, 'owner_company_id');
     }
 } 
